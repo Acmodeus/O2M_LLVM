@@ -1,0 +1,67 @@
+Генерация кода массивов:
+
+	MODULE testModule;
+
+	TYPE TArr = ARRAY 10, 20 OF INTEGER;
+	VAR	arr : TArr;
+
+	PROCEDURE proc(x, y : INTEGER; VAR array : ARRAY OF ARRAY OF INTEGER);
+	BEGIN
+		array[x, y] := 10;
+	END proc;
+
+	END testModule.
+
+после генерации кода:
+
+	/* VAR arr : ARRAY */
+	const int O2M_ARR_0_TArr = 10;
+	const int O2M_ARR_1_TArr = 20;
+	int *arr[O2M_ARR_0_TArr];
+
+	/* initialisation of arrays */
+	class O2M_ARR_INIT_testModule {
+		O2M_ARR_INIT_testModule() {
+			int i;
+			for (i = 0; i < O2M_ARR_0_TArr; i++)
+				arr[i] = new int[O2M_ARR_1_TArr];
+		}
+		~O2M_ARR_INIT_testModule() {
+			int i;
+			for (i = 0; i < O2M_ARR_0_TArr; i++)
+				delete[] arr[i];
+		}
+	};
+
+	void proc(int x, int y, const int O2M_ARR_0_arr, const int O2M_ARR_1_arr, int **arr)
+	{
+		arr[x][y] = 10;
+	}
+
+	void main ()
+	{
+		proc(O2M_ARR_0_TArr, O2M_ARR_1_TArr, arr);
+	}
+
+Для инициализации массивов используется специальный класс, который содержит
+код инициализации и освобождения памяти для массивов.
+Другой вариант генерации кода:
+
+	/* VAR arr : ARRAY */
+	const int O2M_ARR_0_TArr = 10;
+	const int O2M_ARR_1_TArr = 20;
+	int arr[O2M_ARR_0_TArr][O2M_ARR_1_TArr];
+
+	void proc(int x, int y, const int O2M_ARR_0_arr, const int O2M_ARR_1_arr, int *arr)
+	{
+		arr[x * O2M_ARR_1_arr + y] = 10;
+	}
+
+	void main ()
+	{
+		proc(O2M_ARR_0_TArr, O2M_ARR_1_TArr, (int *)arr);
+	}
+
+т.е. внутри процедуры открытый массив фактически является одномерным массивом
+элементов указанного типа, => необходимы специальные преобразования координат
+при обращении к эл-ту массива
