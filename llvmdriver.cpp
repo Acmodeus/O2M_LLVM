@@ -589,7 +589,7 @@ Value* LLVMDriver::WriteLLVM(CModule *m)
         //генерации инструкции 'ret 0'
         Value* retVal=Constant::getNullValue(Type::getInt32Ty(TheContext));
         Builder.CreateRet(retVal);
-        //Проверка сгенерированного кода на согласованность
+        //Проверка сгенерированного кода функции на согласованность
         verifyFunction(*F);
     }//if
 
@@ -746,12 +746,7 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
         std::string firstName=v->parent_element->name;
         std::string lastName=v->name;
         std::string name="_ZN"+std::to_string(firstName.size())+firstName+std::to_string(lastName.size())+lastName+"E";
-        GlobalVariable *gVar= new GlobalVariable(*TheModule.get(),
-        /*Type=*/type,
-        /*isConstant=*/v->is_const,
-        /*Linkage=*/GlobalValue::ExternalLinkage,
-        /*Initializer=*/InitVal,
-        /*Name=*/name);
+        GlobalVariable *gVar= new GlobalVariable(*TheModule.get(),type, v->is_const,GlobalValue::ExternalLinkage,InitVal,name);
         GlobalValues[v->name]=gVar;
         return gVar;
     }else{
@@ -789,176 +784,212 @@ Value *LLVMDriver::WriteLLVM_ConstValue(CBaseVar *v)
     }//switch
 }//WriteLLVM_ConstValue
 
+//-----------------------------------------------------------------------------
+//генерация кода LLVM процедуры
 Function *LLVMDriver::WriteLLVM(CProcedure *p)
 {
+    //Для обобщенных функций код здесь не генерируется
+    //генерация происходит в функции CreateCommonFun
     if(p->name_id==id_CCommonProc) return nullptr;
+    //Получаем указатель на функцию LLVM
     Function* F = GetFunction(p);
+    // Создание нового базового блока для начала записи
     BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
     Builder.SetInsertPoint(BB);
-
+    //очистка карты локальных переменных
     NamedValues.clear();
+    //добавление аргументов функции в карту локальных переменных
     for (auto &Arg : F->args()) {
-        // Create an alloca for this variable.
+        // Выделение памяти для текущего аргумента
         AllocaInst *Alloca = CreateEntryBlockAlloca(F,std::string(Arg.getName()),Arg.getType());
-
-        // Store the initial value into the alloca.
+        // Сохранение значения аргумента в памяти.
         Builder.CreateStore(&Arg, Alloca);
-
-        // Add arguments to variable symbol table.
+        //Сохранения указателя на память в карте локальных переменных
         NamedValues[std::string(Arg.getName())] = Alloca;
-      }
-
+    }//for
     //генерация кода деклараций типов
     WriteLLVM_type(p->DeclSeq);
     //генерация кода переменных
     WriteLLVM_var(p->DeclSeq);
-
     //генерация кода для операторов
     if (p->StatementSeq) {
         WriteLLVM(p->StatementSeq);
-    }
+    }//if
+    //генерация кода возврата нулевого значения
+    //нужно так как после блока RETURN может быть еще ветвь кода
+    //для LLVM обязательно нужен возврат в конце функции
     Builder.CreateRet(Constant::getNullValue(Builder.getCurrentFunctionReturnType()));
-  //  F->print(errs(),nullptr);
-  //  fprintf(stderr, "\n");
+    //Проверка сгенерированного кода функции на согласованность
     verifyFunction(*F);
+    //Возврат указателя на функцию
     return F;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//получение списка типов формальных параметров
 std::vector<Type *> LLVMDriver::WriteLLVM_pars(CFormalPars *fp)
 {
+    std::vector<Type*> values;
     //проверка наличия формальных параметров
-        std::vector<Type*> values;
-        if (fp->FPStore.empty()) return values;
-        //запись первого формального параметра
-        CBaseVarVector::const_iterator i = fp->FPStore.begin();
-        //запись следующих формальных параметров
-        for(i; i != fp->FPStore.end(); ++i) {
-            if((*i)->name_id == id_CArrayVar){
-                WriteLLVM_fp(static_cast<CArrayVar*>(*i),values);
-                continue;
-            }
-            if((*i)->is_var)
-                values.push_back(GetLLVMType((*i))->getPointerTo());
-            else values.push_back(GetLLVMType((*i)));
-        }
-        return values;
-}
+    if (fp->FPStore.empty()) return values;
+    //формирование списка типов формальных параметров
+    for(CBaseVarVector::const_iterator i = fp->FPStore.begin(); i != fp->FPStore.end(); ++i) {
+        //Запись массива в список типов формальных параметров
+        if((*i)->name_id == id_CArrayVar){
+            WriteLLVM_pars_array(static_cast<CArrayVar*>(*i),values);
+            continue;
+        }//if
+        //если параметр является переменной, записываем указатель на тип
+        //иначе сам тип
+        if((*i)->is_var)
+            values.push_back(GetLLVMType((*i))->getPointerTo());
+        else values.push_back(GetLLVMType((*i)));
+    }//for
+    return values;
+}//WriteLLVM_pars
 
-Value *LLVMDriver::WriteLLVM_fp(CArrayVar *v, std::vector<Type *> &values)
+//-----------------------------------------------------------------------------
+//Запись массива в список типов формальных параметров
+void LLVMDriver::WriteLLVM_pars_array(CArrayVar *v, std::vector<Type *> &values)
 {
+    //записываем указатель на базовый тип в список типов формальных параметров
     CArrayType* AT = static_cast<CArrayType*>(v->ArrayType->FindLastType());
     CBaseVar* BV;
     static_cast<CBaseType*>(AT)->CreateVar(BV, v->parent_element);
     values.push_back(GetLLVMType((BV)->GetResultId())->getPointerTo());
     delete BV;
+    //дополнительно записываем в список типов целый тип для каждого размера массива
     AT=v->ArrayType;
     while (AT->name_id == id_CArrayType) {
         values.push_back(Type::getInt32Ty(TheContext));
         AT = static_cast<CArrayType*>(AT->Type);
-    }
-}
+    }//while
+}//WriteLLVM_pars_array
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора IF
 Value *LLVMDriver::WriteLLVM(CIfStatement *s)
 {
     CIfStatement::ElsifPairList_type::iterator i = s->ElsifPairList.begin();
+    //Указатель на текущую функцию
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
+    //Еlse блок
     BasicBlock *ElseBB;
+    //блок после всех условий
     BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont");
-    for(i; i != s->ElsifPairList.end(); ++i) {
+    //Генерация кода условий
+    for(; i != s->ElsifPairList.end(); ++i) {
         ElseBB = WriteLLVM((*i),MergeBB);
         TheFunction->getBasicBlockList().push_back(ElseBB);
         Builder.SetInsertPoint(ElseBB);
-    }
+    }//for
+    //Генерация кода последнего условия ELSE
     if (s->ElseStatementSeq) {
         WriteLLVM(s->ElseStatementSeq);
-    }
+    }//if
+    //Переход в ветку после всех условий
     Builder.CreateBr(MergeBB);
     TheFunction->getBasicBlockList().push_back(MergeBB);
     Builder.SetInsertPoint(MergeBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода условий, возвращает указатель на следующей блок условия
 BasicBlock *LLVMDriver::WriteLLVM(CElsifPair *s, BasicBlock *bb)
 {
+    //генерация кода условия входа в блок
     Value* expr = WriteLLVM(s->Expr);
     while(expr->getType()->isPointerTy()){
         expr=Builder.CreateLoad(expr,expr->getName());
-    }
+    }//while
     if(expr->getType()!=Type::getInt1Ty(TheContext))
         expr=CastToType(expr,Type::getInt1Ty(TheContext));
+    //Указатель на текущую функцию
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-
-    // Create blocks for the then and else cases.  Insert the 'then' block at the
-    // end of the function.
+    // Создаем блоки для веток then и else.  Вставляем блок then в конец функции
     BasicBlock *ThenBB = BasicBlock::Create(TheContext, "then", TheFunction);
     BasicBlock *ElseBB = BasicBlock::Create(TheContext, "else");
+    //Создаем условия перехода в блоки
     Builder.CreateCondBr(expr, ThenBB, ElseBB);
-    //TheFunction->getBasicBlockList().push_back(ThenBB);
     Builder.SetInsertPoint(ThenBB);
+    //Генерация кода блока then
     WriteLLVM(s->StatementSeq);
     Builder.CreateBr(bb);
+    //Возврат указателя на блок ELSE, ELSEIF
     return ElseBB;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора WHILE
 Value *LLVMDriver::WriteLLVM(CWhileStatement *s)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
+    //Создаем блоки while, body, endwhile. Переходим к блоку while
     BasicBlock *WhileBB = BasicBlock::Create(TheContext, "while",TheFunction);
     BasicBlock *BodyBB = BasicBlock::Create(TheContext, "body");
     BasicBlock *EndBB = BasicBlock::Create(TheContext, "endwhile");
     Builder.CreateBr(WhileBB);
     Builder.SetInsertPoint(WhileBB);
+    //Генерация условия перехода к блоку body или endwhile
     Value* expr = WriteLLVM(s->Expr);
+    while(expr->getType()->isPointerTy()){
+        expr=Builder.CreateLoad(expr,expr->getName());
+    }//while
     if(expr->getType()!=Type::getInt1Ty(TheContext))
         expr = CastToType(expr,Type::getInt1Ty(TheContext));
-
     Builder.CreateCondBr(expr, BodyBB, EndBB);
     TheFunction->getBasicBlockList().push_back(BodyBB);
     Builder.SetInsertPoint(BodyBB);
-
+    //Генерация кода тела оператора WHILE
     WriteLLVM(s->StatementSeq);
-
     Builder.CreateBr(WhileBB);
+    //Переход к блоку endwhile
     TheFunction->getBasicBlockList().push_back(EndBB);
     Builder.SetInsertPoint(EndBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора Repeat
 Value *LLVMDriver::WriteLLVM(CRepeatStatement *s)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
+    //создаем блоки
     BasicBlock *RepeatBB = BasicBlock::Create(TheContext, "repeat",TheFunction);
     BasicBlock *EndBB = BasicBlock::Create(TheContext, "endrepeat");
     Builder.CreateBr(RepeatBB);
     Builder.SetInsertPoint(RepeatBB);
-
+    //генерация кода тела цикла
     WriteLLVM(s->StatementSeq);
+    //генерация кода условия повтора цикла
     Value* expr = WriteLLVM(s->Expr);
-    //????????????
     while(expr->getType()->isPointerTy()){
         expr=Builder.CreateLoad(expr,expr->getName());
-    }
-    //????????????
+    }//while
     if(expr->getType()!=Type::getInt1Ty(TheContext))
         expr = CastToType(expr,Type::getInt1Ty(TheContext));
-
     Builder.CreateCondBr(expr, EndBB, RepeatBB);
     TheFunction->getBasicBlockList().push_back(EndBB);
     Builder.SetInsertPoint(EndBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора FOR
 Value *LLVMDriver::WriteLLVM(CForStatement *s)
 {
+    //генерация выражений For и To
     Value* vToExpr=WriteLLVM(s->ToExpr);
     Value* vForExpr=WriteLLVM(s->ForExpr);
     Value* CondV;
-    //---------------вынести в отдельный метод
+    //получение итерационной переменной
     Value* store=NamedValues[s->var_name];
     if(!store) store=GlobalValues[s->var_name];
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
     }
+    //приведение типов выражений к типу переменной
     if(store->getType()->getTypeID()==Type::PointerTyID)   {
         if(store->getType()->getContainedType(0)!=vForExpr->getType())
             vForExpr=CastToType(vForExpr,store->getType()->getContainedType(0));
@@ -969,14 +1000,16 @@ Value *LLVMDriver::WriteLLVM(CForStatement *s)
             vToExpr=CastToType(vToExpr,store->getType()->getContainedType(0));
     }else if(store->getType()!=vToExpr->getType())
         vToExpr=CastToType(vToExpr,store->getType());
-    //---------------------------------------
+    //Сохраняем выражение For в переменной
     Builder.CreateStore(vForExpr, store);
+    //получаем указатель на функцию, создаем блоки
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock* ForBB = BasicBlock::Create(TheContext, "for", TheFunction);
     BasicBlock *ForBodyBB = BasicBlock::Create(TheContext, "forbody");
     BasicBlock *ExitForBB = BasicBlock::Create(TheContext, "exitfor");
     Builder.CreateBr(ForBB);
     Builder.SetInsertPoint(ForBB);
+    //генерация условия входа в тело цикла
     Value* vStore=Builder.CreateLoad(store,store->getName());
     if(s->step > 0){
         CondV=Builder.CreateICmpSLE(vStore,vToExpr,"forcond");
@@ -986,38 +1019,45 @@ Value *LLVMDriver::WriteLLVM(CForStatement *s)
     Builder.CreateCondBr(CondV,ForBodyBB,ExitForBB);
     TheFunction->getBasicBlockList().push_back(ForBodyBB);
     Builder.SetInsertPoint(ForBodyBB);
-
+    //генерация кода тела цикла
     WriteLLVM(s->StatementSeq);
-
+    //Добавление шага к переменной
     vStore=Builder.CreateLoad(store,store->getName());
     Value* vStep = Builder.CreateAdd(vStore,ConstantInt::get(vStore->getType(),s->step),"step");
     Builder.CreateStore(vStep, store);
+
     Builder.CreateBr(ForBB);
     TheFunction->getBasicBlockList().push_back(ExitForBB);
     Builder.SetInsertPoint(ExitForBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора LOOP
 Value *LLVMDriver::WriteLLVM(CLoopStatement *s)
 {
+    //получаем указатель на функцию, создаем блоки
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *LoopBB = BasicBlock::Create(TheContext, "loop", TheFunction);
     BasicBlock *ExitBB = BasicBlock::Create(TheContext, "exitLoop");
+    //сохраняем блок выхода из цикла в карте блоков
     BasicBlocks[s->WithLoopLink.LoopUID]=ExitBB;
     Builder.CreateBr(LoopBB);
     Builder.SetInsertPoint(LoopBB);
-
+    //генерация кода тела цикла
     WriteLLVM(s->StatementSeq);
-
     Builder.CreateBr(LoopBB);
-
+    //вставка блока выхода из цикла
     TheFunction->getBasicBlockList().push_back(ExitBB);
     Builder.SetInsertPoint(ExitBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для оператора CASE
 Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
 {
+    //блок выхода, один для всех меток
     BasicBlock *ExitBB = BasicBlock::Create(TheContext, "exitCase");
     //цикл перебора последовательностей меток
     CCaseStatement::CaseLabelsSeqList_type::const_iterator i;
@@ -1025,7 +1065,6 @@ Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
     {
         WriteLLVM((*i), s->Expr,ExitBB);
     }//for
-
     //проверка наличия условия ELSE
     if (s->ElseStatementSeq) {
         WriteLLVM(s->ElseStatementSeq);
@@ -1035,39 +1074,41 @@ Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
     TheFunction->getBasicBlockList().push_back(ExitBB);
     Builder.SetInsertPoint(ExitBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM варианта оператора CASE
 Value *LLVMDriver::WriteLLVM(CCaseLabelsSeq *cls, CExpr *e, BasicBlock *exitBB)
 {
     CCaseLabelsSeq::CaseLabelsList_type::const_iterator i;
-
     //проверка первой метки
-    if (cls->CaseLabelsList.empty()) throw error_Internal("CCaseLabelsSeq::WriteCPP");
+    if (cls->CaseLabelsList.empty()) throw error_Internal("CCaseLabelsSeq::WriteLLVM");
     i = cls->CaseLabelsList.begin();
     Value* expr = WriteLLVM((*i), e);
     //цикл перебора оставшихся меток
     for (++i; i != cls->CaseLabelsList.end(); ++i)
     {
-        //fprintf(f.fc, ")||(");
         Value* expr2 = WriteLLVM((*i), e);
         expr=Builder.CreateOr(expr,expr2,"cond");
     }
-
+    //создание блоков, генерация условия входа в блок case
     BasicBlock *caseBB = BasicBlock::Create(TheContext, "case");
     BasicBlock *elseBB = BasicBlock::Create(TheContext, "else");
     Builder.CreateCondBr(expr,caseBB,elseBB);
-    //генерация кода послед-ти операторов
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     TheFunction->getBasicBlockList().push_back(caseBB);
     Builder.SetInsertPoint(caseBB);
+    //генерация кода послед-ти операторов
     WriteLLVM(&cls->StatementSeq);
     Builder.CreateBr(exitBB);
-
+    //вставка блока следующей метки
     TheFunction->getBasicBlockList().push_back(elseBB);
     Builder.SetInsertPoint(elseBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM метки оператора CASE
 Value *LLVMDriver::WriteLLVM(CCaseLabels *cls, CExpr *e)
 {
     Value* expr = WriteLLVM(e);
@@ -1078,72 +1119,87 @@ Value *LLVMDriver::WriteLLVM(CCaseLabels *cls, CExpr *e)
         return Builder.CreateAnd(uge,ule);
     } else
         return Builder.CreateICmpEQ(expr,ConstantInt::get(expr->getType(),cls->ConstValue));
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM оператора Return
 Value *LLVMDriver::WriteLLVM(CReturnStatement *s)
 {
+    //получаем тип возвращаемого значения
     Type* funRetType=Builder.getCurrentFunctionReturnType();
+    //генерация возвращаемого значения
     Value* retVal;
     if (s->Expr) {
         retVal=WriteLLVM(s->Expr);
     } else retVal=Constant::getNullValue(funRetType);
     retVal=CastToType(retVal,funRetType);
     Builder.CreateRet(retVal);
-
+    //переход к недостижимому блоку, из-за особенностей LLVM
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
     Builder.SetInsertPoint(unreachBB);
     return nullptr;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM оператора присваивания
 Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
 {
     ////////////////////////////////////////////////////
     //генерация кода присвоения текстовой строки массиву
     if (s->str_to_array) {
         return WriteLLVM_array(s);
-    }
+    }//if
 
+    ////////////////////////////////////////////////////
+    //генерация кода присваивания процедуры
     if(s->Designator->ResultId==id_CProcedureVar){
         Value* store=WriteLLVM(s->Designator);
         while (store->getType()->getContainedType(0)->getContainedType(0)->isPointerTy()) {
             store=Builder.CreateLoad(store,store->getName());
-        }
+        }//while
         Value* expr=WriteLLVM(s->Expr);
         while (expr->getType()->getContainedType(0)->isPointerTy()) {
             expr=Builder.CreateLoad(expr,expr->getName());
-        }
+        }//while
         return Builder.CreateStore(expr, store);
-    }
+    }//if
+
+    ////////////////////////////////////////////////////
+    //генерация кода присваивания указателя
     if(s->Designator->ResultId==id_CPointerVar){
         Value* store=WriteLLVM(s->Designator);
         while (store->getType()->getContainedType(0)->getContainedType(0)->isPointerTy()) {
             store=Builder.CreateLoad(store,store->getName());
-        }
+        }//while
         Value* expr=WriteLLVM(s->Expr);
         if(!expr) expr=Constant::getNullValue(store->getType()->getContainedType(0));
         CBaseName* BN=s->Expr->FindLastName();
         if(BN && SpecTypes[BN->name]){
             SpecTypes[s->Designator->Qualident->ident]=SpecTypes[BN->name];
-        }
+        }//if
         return Builder.CreateStore(expr, store);
-    }
+    }//if
+
     //////////////////////////////////////
     //генерация кода обычного присваивания
     Value* store=WriteLLVM(s->Designator);
     while (store->getType()->getContainedType(0)->isPointerTy()) {
         store=Builder.CreateLoad(store,store->getName());
-    }
+    }//while
     Value* expr=CastToType(WriteLLVM(s->Expr),store->getType()->getContainedType(0));
     while (expr->getType()->isPointerTy()) {
         expr=Builder.CreateLoad(expr,expr->getName());
-    }
+    }//while
     return Builder.CreateStore(expr, store);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM в случае присвоения текстовой строки массиву
 Value *LLVMDriver::WriteLLVM_array(CAssignStatement *s)
 {
+    //используется функция COPY из сгенерированного файла _O2M_sys.cpp
     std::string name="_Z4COPYPKciPci";
     Function *F=Functions[name];
     if(!F){
@@ -1155,27 +1211,30 @@ Value *LLVMDriver::WriteLLVM_array(CAssignStatement *s)
         StringVector emptyVector;
         F=createFunction(FunRetType,pars,emptyVector,name);
         Functions[name]=F;
-    }
+    }//if
+    //получение значения источника
     Value* string1 = WriteLLVM(s->Expr);
     CBaseName* BN = s->Expr->FindLastName();
     Value* size1 = WriteLLVM_COPY_Par(BN);
-    //запись значения приемника
+    //получение значения приемника
     Value* string2 = WriteLLVM(s->Designator);
-    //получение приемника (переменной-массива или указателя)
     BN = s->Designator->FindLastName();
     Value* size2 = WriteLLVM_COPY_Par(BN);
-    //********???????????
+    //Если указатель на строку, получим саму строку
     while(string2->getType()->getContainedType(0)->isArrayTy()){
         std::vector<Value*> values;
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
         string2=Builder.CreateGEP(string2,values);
-    }
-    //???????????
+    }//while
+    //Вызов функции COPY
     std::vector<Value *> values={string1,size1,string2,size2};
     return Builder.CreateCall(F,values);
-}
+}//WriteLLVM_array
 
+//-----------------------------------------------------------------------------
+//получение размерности массива в качестве параметра при вызове COPY
+//предполагается, что BN является массивом символов или ук. на массив символов
 Value *LLVMDriver::WriteLLVM_COPY_Par(CBaseName *bn)
 {
     if (id_CPointerVar == bn->name_id) bn = static_cast<CPointerVar*>(bn)->FindType();
@@ -1186,20 +1245,24 @@ Value *LLVMDriver::WriteLLVM_COPY_Par(CBaseName *bn)
     else
         arr_size = static_cast<CArrayType*>(bn)->size;
     return ConstantInt::get(Type::getInt32Ty(TheContext),arr_size);
-}
+}//WriteLLVM_COPY_Par
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM оператора EXIT
 Value *LLVMDriver::WriteLLVM(CExitStatement *s)
 {
+    //генерация выхода из цикла LOOP
     Builder.CreateBr(BasicBlocks[s->UID]);
-
+    //создание недостижимого блока и переход к нему
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
     Builder.SetInsertPoint(unreachBB);
     return nullptr;
-}
+}//WriteLLVM
 
-
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM оператора вызова процедуры
 Value *LLVMDriver::WriteLLVM(CCallStatement *s)
 {
     //получение ук. на CProcedure или CProcedureVar
@@ -1208,40 +1271,47 @@ Value *LLVMDriver::WriteLLVM(CCallStatement *s)
     if (CProcedure::IsProcId(BN->name_id)){
         CProcedure* BV = static_cast<CProcedure*>(BN);
         FP=BV->FormalPars;
-        Function* F;
-        /*if(id_CCommonProc == BN->name_id || id_CDfnCommonProc == BN->name_id || id_CHandlerProc == BN->name_id){
-            F=GetFunction(static_cast<CCommonProc*>(BV),s->CommonList);
-        }else */
-            F=GetFunction(BV);
+        //Получение указателяя на функцию
+        Function* F=GetFunction(BV);
+        //Формирование списка параметров, если есть
         std::vector<Value *> ArgsV;
         if (s->ExprList) {
             ArgsV = WriteLLVM(s->ExprList,FP);
-        }
+        }//if
+        //Формирование списка обобщающих параметров, если есть
         if (s->CommonList) {
             std::vector<Value *> ArgsVC = WriteLLVM(s->CommonList,static_cast<CCommonProc*>(BV)->CommonPars);
             ArgsV.insert(ArgsV.end(),ArgsVC.begin(),ArgsVC.end());
-        }
+        }//if
+        //Если есть приемник, добавляем его в параметры
         if(BV->Receiver){
             ArgsV.push_back(WriteLLVM(s->Designator));
-        }
+        }//if
+        //Вызов функции
         return Builder.CreateCall(F,ArgsV,"calltmp");
-    }
-    else
-        if (id_CProcedureVar == BN->name_id){
-            FP = &static_cast<CProcedureVar*>(BN)->FormalPars;
-            Value* d = Builder.CreateLoad(WriteLLVM(s->Designator),BN->name);
-            FunctionType* ft= static_cast<FunctionType*>(d->getType()->getContainedType(0));
-            std::vector<Value *> ArgsV;
-            if (s->ExprList) {
-                ArgsV = WriteLLVM(s->ExprList,FP);
-            }
-            return Builder.CreateCall(ft,d,ArgsV,"calltmp");;
-        }
-        else{
-            return nullptr;
-        }
-}
+    } else if (id_CProcedureVar == BN->name_id){
+        //случай переменной типа PROCEDURE
+        FP = &static_cast<CProcedureVar*>(BN)->FormalPars;
+        //Получаем указатель на переменную типа PRCEDURE
+        Value* d = Builder.CreateLoad(WriteLLVM(s->Designator),BN->name);
+        //Получение типа функции
+        FunctionType* ft= static_cast<FunctionType*>(d->getType()->getContainedType(0));
+        //Формирование списка параметров, если есть
+        std::vector<Value *> ArgsV;
+        if (s->ExprList) {
+            ArgsV = WriteLLVM(s->ExprList,FP);
+        }//if
+        ////!Добавить обработку CommonList и Receiver!
+        //Вызов функции
+        return Builder.CreateCall(ft,d,ArgsV,"calltmp");;
+    } else{
+        ////!Добавить обработку CProcedureType!
+        return nullptr;
+    }//if
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Формирование списка фактических параметров функции
 std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
 {
     std::vector<Value *> ArgsV;
@@ -1249,53 +1319,63 @@ std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
     CBaseVarVector::const_iterator ci = fp->FPStore.begin();
     for(i; i != e->ExprVector->end(); ++i, ++ci) {
         Value* value;
+        //Если параметр переменная, нужно передавать указатель на него
         if((*ci)->is_var){
             value = WriteLLVM((*i)->SimpleExpr1->Term->Factor->Designator);
         }else value=WriteLLVM((*i));
+        //если это не переменная-указатель - нужно грузить до первого указателя
         while (value->getType()->getNumContainedTypes()>0&&value->getType()->getContainedType(0)->isPointerTy()
                &&((*ci)->name_id!=id_CPointerVar or value->getType()->getContainedType(0)->getContainedType(0)->isPointerTy())) {
             value=Builder.CreateLoad(value,value->getName());
-        }
+        }//while
+        //если указатель на массив, получаем сам массив
         while(value->getType()->getNumContainedTypes()>0&&value->getType()->getContainedType(0)->isArrayTy()){
             std::vector<Value*> values;
             values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
             values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
             value=Builder.CreateGEP(value,values);
-        }
+        }//while
         ArgsV.push_back(CastToType(value,GetLLVMType((*ci)->name_id)));
+        //для массива нужно также добавить в список размеры массива
         if(id_CArrayVar == (*ci)->name_id){
             CArrayVar* AV=static_cast<CArrayVar*>((*i)->FindLastName());
             CArrayType* AT=static_cast<CArrayVar*>(AV)->ArrayType;
-            long size=AT->size;
-            if(size>0)
-                ArgsV.push_back(ConstantInt::get(Type::getInt32Ty(TheContext),size));
-            else{
-                int dimention = 0;
-                while (AT->name_id == id_CArrayType) {
+            int dimention = 0;
+            while (AT->name_id == id_CArrayType) {
+                if(AT->size>0)
+                    ArgsV.push_back(ConstantInt::get(Type::getInt32Ty(TheContext),AT->size));
+                else{
                     std::string s="O2M_ARR_"+std::to_string(dimention)+"_"+AV->name;
                     ArgsV.push_back(Builder.CreateLoad(NamedValues[s],s));
-                    ++dimention;
-                    AT = static_cast<CArrayType*>(AT->Type);
-                }
-            }
-        }
-    }
+                }//if
+                ++dimention;
+                AT = static_cast<CArrayType*>(AT->Type);
+            }//while
+        }//if
+    }//for
     return ArgsV;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM выражения
 Value *LLVMDriver::WriteLLVM(CExpr *e)
 {
+    //Генерация 1-го простого выражения
     Value* simpleExpr1 = CastToType(WriteLLVM(e->SimpleExpr1),GetLLVMType(e->SimpleExpr1->GetResultId()));
+    //Генерация 2-го простого выражения (если есть)
     Value* simpleExpr2 =nullptr;
     if (e->SimpleExpr2) {
         simpleExpr2 = CastToType(WriteLLVM(e->SimpleExpr2),GetLLVMType(e->SimpleExpr2->GetResultId()));
+        /* разобраться, предварительно
+        Если expr2 - нулевой указатель, приводим его к типу expr1*/
         if(!simpleExpr2)
             simpleExpr2 = ConstantPointerNull::get(simpleExpr1->getType()->getContainedType(0)->getPointerTo());
+        //приведение типов
         if(IsId1IncloseId2(e->SimpleExpr1->GetResultId(),e->SimpleExpr2->GetResultId()))
             simpleExpr2 = CastToType(simpleExpr2,simpleExpr1->getType());
         else simpleExpr1 = CastToType(simpleExpr1,simpleExpr2->getType());
-    }
-
+    }//if
+    //Выполнение операции (если есть)
     switch (e->Relation) {
     case rel_EQ:
         if(simpleExpr1->getType()==Type::getDoubleTy(TheContext))
@@ -1322,27 +1402,32 @@ Value *LLVMDriver::WriteLLVM(CExpr *e)
             return Builder.CreateFCmpOGE(simpleExpr1, simpleExpr2, "getmp");
         return Builder.CreateICmpSGE(simpleExpr1, simpleExpr2, "getmp");
     }//switch
-
     return  simpleExpr1;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM простого выражения
 Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
 {
+    //Генерация первого Term
     Value* term = CastToType(WriteLLVM(e->Term),GetLLVMType(e->Term->GetResultId()));
+    //Генерация отрицания (если используется)
     if (e->negative) {
         if(term->getType()==Type::getDoubleTy(TheContext))
             term=Builder.CreateFNeg(term);
         else term=Builder.CreateNeg(term);
-    }
+    }//if
+    //Генерация остальных Term'ов (если есть)
     if (e->SimpleExprPairStore) {
         CBaseVector::const_iterator ci;
         for (ci = e->SimpleExprPairStore->begin(); ci != e->SimpleExprPairStore->end(); ++ci){
             CSimpleExprPair* sep = static_cast<CSimpleExprPair*>(*ci);
-            Value* simplePair=CastToType(WriteLLVM(sep),GetLLVMType(sep->GetResultId()));
+            Value* simplePair=CastToType(WriteLLVM(sep->Term),GetLLVMType(sep->GetResultId()));
+            //приведение типов
             if(IsId1IncloseId2(e->Term->GetResultId(),sep->GetResultId()))
                 simplePair = CastToType(simplePair,term->getType());
             else term = CastToType(term,simplePair->getType());
-
+            //выполнение операций
             switch (sep->AddOp) {
             case aop_ADD:
                 if(term->getType()==Type::getDoubleTy(TheContext))
@@ -1357,38 +1442,37 @@ Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
                   term=Builder.CreateSub(term, simplePair, "subtmp");
                 break;
             case aop_OR:
-                //проверить
                 term=Builder.CreateOr(term, simplePair, "ortmp");
                 break;
-            }
-        }
-    }
+            }//switch
+        }//for
+    }//if
     return term;
-}
+}//WriteLLVM
 
-Value *LLVMDriver::WriteLLVM(CSimpleExprPair *e)
-{
-    return WriteLLVM(e->Term);
-}
-
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для CTerm
 Value *LLVMDriver::WriteLLVM(CTerm *t)
 {
+    //Генерация первого множителя
     Value* factor = CastToType(WriteLLVM(t->Factor),GetLLVMType(t->Factor->GetResultId()));
     if (t->TermPairStore) {
+        //запись оставшихся множителей (если есть)
         CBaseVector::const_iterator ci;
         for (ci = t->TermPairStore->begin(); ci != t->TermPairStore->end(); ++ci) {
             CTermPair* tp=static_cast<CTermPair*>(*ci);
-            Value* termPair = CastToType(WriteLLVM(tp),GetLLVMType(tp->GetResultId()));
+            //генерация второго операнда для текущей операци
+            Value* termPair = CastToType(WriteLLVM(tp->Factor),GetLLVMType(tp->GetResultId()));
+            //приведение типов
             if(IsId1IncloseId2(t->Factor->GetResultId(),tp->GetResultId()))
                 termPair = CastToType(termPair,factor->getType());
             else factor = CastToType(factor,termPair->getType());
+            //выполнение операции
             switch (tp->MulOp) {
             case mop_DIV:
-                //проверить
                 factor=Builder.CreateSDiv(factor, termPair, "quotmp");
                 break;
             case mop_MOD:
-                //проверить
                 factor=Builder.CreateSRem(factor, termPair, "remtmp");
                 break;
             case mop_M:
@@ -1408,27 +1492,26 @@ Value *LLVMDriver::WriteLLVM(CTerm *t)
                 break;
             }//switch
         }//for
-    }
+    }//if
     return factor;
-}
+}//WriteLLVM
 
-Value *LLVMDriver::WriteLLVM(CTermPair *t)
-{
-    return WriteLLVM(t->Factor);
-}
-
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для CFactor
 Value *LLVMDriver::WriteLLVM(CFactor *f)
 {
     switch (f->FactorKind) {
     case fk_Negation:{
         Value* factor=WriteLLVM(f->Factor);
+        if (factor->getType()==Type::getDoubleTy(TheContext))
+            return Builder.CreateFCmpOEQ(factor,Constant::getNullValue(factor->getType()),"neg");
         return Builder.CreateICmpEQ(factor,Constant::getNullValue(factor->getType()),"neg");
-    }
-    case fk_Expr:
+    } case fk_Expr:
         return WriteLLVM(f->Expr);
     case fk_ConstVar:
         return WriteLLVM_ConstValue(f->ConstVar);
     case fk_StdProcFunc:
+        //выбор и генерация кода конкретной стандартной процедуры
         if(typeid(*f->StdProcFunc) == typeid (CAbsStdProcFunc) )
             return WriteLLVM(static_cast<CAbsStdProcFunc*>(f->StdProcFunc));
         if(typeid(*f->StdProcFunc) == typeid (CAshStdProcFunc) )
@@ -1461,6 +1544,8 @@ Value *LLVMDriver::WriteLLVM(CFactor *f)
             return WriteLLVM(f->Call);
         else{
             Value* designator = WriteLLVM(f->Designator);
+            //для простых переменных, возвращаем ее значение, а не указатель на нее
+            //(нужно перенести на верхний уровень или в CastToType)
             while (f->GetResultId()!=id_CArrayVar && f->GetResultId()!=id_CProcedureVar
                    && f->GetResultId()!=id_CProcedure && designator->getType()->isPointerTy()
                    && !designator->getType()->getContainedType(0)->isStructTy()) {
@@ -1469,38 +1554,37 @@ Value *LLVMDriver::WriteLLVM(CFactor *f)
             return designator;
         }
     }//switch
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM для CDesignator
 Value *LLVMDriver::WriteLLVM(CDesignator *d)
 {
-    //перебор и генерация кода эл-тов обозначения
+    //вначале ищем обозначение в локальных переменных, затем в глобальных
     Value* designator=NamedValues[d->Qualident->ident];
     if(!designator) designator=GlobalValues[d->Qualident->ident];
-    CDesignator::SDesElemStore::const_iterator ci;
+    //если не нашли, возможно это процедура
     if(!designator) {
         CBaseName* BN = d->FindLastName();
         if(BN->name_id==id_CProcedure)
             designator=GetFunction(static_cast<CProcedure*>(BN));
-    }
+    }//if
+    //если нет, создаем глобальную переменную
     if(!designator){
         const CBaseName* BN = d->parent_element;
         while(BN->name_id!=id_CModule){
             BN=BN->parent_element;
-        }
+        }//while
         CBaseVar* BV=static_cast<CBaseVar*>(BN->GetGlobalName(d->Qualident->pref_ident,d->Qualident->ident));
         std::string firstName=BV->parent_element->name;
         std::string lastName=BV->name;
         std::string name="_ZN"+std::to_string(firstName.size())+firstName+std::to_string(lastName.size())+lastName+"E";
-        GlobalVariable *gVar= new GlobalVariable(*TheModule.get(),
-        /*Type=*/GetLLVMType(BV),
-        /*isConstant=*/false,
-        /*Linkage=*/GlobalValue::ExternalLinkage,
-        /*Initializer=*/nullptr,
-        /*Name=*/name);
+        GlobalVariable *gVar= new GlobalVariable(*TheModule.get(),GetLLVMType(BV),false,GlobalValue::ExternalLinkage,nullptr,name);
         GlobalValues[lastName]=gVar;
         designator=gVar;
-    }
-    for (ci = d->DesElemStore.begin(); ci != d->DesElemStore.end(); ci++) {
+    }//if
+    //получение значения по эл-там обозначения (индексам)
+    for (CDesignator::SDesElemStore::const_iterator ci = d->DesElemStore.begin(); ci != d->DesElemStore.end(); ci++) {
         switch ((*ci)->DesKind) {
         case CDesignator::EDesKind::dk_Array:       
             designator=WriteLLVM_index((*ci)->ExprList, false,designator);
@@ -1517,86 +1601,96 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
         }//switch
     }//for
     return designator;
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Получения значения массива по индексам
 Value *LLVMDriver::WriteLLVM_index(CExprList *e, bool IsOpenArray, Value* array)
 {
     std::vector<Value*> values;
-    if(!IsOpenArray /*&& array->getType()->isArrayTy()*/){
+    if(!IsOpenArray){
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
-    }
+    }//if
     CExprVector::const_iterator ci = e->ExprVector->begin();
     for (ci; ci != e->ExprVector->end(); ++ci) {
         Value* value=WriteLLVM((*ci));
         value=CastToType(value,Type::getInt32Ty(TheContext));
         values.push_back(value);
     }//for
-    if(IsOpenArray /*or !array->getType()->isArrayTy()*/){
+    if(IsOpenArray){
         array=Builder.CreateLoad(array,array->getName());
         return Builder.CreateInBoundsGEP(array,values,"gep");
-    }
+    }//if
     return Builder.CreateGEP(array,values,"gep");
-}
+}//WriteLLVM_index
 
+//-----------------------------------------------------------------------------
+//Получения значения элемента записи по индексам
 Value *LLVMDriver::WriteLLVM_record_index(Value *record, char *ident,CDesignator *d)
 {
     CBaseVar* BN = static_cast<CBaseVar*>(d->parent_element->GetGlobalName(d->Qualident->pref_ident, d->Qualident->ident));
     while(record->getType()->getContainedType(0)->isPointerTy()){
         record=Builder.CreateLoad(record,record->getName());
-    }
+    }//while
     const char* parentIdent;
     if(BN->name_id==id_CRecordVar)
-     parentIdent= static_cast<CRecordVar*>(BN)->GetTypeName();
+        parentIdent= static_cast<CRecordVar*>(BN)->GetTypeName();
     else if(BN->name_id==id_CCommonVar) parentIdent=static_cast<CCommonVar*>(BN)->SpecName;
     else{
         CPointerVar* PV = static_cast<CPointerVar*>(BN);
         CBaseType* BT = PV->FindType();
         if(BT->name_id==id_CRecordType){
             parentIdent=BT->name;
-        }
-        else{
+        }else{
             CSpecType* ST = static_cast<CSpecType*>(BT);
             parentIdent = ST->GetSpecName();
             if(!TheModule->getTypeByName(parentIdent)){
                 CCommonType* CT = static_cast<CCommonType*>(ST->parent_element->GetGlobalName(ST->Qualident->pref_ident, ST->Qualident->ident));
                 const CCommonType::SSpec* SS = CT->FindSpec(ST->GetQualSpecName(),ST->GetSpecName(),ST->GetSpecName());
                 parentIdent = SS->Name;
-            }
+            }//if
             record=Builder.CreateStructGEP(record,0,"gep");
             while(record->getType()->getContainedType(0)->isPointerTy()){
                 record=Builder.CreateLoad(record,record->getName());
-            }
+            }//while
             Type* type=TheModule->getTypeByName(parentIdent)->getPointerTo();
             record=Builder.CreateBitCast(record,type,"bitcast");
-        }
-    }
+        }//if
+    }//if
     if(Structures[parentIdent].find(ident) == Structures[parentIdent].end()) return record;
     return Builder.CreateStructGEP(record,Structures[parentIdent][ident],"gep");
-}
+}//WriteLLVM_record_index
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции ABS
 Value *LLVMDriver::WriteLLVM(CAbsStdProcFunc *d)
 {
-    std::string name="abs";
-    Type* type=GetLLVMType(id_CIntegerVar);
+    //Вызов стандартных функций С (в зависимости от типа аргумента)
+    std::string name;
+    Type* type;
     if (id_CLongintVar == d->GetResultId()) {
         name="labs";
         type=GetLLVMType(id_CLongintVar);
-    }else
-        if (CBaseVar::IsRealId(d->GetResultId())) {
-            name="fabs";
-            type=GetLLVMType(id_CRealVar);
-        }
+    }else if (CBaseVar::IsRealId(d->GetResultId())) {
+        name="fabs";
+        type=GetLLVMType(id_CRealVar);
+    }else{
+        name="abs";
+        type=GetLLVMType(id_CIntegerVar);
+    }//if
     Function *F=Functions[name];
     if(!F){
-    std::vector<Type *> pars(1, type);
-    StringVector emptyVector;
-    F = createFunction(type,pars,emptyVector,name);
-    Functions[name]=F;
-    }
+        std::vector<Type *> pars(1, type);
+        StringVector emptyVector;
+        F = createFunction(type,pars,emptyVector,name);
+        Functions[name]=F;
+    }//if
     Value* expr=WriteLLVM(&d->Expr);
     return Builder.CreateCall(F, expr, "calltmp");
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции CAP
 Value *LLVMDriver::WriteLLVM(CCapStdProcFunc *d)
 {
     std::string name="toupper";
@@ -1607,45 +1701,60 @@ Value *LLVMDriver::WriteLLVM(CCapStdProcFunc *d)
         StringVector emptyVector;
         F = createFunction(reType,pars,emptyVector,name);
         Functions[name]=F;
-    }
+    }//if
     Value* exp=WriteLLVM(&d->Expr);
     exp=CastToType(exp,Type::getInt32Ty(TheContext));
     return Builder.CreateCall(F,exp,"cap");
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции CHR
 Value *LLVMDriver::WriteLLVM(CChrStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции ENTIER
 Value *LLVMDriver::WriteLLVM(CEntierStdProcFunc *d)
 {
     return CastToType(WriteLLVM(&d->Expr),Type::getInt32Ty(TheContext));
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры LEN
 Value *LLVMDriver::WriteLLVM(CLenStdProcFunc *d)
 {
+    //проверка типа массива (открытый / обычный)
     if (!d->array_size){
         std::string name="O2M_ARR_"+std::to_string(d->dimension)+"_"+d->array_name;
         return Builder.CreateLoad(NamedValues[name],name);
     }
     return ConstantInt::get(Type::getInt32Ty(TheContext),d->array_size);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции LONG
 Value *LLVMDriver::WriteLLVM(CLongStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции ODD
 Value *LLVMDriver::WriteLLVM(COddStdProcFunc *d)
 {
     Value* expr = WriteLLVM(&d->Expr);
     Value* rem = Builder.CreateSRem(expr,ConstantInt::get(expr->getType(),2));
     return Builder.CreateICmpEQ(rem,ConstantInt::get(rem->getType(),1));
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции ORD
 Value *LLVMDriver::WriteLLVM(COrdStdProcFunc *d)
 {
+    //вызов стандартной функции из сгенерированного файла _O2M_sys.cpp
+    //(как вариант можно вручную сгенерировать эту функцию)
     std::string name="_Z3ORDc";
     Function *F=Functions[name];
     if(!F){
@@ -1654,60 +1763,75 @@ Value *LLVMDriver::WriteLLVM(COrdStdProcFunc *d)
         StringVector emptyVector;
         F=createFunction(FunRetType,pars,emptyVector,name);
         Functions[name]=F;
-    }
+    }//if
     Value* exp=WriteLLVM(&d->Expr);
     exp=CastToType(exp,Type::getInt8Ty(TheContext));
     return Builder.CreateCall(F,exp,"ORD");
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции SHORT
 Value *LLVMDriver::WriteLLVM(CShortStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры DEC
 Value *LLVMDriver::WriteLLVM(CDecStdProc *d)
 {
+    //получение переменной (первого выражения)
     Value* store=WriteLLVM(d->Expr1.SimpleExpr1->Term->Factor->Designator);
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
-    }
+    }//while
     Value* expr=Builder.CreateLoad(store,store->getName());
     Value* dec=nullptr;
-    if (d->Expr2) dec=WriteLLVM(d->Expr2);
+    //получение второго выражения или создание единичной константы
+    if (d->Expr2) dec=CastToType(WriteLLVM(d->Expr2),expr->getType());
     else dec=ConstantInt::get(expr->getType(),1);
-    if(expr->getType()!=dec->getType())
-        dec=CastToType(dec,expr->getType());
+    //выполнение операции и сохранение
     expr=Builder.CreateSub(expr,dec,"dec");
     return Builder.CreateStore(expr,store);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры INC
 Value *LLVMDriver::WriteLLVM(CIncStdProc *d)
 {
+    //получение переменной (первого выражения)
     Value* store=WriteLLVM(d->Expr1.SimpleExpr1->Term->Factor->Designator);
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
-    }
+    }//while
     Value* expr=Builder.CreateLoad(store,store->getName());
     Value* inc=nullptr;
-    if (d->Expr2) inc=WriteLLVM(d->Expr2);
+    //получение второго выражения или создание единичной константы
+    if (d->Expr2) inc=CastToType(WriteLLVM(d->Expr2),expr->getType());
     else inc=ConstantInt::get(expr->getType(),1);
-    if(expr->getType()!=inc->getType())
-        inc=CastToType(inc,expr->getType());
+    //выполнение операции и сохранение
     expr=Builder.CreateAdd(expr,inc,"inc");
     return Builder.CreateStore(expr,store);
-}
+}//WriteLLVM
 
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры NEW
 Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
 {
+    //получение переменной по обозначению
     CPointerVar* pVar = static_cast<CPointerVar*>(d->Des.FindLastName());
+    //получения типа по переменной
     CBaseType* BT = pVar->FindType();
+    //получения переменной
     Value* des = WriteLLVM(&(d->Des));
     Type* type = des->getType();
+    //получение указателя на базовый тип
     while(type->isPointerTy()&&type->getContainedType(0)->isPointerTy()&&type->getContainedType(0)->getContainedType(0)->isPointerTy()){
         des = Builder.CreateLoad(des,des->getName());
         type = des->getType();
-    }
+    }//while
     type = type->getContainedType(0);
+    //Создание стандартной функции new
     std::string name="_Znwy";
     Function *F=Functions[name];
     if(!F){
@@ -1717,14 +1841,19 @@ Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
         F = createFunction(reType,pars,emptyVector,name);
         Functions[name]=F;
     }
+    //вызов функции new
     Value* call = Builder.CreateCall(F, ConstantInt::get(Type::getInt64Ty(TheContext),32), "new");
+    //приведение результата к базовому типу
     call=Builder.CreateBitCast(call,type,"bitcast");
+    //для специализаций также нужно выделить память под саму специализацию
     if (id_CSpecType == BT->name_id){
+        //выделение памяти под тип специализации
         Value* val=Builder.CreateStructGEP(call,0,"val");
         type=val->getType()->getContainedType(0);
         Value* call2 = Builder.CreateCall(F, ConstantInt::get(Type::getInt64Ty(TheContext),32), "new");
         call2=Builder.CreateBitCast(call2,type,"bitcast2");
         Builder.CreateStore(call2,val);
+        //во втором параметре сохраняем идентификатор специализации
         Value* spec=Builder.CreateStructGEP(call,1,"val");
         CSpecType* ST=static_cast<CSpecType*>(BT);
         std::string specname=std::string(ST->GetSpecName());
@@ -1732,10 +1861,10 @@ Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
             CCommonType* CT = static_cast<CCommonType*>(ST->parent_element->GetGlobalName(ST->Qualident->pref_ident, ST->Qualident->ident));
             const CCommonType::SSpec* SS = CT->FindSpec(ST->GetQualSpecName(),ST->GetSpecName(),ST->GetSpecName());
             specname = SS->Name;
-        }
+        }//if
         Builder.CreateStore(ConstantInt::get(Type::getInt32Ty(TheContext),SpecTypes[specname]),spec);
-    }
+    }//if
     return Builder.CreateStore(call,des);
-}
+}//WriteLLVM
 
 

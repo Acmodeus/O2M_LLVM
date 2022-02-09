@@ -48,7 +48,7 @@ public:
     std::map<std::string, std::map<std::string,int>> Structures;
     // арта номеров специализаций, дл€ формировани€ функций выбора
     std::map<std::string, int> SpecTypes;
-    // арта дл€ выхода из бесконечного цикла
+    // арта блоков, используетс€ дл€ выхода из бесконечного цикла
     std::map<int, BasicBlock *> BasicBlocks;
     LLVMDriver(): Builder(TheContext){};
     ~LLVMDriver(){};
@@ -91,7 +91,7 @@ public:
     Function* WriteLLVM(CProcedure* p);
     //получение списка типов формальных параметров
     std::vector<Type *> WriteLLVM_pars(CFormalPars *fp);
-    Value* WriteLLVM_fp(CArrayVar* v,std::vector<Type*>& values);
+    void WriteLLVM_pars_array(CArrayVar* v,std::vector<Type*>& values);
     //генераци€ кода LLVM операторов
     Value* WriteLLVM(CIfStatement* s);
     BasicBlock* WriteLLVM(CElsifPair* s,BasicBlock* bb);
@@ -106,15 +106,14 @@ public:
     Value* WriteLLVM(CExitStatement* s);
     Value* WriteLLVM(CReturnStatement* s);
     Value* WriteLLVM(CAssignStatement* s); //частично реализовано
-    Value* WriteLLVM_array(CAssignStatement* s);//частично реализовано
-    Value* WriteLLVM_COPY_Par(CBaseName* bn); //частично реализовано
+    Value* WriteLLVM_array(CAssignStatement* s);
+    Value* WriteLLVM_COPY_Par(CBaseName* bn);
     Value* WriteLLVM(CCallStatement* s); //частично реализовано
     //получение списка фактических параметров
     std::vector<Value *> WriteLLVM(CExprList* e,CFormalPars* fp);
     //генераци€ кода LLVM выражений
     Value* WriteLLVM(CExpr* e); //не реализовано rel_is,rel_IN
     Value* WriteLLVM(CSimpleExpr* e);
-    Value* WriteLLVM(CSimpleExprPair* e);
     Value* WriteLLVM(CTerm* t);
     Value* WriteLLVM(CTermPair* t);
     Value* WriteLLVM(CFactor* f);
