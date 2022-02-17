@@ -3099,8 +3099,10 @@ const CCommonType::SSpec* CCommonType::FindSpecByTag(const char *Tag) const
 {
 	//поиск в списке специализаций
 	SpecStore_type::const_iterator ci;
-	for (ci = SpecStore.begin(); ci != SpecStore.end(); ci++)
-		if (!strcmp(Tag, (*ci)->Tag)) return *ci;
+    for (ci = SpecStore.begin(); ci != SpecStore.end(); ci++){
+        bool IsEqual = (Tag && (*ci)->Tag);
+        if (IsEqual && !strcmp(Tag, (*ci)->Tag)) return *ci;
+    }
 	//проверка специализации по умолчанию (если есть)
 	if (DefaultSpec && !strcmp(Tag, DefaultSpec->Tag)) return DefaultSpec;
 	//специализация не найдена

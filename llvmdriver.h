@@ -25,6 +25,7 @@
 #include "Type.h"
 #include "Var.h"
 #include "Stat.h"
+#include <float.h>
 
 using namespace llvm;
 using namespace llvm::sys;
@@ -41,8 +42,6 @@ public:
     std::map<std::string, GlobalVariable *> GlobalValues;
     //Карта функций
     std::map<std::string, Function *> Functions;
-  //  std::map<std::string, char*> namespaces;
-   // std::map<std::string, Type*> Types;
     //Карта связи имени элемента структуры с его порядковым номером
     //для обращения к нему в IR LLVM
     std::map<std::string, std::map<std::string,int>> Structures;
@@ -74,13 +73,9 @@ public:
     int Init(CModule *m);
     //генерация кода LLVM модуля
     Value* WriteLLVM(CModule *m);
-    Value* WriteLLVM_type(CDeclSeq* ds);
     Value* WriteLLVM_var(CDeclSeq* ds);
     Value* WriteLLVM_proc(CDeclSeq* ds);
     Value* WriteLLVM(CStatementSeq* ss);
-    //Value* WriteLLVM(CImportModule* im);
-    //генерация кода LLVM типов
-    Value* WriteLLVM(CBaseType* t);
     //генерация кода LLVM переменных
     Value* WriteLLVM(CBaseVar* v);
     Value* WriteLLVM_ConstValue(CBaseVar* v);
@@ -118,18 +113,18 @@ public:
     Value* WriteLLVM(CTermPair* t);
     Value* WriteLLVM(CFactor* f);
     Value* WriteLLVM(CDesignator* d); //частично реализовано
-    Value* WriteLLVM_index(CExprList* e, bool IsOpenArray, Value* array);
+    Value* WriteLLVM_index(CExprList* e, Value* array);
     Value* WriteLLVM_record_index(Value* record,char *ident,CDesignator *d);
     //генерация кода LLVM стандартных процедур
     Value* WriteLLVM(CAbsStdProcFunc* d);
-    Value* WriteLLVM(CAshStdProcFunc* d){}; //не реализовано
+    Value* WriteLLVM(CAshStdProcFunc* d);
     Value* WriteLLVM(CCapStdProcFunc* d);
     Value* WriteLLVM(CChrStdProcFunc* d);
     Value* WriteLLVM(CEntierStdProcFunc* d);
     Value* WriteLLVM(CLenStdProcFunc* d);
     Value* WriteLLVM(CLongStdProcFunc* d);
-    Value* WriteLLVM(CMaxStdProcFunc* d){}; //не реализовано
-    Value* WriteLLVM(CMinStdProcFunc* d){}; //не реализовано
+    Value* WriteLLVM(CMaxStdProcFunc* d);
+    Value* WriteLLVM(CMinStdProcFunc* d);
     Value* WriteLLVM(COddStdProcFunc* d);
     Value* WriteLLVM(COrdStdProcFunc* d);
     Value* WriteLLVM(CShortStdProcFunc* d);

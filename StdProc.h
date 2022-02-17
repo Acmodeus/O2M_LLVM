@@ -34,7 +34,7 @@ public:
 	CAshStdProcFunc(const CBaseName *parent) : CStdProcFunc(parent), ExprX(parent), ExprN(parent) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	CExpr ExprX;			//целое выражение
 	CExpr ExprN;			//целое выражение
 };
@@ -124,7 +124,7 @@ public:
 	int CreateConst(CBaseVar *&BaseConst);
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	//признак использования для типа SET, применим только при id_CIntegerVar == ResultId
 	bool AppliedToSET;
 };
@@ -140,7 +140,7 @@ public:
 	int CreateConst(CBaseVar *&BaseConst);
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	//признак использования для типа SET, применим только при id_CIntegerVar == ResultId
 	bool AppliedToSET;
 };

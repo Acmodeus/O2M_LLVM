@@ -94,12 +94,6 @@ Type *LLVMDriver::GetLLVMType(EName_id name_id)
 //получения типа LLVM на основе наследников класса CBaseVar
 Type *LLVMDriver::GetLLVMType(CBaseVar *v)
 {
-    //отказ от карты типов вызван тем, что в каждом модуле приходится формировать ее заново
-    //в процессе объявления типов и формальных параметров, в некоторых случаях это больше запутывает,
-    //чем помогает. Также у модуля LLVM есть своя карта имменнованных типов
-    /*if(!(v->name_id==id_CCommonVar)&&!Types.empty()&&Types[v->GetTypeName()]) {
-        return Types[v->GetTypeName()];
-    }*/
     switch (v->name_id) {
     default:
         //для простых типов вызывается соответствующий метод
@@ -188,10 +182,6 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         //Именной тип
         //Ищем именной тип в глобальной области видимости и формируем его
         CQualidentType* QT = static_cast<CQualidentType*>(v);
-        //структуру заполняем только для базового типа Record
-   /*     if(!Structures.empty()&&!Structures[QT->Qualident->ident].empty()) Structures[v->name] = Structures[QT->Qualident->ident];
-        if(!Types.empty()&&Types[QT->Qualident->ident])
-            return Types[QT->Qualident->ident];*/
         CBaseType* BT = static_cast<CBaseType*>(QT->parent_element->GetGlobalName(QT->Qualident->pref_ident, QT->Qualident->ident));
         return GetLLVMType(BT);
     }
@@ -213,7 +203,6 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
                 CBaseType* BT = PT->FindType();
                 type = GetLLVMType(BT);
         }//if
-        //if(!Structures.empty()&&!Structures[PT->Qualident->ident].empty()) Structures[v->name] = Structures[PT->Qualident->ident];
         //В случае указателя на указатель возвращается первый указатель
         //??????возможно нужно изменить??????
         if(type->isPointerTy())
@@ -301,8 +290,7 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
         funName="_ZN"+std::to_string(firstName.size())+firstName+std::to_string(recieverName.size())+recieverName+std::to_string(lastName.size())+lastName+"E";
     }else funName="_ZN"+std::to_string(firstName.size())+firstName+std::to_string(lastName.size())+lastName+"E";
     if(!p->FormalPars->FPStore.empty()){
-        CBaseVarVector::const_iterator i = p->FormalPars->FPStore.begin();
-        for(i; i != p->FormalPars->FPStore.end(); ++i) {            
+        for(CBaseVarVector::const_iterator i = p->FormalPars->FPStore.begin(); i != p->FormalPars->FPStore.end(); ++i) {
             if((*i)->is_var){
                 funName+="R";
             }//if
@@ -464,7 +452,6 @@ void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector
         Value* common=Builder.CreateLoad(NamedValues[(*i)->name]);
         Value* spec=Builder.CreateStructGEP(common,1);
         spec=Builder.CreateLoad(spec);
-        //spec=Builder.CreateBitCast(spec,SpecType);
         //формирование инструкции if-then-else
         int sTag=SpecTypes[(*ci)->Name];
         Value* condV=Builder.CreateICmpEQ(spec,ConstantInt::get(Type::getInt32Ty(TheContext),sTag));
@@ -563,8 +550,6 @@ Value* LLVMDriver::WriteLLVM(CModule *m)
 {
     TheModule = std::make_unique<Module>(m->name, TheContext);
 
-    //генерация кода деклараций типов
-    WriteLLVM_type(m->DeclSeq);
     //генерация кода переменных
     WriteLLVM_var(m->DeclSeq);
     //генерация кода деклараций процедур
@@ -601,28 +586,6 @@ Value* LLVMDriver::WriteLLVM(CModule *m)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//генерация кода деклараций типов
-Value *LLVMDriver::WriteLLVM_type(CDeclSeq *ds)
-{
-    CBaseNameVector::const_iterator ci;
-
-  /*  //запись кода импортируемых модулей
-    for (ci = ds->BaseNameStore.begin(); ci != ds->BaseNameStore.end(); ++ci) {
-        if (id_CImportModule == (*ci)->name_id) {
-            WriteLLVM(static_cast<CImportModule*>(*ci));
-        }
-    }*/
-
-    //запись кода типов
-    for (ci = ds->BaseNameStore.begin(); ci != ds->BaseNameStore.end(); ++ci){
-        if (CBaseType::IsTypeId((*ci)->name_id)) {
-            WriteLLVM(static_cast<CBaseType*>(*ci));
-        }//if
-    }//for
-    return nullptr;
-}//WriteLLVM_type
-
-//-----------------------------------------------------------------------------
 //генерация кода переменных
 Value *LLVMDriver::WriteLLVM_var(CDeclSeq *ds){
     CBaseNameVector::const_iterator ci;
@@ -651,55 +614,38 @@ Value *LLVMDriver::WriteLLVM_proc(CDeclSeq *ds){
 Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
 {
     //цикл выбора и генерации кода конкретного оператора
-    CBaseVector::iterator i;
-    for(i = ss->StatStore.begin(); i != ss->StatStore.end(); ++i) {
-        if(typeid(**i) == typeid (CIfStatement)){
-            WriteLLVM(static_cast<CIfStatement*>(*i));
-        }else if(typeid(**i) == typeid (CCaseStatement)){
-            WriteLLVM(static_cast<CCaseStatement*>(*i));
-        }else if(typeid(**i) == typeid (CWhileStatement)){
-            WriteLLVM(static_cast<CWhileStatement*>(*i));
-        }else if(typeid(**i) == typeid (CRepeatStatement)){
-            WriteLLVM(static_cast<CRepeatStatement*>(*i));
-        }else if(typeid(**i) == typeid (CForStatement)){
-            WriteLLVM(static_cast<CForStatement*>(*i));
-        }else if(typeid(**i) == typeid (CLoopStatement)){
-            WriteLLVM(static_cast<CLoopStatement*>(*i));
-        }else if(typeid(**i) == typeid (CWithStatement)){
-            WriteLLVM(static_cast<CWithStatement*>(*i));
-        }else if(typeid(**i) == typeid (CExitStatement)){
-            WriteLLVM(static_cast<CExitStatement*>(*i));
-        }else if(typeid(**i) == typeid (CAssignStatement)){
-            WriteLLVM(static_cast<CAssignStatement*>(*i));
-        }else if(typeid(**i) == typeid (CReturnStatement)){
-            WriteLLVM(static_cast<CReturnStatement*>(*i));
-        }else if(typeid(**i) == typeid (CCallStatement)){
-            WriteLLVM(static_cast<CCallStatement*>(*i));
-        }else if(typeid(**i) == typeid (CDecStdProc)){
-            WriteLLVM(static_cast<CDecStdProc*>(*i));
-        }else if(typeid(**i) == typeid (CIncStdProc)){
-            WriteLLVM(static_cast<CIncStdProc*>(*i));
-        }else if(typeid(**i) == typeid (CNewStdProc)){
-            WriteLLVM(static_cast<CNewStdProc*>(*i));
+    for(CBaseVector::iterator i = ss->StatStore.begin(); i != ss->StatStore.end(); ++i) {
+        CBase* base = *i;
+        if(typeid(*base) == typeid (CIfStatement)){
+            WriteLLVM(static_cast<CIfStatement*>(base));
+        }else if(typeid(*base) == typeid (CCaseStatement)){
+            WriteLLVM(static_cast<CCaseStatement*>(base));
+        }else if(typeid(*base) == typeid (CWhileStatement)){
+            WriteLLVM(static_cast<CWhileStatement*>(base));
+        }else if(typeid(*base) == typeid (CRepeatStatement)){
+            WriteLLVM(static_cast<CRepeatStatement*>(base));
+        }else if(typeid(*base) == typeid (CForStatement)){
+            WriteLLVM(static_cast<CForStatement*>(base));
+        }else if(typeid(*base) == typeid (CLoopStatement)){
+            WriteLLVM(static_cast<CLoopStatement*>(base));
+        }else if(typeid(*base) == typeid (CWithStatement)){
+            WriteLLVM(static_cast<CWithStatement*>(base));
+        }else if(typeid(*base) == typeid (CExitStatement)){
+            WriteLLVM(static_cast<CExitStatement*>(base));
+        }else if(typeid(*base) == typeid (CAssignStatement)){
+            WriteLLVM(static_cast<CAssignStatement*>(base));
+        }else if(typeid(*base) == typeid (CReturnStatement)){
+            WriteLLVM(static_cast<CReturnStatement*>(base));
+        }else if(typeid(*base) == typeid (CCallStatement)){
+            WriteLLVM(static_cast<CCallStatement*>(base));
+        }else if(typeid(*base) == typeid (CDecStdProc)){
+            WriteLLVM(static_cast<CDecStdProc*>(base));
+        }else if(typeid(*base) == typeid (CIncStdProc)){
+            WriteLLVM(static_cast<CIncStdProc*>(base));
+        }else if(typeid(*base) == typeid (CNewStdProc)){
+            WriteLLVM(static_cast<CNewStdProc*>(base));
         }//if
     }//for
-    return nullptr;
-}//WriteLLVM
-/*
-Value *LLVMDriver::WriteLLVM(CImportModule *im)
-{
-    namespaces[im->name]=im->real_name;
-    return nullptr;
-}
-*/
-//-----------------------------------------------------------------------------
-//генерация кода деклараций конкретного типа
-//в основном нужно для обобщений
-//???????возможно можно обойтись и без этой функции???????
-Value *LLVMDriver::WriteLLVM(CBaseType *t)
-{
-    //Types[t->name]=
-    GetLLVMType(t);
     return nullptr;
 }//WriteLLVM
 
@@ -736,6 +682,8 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
             case id_CShortintVar:
                 InitVal = ConstantInt::get(type,static_cast<CShortintVar*>(v)->ConstValue);
                 break;
+        default:
+            break;
         }//switch
     } else {
         InitVal = Constant::getNullValue(type);
@@ -807,8 +755,6 @@ Function *LLVMDriver::WriteLLVM(CProcedure *p)
         //Сохранения указателя на память в карте локальных переменных
         NamedValues[std::string(Arg.getName())] = Alloca;
     }//for
-    //генерация кода деклараций типов
-    WriteLLVM_type(p->DeclSeq);
     //генерация кода переменных
     WriteLLVM_var(p->DeclSeq);
     //генерация кода для операторов
@@ -1080,10 +1026,8 @@ Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
 //Генерация кода LLVM варианта оператора CASE
 Value *LLVMDriver::WriteLLVM(CCaseLabelsSeq *cls, CExpr *e, BasicBlock *exitBB)
 {
-    CCaseLabelsSeq::CaseLabelsList_type::const_iterator i;
-    //проверка первой метки
-    if (cls->CaseLabelsList.empty()) throw error_Internal("CCaseLabelsSeq::WriteLLVM");
-    i = cls->CaseLabelsList.begin();
+    CCaseLabelsSeq::CaseLabelsList_type::const_iterator i = cls->CaseLabelsList.begin();
+    //генерация первой метки
     Value* expr = WriteLLVM((*i), e);
     //цикл перебора оставшихся меток
     for (++i; i != cls->CaseLabelsList.end(); ++i)
@@ -1175,9 +1119,11 @@ Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
         }//while
         Value* expr=WriteLLVM(s->Expr);
         if(!expr) expr=Constant::getNullValue(store->getType()->getContainedType(0));
-        CBaseName* BN=s->Expr->FindLastName();
-        if(BN && SpecTypes[BN->name]){
-            SpecTypes[s->Designator->Qualident->ident]=SpecTypes[BN->name];
+        if (!SpecTypes.empty()){
+            CBaseName* BN=s->Expr->FindLastName();
+            if(BN && !SpecTypes.empty() && SpecTypes[BN->name]){
+                SpecTypes[s->Designator->Qualident->ident]=SpecTypes[BN->name];
+            }//if
         }//if
         return Builder.CreateStore(expr, store);
     }//if
@@ -1315,9 +1261,8 @@ Value *LLVMDriver::WriteLLVM(CCallStatement *s)
 std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
 {
     std::vector<Value *> ArgsV;
-    CExprVector::const_iterator i = e->ExprVector->begin();
     CBaseVarVector::const_iterator ci = fp->FPStore.begin();
-    for(i; i != e->ExprVector->end(); ++i, ++ci) {
+    for(CExprVector::const_iterator i = e->ExprVector->begin(); i != e->ExprVector->end(); ++i, ++ci) {
         Value* value;
         //Если параметр переменная, нужно передавать указатель на него
         if((*ci)->is_var){
@@ -1444,6 +1389,8 @@ Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
             case aop_OR:
                 term=Builder.CreateOr(term, simplePair, "ortmp");
                 break;
+            default:
+                break;
             }//switch
         }//for
     }//if
@@ -1489,6 +1436,8 @@ Value *LLVMDriver::WriteLLVM(CTerm *t)
                 break;
             case mop_AND:
                 factor=Builder.CreateAnd(factor, termPair, "andtmp");
+                break;
+            default:
                 break;
             }//switch
         }//for
@@ -1587,10 +1536,8 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
     for (CDesignator::SDesElemStore::const_iterator ci = d->DesElemStore.begin(); ci != d->DesElemStore.end(); ci++) {
         switch ((*ci)->DesKind) {
         case CDesignator::EDesKind::dk_Array:       
-            designator=WriteLLVM_index((*ci)->ExprList, false,designator);
-            break;
         case CDesignator::EDesKind::dk_OpenArray:
-            designator=WriteLLVM_index((*ci)->ExprList, true,designator);
+            designator=WriteLLVM_index((*ci)->ExprList, designator);
             break;
         case CDesignator::EDesKind::dk_Pointer:
         case CDesignator::EDesKind::dk_Record:
@@ -1605,19 +1552,23 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
 
 //-----------------------------------------------------------------------------
 //Получения значения массива по индексам
-Value *LLVMDriver::WriteLLVM_index(CExprList *e, bool IsOpenArray, Value* array)
+Value *LLVMDriver::WriteLLVM_index(CExprList *e, Value* array)
 {
     std::vector<Value*> values;
-    if(!IsOpenArray){
+    //Закрытый массив - это должен быть указатель на тип Массив
+    bool isCloseArray = array->getType()->isPointerTy() && array->getType()->getContainedType(0)->isArrayTy();
+    //Для закрытого массиванужен дополнительный параметр вначале
+    if(isCloseArray){
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
     }//if
-    CExprVector::const_iterator ci = e->ExprVector->begin();
-    for (ci; ci != e->ExprVector->end(); ++ci) {
+    //запись индексов массива
+    for (CExprVector::const_iterator ci = e->ExprVector->begin(); ci != e->ExprVector->end(); ++ci) {
         Value* value=WriteLLVM((*ci));
         value=CastToType(value,Type::getInt32Ty(TheContext));
         values.push_back(value);
     }//for
-    if(IsOpenArray){
+    //взятие значения у закрытого и открытого массива обрабатываются разными функциями
+    if(!isCloseArray){
         array=Builder.CreateLoad(array,array->getName());
         return Builder.CreateInBoundsGEP(array,values,"gep");
     }//if
@@ -1687,6 +1638,18 @@ Value *LLVMDriver::WriteLLVM(CAbsStdProcFunc *d)
     }//if
     Value* expr=WriteLLVM(&d->Expr);
     return Builder.CreateCall(F, expr, "calltmp");
+}
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции ASH
+Value *LLVMDriver::WriteLLVM(CAshStdProcFunc *d)
+{
+    Value* exprX = WriteLLVM(&d->ExprX);
+    Value* exprN = WriteLLVM(&d->ExprN);
+    if(IsId1IncloseId2((&d->ExprX)->GetResultId(),(&d->ExprN)->GetResultId()))
+        exprN = CastToType(exprN,exprX->getType());
+    else exprX = CastToType(exprX,exprN->getType());
+    return Builder.CreateShl(exprX,exprN,"ASH");
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
@@ -1738,6 +1701,59 @@ Value *LLVMDriver::WriteLLVM(CLenStdProcFunc *d)
 Value *LLVMDriver::WriteLLVM(CLongStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции MAX
+Value *LLVMDriver::WriteLLVM(CMaxStdProcFunc *d){
+    switch (d->GetResultId()) {
+    case id_CBooleanVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),1);
+    case id_CCharVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),255);
+    case id_CShortintVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),SHRT_MAX);
+    case id_CIntegerVar:
+        //выбор между SET и INTEGER
+        if (d->AppliedToSET)
+            return ConstantInt::get(GetLLVMType(d->GetResultId()),SET_MAX);
+        else
+            return ConstantInt::get(GetLLVMType(d->GetResultId()),INT_MAX);
+    case id_CLongintVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),LONG_MAX);
+    case id_CRealVar:
+    case id_CLongrealVar:
+        //double по размеру совпадает с long double
+        return ConstantFP::get(GetLLVMType(d->GetResultId()),DBL_MAX);
+    default:
+        return nullptr;
+    }//switch
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции MIN
+Value *LLVMDriver::WriteLLVM(CMinStdProcFunc *d){
+    switch (d->GetResultId()) {
+    case id_CBooleanVar:
+    case id_CCharVar:
+        return Constant::getNullValue(GetLLVMType(d->GetResultId()));
+    case id_CShortintVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),SHRT_MIN);
+    case id_CIntegerVar:
+        //выбор между SET и INTEGER
+        if (d->AppliedToSET)
+            return Constant::getNullValue(GetLLVMType(d->GetResultId()));
+        else
+            return ConstantInt::get(GetLLVMType(d->GetResultId()),INT_MIN);
+    case id_CLongintVar:
+        return ConstantInt::get(GetLLVMType(d->GetResultId()),LONG_MIN);
+    case id_CRealVar:
+    case id_CLongrealVar:
+        //double по размеру совпадает с long double
+        return ConstantFP::get(GetLLVMType(d->GetResultId()),DBL_MIN);
+    default:
+        return nullptr;
+    }//switch
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
