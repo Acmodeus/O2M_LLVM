@@ -50,7 +50,7 @@ public:
     //Карта блоков, используется для выхода из бесконечного цикла
     std::map<int, BasicBlock *> BasicBlocks;
     LLVMDriver(): Builder(TheContext){};
-    ~LLVMDriver(){};
+    ~LLVMDriver();
     //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
     AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, std::string name,Type* type);
     //Функция приведения типов

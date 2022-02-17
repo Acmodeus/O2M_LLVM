@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 	bool sw_version = false;
 	bool sw_help = false;
 	bool sw_arg_err = false;
+    bool sw_LLVM = false;
 
 	//дл€ временного хранени€ значени€ табул€ции (-1 - недопустимое значение)
 	int tab_size = -1;
@@ -133,6 +134,10 @@ int main(int argc, char *argv[])
 
 				//проверка ключа 'h'
 				if (('H' == sw || '?' == sw) && '\0' == argv[i][2]) sw_help = true;
+                else
+
+                //проверка ключа 'l'
+                if ('L' == sw && '\0' == argv[i][2]) sw_LLVM = true;
 				else {
 					fprintf(output, "ERROR: Unknown command line option %s\n", argv[i]);
 					sw_arg_err = true;
@@ -156,6 +161,7 @@ int main(int argc, char *argv[])
 		fprintf(output, "  f <file>  Specify file for output messages instead of stdout\n");
 		fprintf(output, "  v         Version info\n");
 		fprintf(output, "  h,?       This help\n");
+        fprintf(output, "  l         Choose compile file with LLVM-compiler\n");
 		return sw_arg_err ? ErrExitCode : 0;
 	}
 
@@ -216,41 +222,41 @@ int main(int argc, char *argv[])
 	//проверка отсутстви€ ошибок после генерации DFN файла
 	if (err_num) goto fault_exit;
 
+    if (!sw_LLVM){
+        //////////////////////////////////////////////////////////////
+        //подготовка файлов и генераци€ кода C++
+        err_num = s_m_Error;
+        try {
+            CPP_files cpp_f;
+            if (!cpp_f.Init(M->name)) {
+                M->WriteCPP(cpp_f);
+                err_num = 0;
+            }
+        }
+        catch (error_Internal e_I) {
+            fprintf(output, textInternalError, e_I.error_message);
+        }
+        //проверка отсутстви€ ошибок после генерации кода C++
+        if (err_num) goto fault_exit;
 
-    //////////////////////////////////////////////////////////////
- /* //подготовка файлов и генераци€ кода C++
-	err_num = s_m_Error;
-	try {
-		CPP_files cpp_f;
-		if (!cpp_f.Init(M->name)) {
-			M->WriteCPP(cpp_f);
-			err_num = 0;
-		}
-	}
-	catch (error_Internal e_I) {
-		fprintf(output, textInternalError, e_I.error_message);
-	}
-	//проверка отсутстви€ ошибок после генерации кода C++
-	if (err_num) goto fault_exit;
-
-*/
-    //////////////////////////////////////////////////////////////
-
-    //////////////////////////////////////////////////////////////
-    //подготовка файлов и генераци€ кода LLVM
-    err_num = s_m_Error;
-    try {
-        LLVMDriver llvmDriver;
-        llvmDriver.Init(M);
-        err_num = 0;
     }
-    catch (error_Internal e_I) {
-        fprintf(output, textInternalError, e_I.error_message);
+    else{
+
+        //////////////////////////////////////////////////////////////
+        //подготовка файлов и генераци€ кода LLVM
+        err_num = s_m_Error;
+        try {
+            LLVMDriver llvmDriver;
+            if (!llvmDriver.Init(M))
+                err_num = 0;
+        }
+        catch (error_Internal e_I) {
+            fprintf(output, textInternalError, e_I.error_message);
+        }
+        //проверка отсутстви€ ошибок после генерации кода LLVM
+        if (err_num) goto fault_exit;
+
     }
-    //проверка отсутстви€ ошибок после генерации кода LLVM
-    if (err_num) goto fault_exit;
-
-
     //////////////////////////////////////////////////////////////
 
 	//обработка O2M makefile и главного файла проекта

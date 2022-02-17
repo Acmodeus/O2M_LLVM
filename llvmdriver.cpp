@@ -1,5 +1,16 @@
 #include "llvmdriver.h"
 
+//Деструктор объекта LLVMDriver
+LLVMDriver::~LLVMDriver()
+{
+    NamedValues.clear();
+    GlobalValues.clear();
+    Functions.clear();
+    Structures.clear();
+    SpecTypes.clear();
+    BasicBlocks.clear();
+}//~LLVMDriver
+
 //-----------------------------------------------------------------------------
 //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
 AllocaInst *LLVMDriver::CreateEntryBlockAlloca(Function *TheFunction,
@@ -579,8 +590,8 @@ Value* LLVMDriver::WriteLLVM(CModule *m)
     }//if
 
     //печать текста модуля в поток ошибок для отладки
-    TheModule->print(errs(),nullptr);
-    fprintf(stderr, "\n");
+    //TheModule->print(errs(),nullptr);
+    //fprintf(stderr, "\n");
 
     return nullptr;
 }//WriteLLVM

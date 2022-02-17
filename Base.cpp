@@ -30,56 +30,56 @@ CPP_files::~CPP_files()
 //открытие файлов для записи с выдачей сообщения при возникновении ошибки
 int CPP_files::Init(const char *name)
 {
-	//подготовка строки для формирования полного пути к файлу
-    ext_offs = /*strlen("CPP/.") +*/ strlen(name);
-	f_name = new char[ext_offs + strlen("cpp_")];
-	//формирование полного пути к файлу без расширения
-    //strcpy(f_name, "CPP/");
-    strcpy(f_name, name);
+    //подготовка строки для формирования полного пути к файлу
+    ext_offs = strlen("CPP/.") + strlen(name);
+    f_name = new char[ext_offs + strlen("cpp_")];
+    //формирование полного пути к файлу без расширения
+    strcpy(f_name, "CPP/");
+    strcat(f_name, name);
 
-	//добавление расширения ".2ml"
-	strcat(f_name, ".2ml");
-	//открытие 2ml файла для записи
-	f2ml = fopen(f_name, "w");
-	if (!f2ml) {
-		fprintf(output, textCheckFolder, "CPP");
-		goto fault_exit;
-	}
+    //добавление расширения ".2ml"
+    strcat(f_name, ".2ml");
+    //открытие 2ml файла для записи
+    f2ml = fopen(f_name, "w");
+    if (!f2ml) {
+        fprintf(output, textCheckFolder, "CPP");
+        goto fault_exit;
+    }
 
-	//смена расширения на "cpp"
-	f_name[ext_offs] = 0;
-	strcat(f_name, "cpp");
-	//открытие cpp файла для записи
-	fc = fopen(f_name, "w");
-	if (!fc) goto fault_exit;
+    //смена расширения на "cpp"
+    f_name[ext_offs] = 0;
+    strcat(f_name, "cpp");
+    //открытие cpp файла для записи
+    fc = fopen(f_name, "w");
+    if (!fc) goto fault_exit;
 
-	//смена расширения на "h"
-	f_name[ext_offs] = 'h';
-	f_name[ext_offs + 1] = 0;
-	//открытие h файла для записи
-	fh = fopen(f_name, "w");
-	if (!fh) goto fault_exit;
+    //смена расширения на "h"
+    f_name[ext_offs] = 'h';
+    f_name[ext_offs + 1] = 0;
+    //открытие h файла для записи
+    fh = fopen(f_name, "w");
+    if (!fh) goto fault_exit;
 
-	//запись комментария в начало файла
-	fprintf(fc, comment_format, comment_line_cpp, comment_title, comment_line_cpp);
-	fprintf(fh, comment_format, comment_line_cpp, comment_title, comment_line_cpp);
+    //запись комментария в начало файла
+    fprintf(fc, comment_format, comment_line_cpp, comment_title, comment_line_cpp);
+    fprintf(fh, comment_format, comment_line_cpp, comment_title, comment_line_cpp);
 
-	//запись заголовка в 2ml файл
-	fprintf(f2ml, "<?xml version=\"1.0\" ?>\n<!-- %s -->\n<Module Name=\"%s\">\n", comment_title, name);
+    //запись заголовка в 2ml файл
+    fprintf(f2ml, "<?xml version=\"1.0\" ?>\n<!-- %s -->\n<Module Name=\"%s\">\n", comment_title, name);
 
-	//предотвращение повторного объявления
-	fprintf(fh, "#ifndef O2M_H_FILE_%s\n", name);
-	fprintf(fh, "#define O2M_H_FILE_%s\n", name);
-	//вставка файла _O2M_sys.h
-	fprintf(fh, "#include \"_O2M_sys.h\"\n");
+    //предотвращение повторного объявления
+    fprintf(fh, "#ifndef O2M_H_FILE_%s\n", name);
+    fprintf(fh, "#define O2M_H_FILE_%s\n", name);
+    //вставка файла _O2M_sys.h
+    fprintf(fh, "#include \"_O2M_sys.h\"\n");
 
-	//открытие файлов завершено удачно
-	return 0;
+    //открытие файлов завершено удачно
+    return 0;
 
 fault_exit:
-	//вывод сообщения об ошибке открытия файла для записи
-	fprintf(output, textCannotOpenW, f_name);
-	return s_m_Error;
+    //вывод сообщения об ошибке открытия файла для записи
+    fprintf(output, textCannotOpenW, f_name);
+    return s_m_Error;
 }
 
 
