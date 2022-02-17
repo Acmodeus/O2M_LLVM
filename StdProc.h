@@ -197,7 +197,7 @@ public:
 	CSizeStdProcFunc(const CBaseName *parent) : CStdProcFunc(parent) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	CQualident Qualident;	//любой тип
 };
 

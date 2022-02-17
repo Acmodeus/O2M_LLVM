@@ -1793,6 +1793,13 @@ Value *LLVMDriver::WriteLLVM(CShortStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры-функции SIZE
+Value *LLVMDriver::WriteLLVM(CSizeStdProcFunc *d)
+{
+    return llvm::ConstantInt::get(llvm::Type::getInt64Ty(TheContext), TheModule->getDataLayout().getTypeAllocSize(GetLLVMType(d->Qualident.TypeResultId)));
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
 //Генерация кода LLVM процедуры DEC
 Value *LLVMDriver::WriteLLVM(CDecStdProc *d)
 {

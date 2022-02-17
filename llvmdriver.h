@@ -128,7 +128,7 @@ public:
     Value* WriteLLVM(COddStdProcFunc* d);
     Value* WriteLLVM(COrdStdProcFunc* d);
     Value* WriteLLVM(CShortStdProcFunc* d);
-    Value* WriteLLVM(CSizeStdProcFunc* d){}; //не реализовано
+    Value* WriteLLVM(CSizeStdProcFunc* d); //не реализовано
     Value* WriteLLVM(CDecStdProc* d);
     Value* WriteLLVM(CIncStdProc* d);
     Value* WriteLLVM(CNewStdProc* d);
