@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 {
 	//версия O2M
 	const char* const Version = "1.8.162";
+    const char* const VersionLLVM = "0.2";
 
 	//код ошибки, возвращаемый в операционную систему
 	const int ErrExitCode = 1;
@@ -149,9 +150,13 @@ int main(int argc, char *argv[])
 	//отображение справочной информации (если надо)
 	if (sw_version) {
 		fprintf(output, "O2M compiler version %s\n", Version);
+        fprintf(output, "Driver LLVM compiler version %s\n",VersionLLVM);
 		return 0;
 	}
-	if (sw_about) fprintf(output, "\nO2M compiler v%s\nCopyright(c) Schwetz Dmitry, 2004\n\n", Version);
+    if (sw_about) {
+        fprintf(output, "\nO2M compiler v%s\nCopyright(c) Schwetz Dmitry, 2004\n\n", Version);
+        fprintf(output, "Driver LLVM compiler v%s\nCopyright(c) Fomichev Maxim, 2022\n\n",VersionLLVM);
+    }
 	if (sw_help || sw_arg_err) {
 		fprintf(output, "Usage:      O2M <source_file> [<project_file>] [-<switch>...]\n\n<Examples>\n  O2M source.o2m project.pro -a\n  O2M \"source file.o2m\" -m -f \"log.txt\" -a\n\n<Switches>\n");
 		fprintf(output, "  m         Specify current file as main file in project\n");

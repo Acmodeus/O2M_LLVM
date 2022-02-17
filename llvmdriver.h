@@ -56,7 +56,6 @@ public:
     //Функция приведения типов
     Value *CastToType(Value* v, Type* destType);
     //Создание функции без аргументов
-    //????Может удалить, переделать на нижнюю все вызовы????
     Function* createFunction(Type* retType,std::string name);
     //Создание функции с аргументами
     Function* createFunction(Type* retType,std::vector<Type*> typePars,StringVector namePars,std::string name);
@@ -80,8 +79,6 @@ public:
     Value* WriteLLVM(CBaseVar* v);
     Value* WriteLLVM_ConstValue(CBaseVar* v);
 
-    Value* WriteLLVM(CSetVar* v); //не реализовано
-    Value* WriteLLVM(CPtrVar* v); //не реализовано
     //генерация кода LLVM процедуры
     Function* WriteLLVM(CProcedure* p);
     //получение списка типов формальных параметров
@@ -100,7 +97,7 @@ public:
     Value* WriteLLVM(CWithStatement* s){}; //не реализовано
     Value* WriteLLVM(CExitStatement* s);
     Value* WriteLLVM(CReturnStatement* s);
-    Value* WriteLLVM(CAssignStatement* s); //частично реализовано
+    Value* WriteLLVM(CAssignStatement* s);
     Value* WriteLLVM_array(CAssignStatement* s);
     Value* WriteLLVM_COPY_Par(CBaseName* bn);
     Value* WriteLLVM(CCallStatement* s); //частично реализовано
@@ -112,7 +109,7 @@ public:
     Value* WriteLLVM(CTerm* t);
     Value* WriteLLVM(CTermPair* t);
     Value* WriteLLVM(CFactor* f);
-    Value* WriteLLVM(CDesignator* d); //частично реализовано
+    Value* WriteLLVM(CDesignator* d);
     Value* WriteLLVM_index(CExprList* e, Value* array);
     Value* WriteLLVM_record_index(Value* record,char *ident,CDesignator *d);
     //генерация кода LLVM стандартных процедур
@@ -128,7 +125,7 @@ public:
     Value* WriteLLVM(COddStdProcFunc* d);
     Value* WriteLLVM(COrdStdProcFunc* d);
     Value* WriteLLVM(CShortStdProcFunc* d);
-    Value* WriteLLVM(CSizeStdProcFunc* d); //не реализовано
+    Value* WriteLLVM(CSizeStdProcFunc* d);
     Value* WriteLLVM(CDecStdProc* d);
     Value* WriteLLVM(CIncStdProc* d);
     Value* WriteLLVM(CNewStdProc* d);

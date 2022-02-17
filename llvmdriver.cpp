@@ -133,7 +133,6 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
                 type = GetLLVMType(BT);
         }//if
         //В случае указателя на указатель возвращается первый указатель
-        //??????возможно нужно изменить??????
         if(type->isPointerTy())
             return type;
         return type->getPointerTo();
@@ -161,10 +160,6 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
     }
     case id_CCommonVar:{
         //COMMON
-        /*StructType* ST=TheModule->getTypeByName(v->GetTypeName());
-        if(ST){
-           return ST;
-        }*/
         //если знаем специализацию обобщения, то возвращаем ее, если нет, то тип обобщения;
         //предполагается что тип обобщения создастся при объявления типа,
         //либо при объявлении переменной типа указатель на обобщение
@@ -215,7 +210,6 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
                 type = GetLLVMType(BT);
         }//if
         //В случае указателя на указатель возвращается первый указатель
-        //??????возможно нужно изменить??????
         if(type->isPointerTy())
             return type;
         return type->getPointerTo();
@@ -1781,7 +1775,6 @@ Value *LLVMDriver::WriteLLVM(COddStdProcFunc *d)
 Value *LLVMDriver::WriteLLVM(COrdStdProcFunc *d)
 {
     //вызов стандартной функции из сгенерированного файла _O2M_sys.cpp
-    //(как вариант можно вручную сгенерировать эту функцию)
     std::string name="_Z3ORDc";
     Function *F=Functions[name];
     if(!F){
