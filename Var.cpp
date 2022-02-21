@@ -1,12 +1,12 @@
 //=============================================================================
-// Описание классов переменных (Var)
+// РћРїРёСЃР°РЅРёРµ РєР»Р°СЃСЃРѕРІ РїРµСЂРµРјРµРЅРЅС‹С… (Var)
 //=============================================================================
 
 #include "Var.h"
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта CArrayVar
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° CArrayVar
 CArrayVar::~CArrayVar()
 {
 	delete ArrayType;
@@ -15,7 +15,7 @@ CArrayVar::~CArrayVar()
 
 
 //-----------------------------------------------------------------------------
-//проверка завершенности типа эл-тов массива
+//РїСЂРѕРІРµСЂРєР° Р·Р°РІРµСЂС€РµРЅРЅРѕСЃС‚Рё С‚РёРїР° СЌР»-С‚РѕРІ РјР°СЃСЃРёРІР°
 int CArrayVar::CheckComplete(CLexBuf *lb)
 {
 	return ArrayType->CheckComplete(lb);
@@ -23,16 +23,16 @@ int CArrayVar::CheckComplete(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CArrayVar::CreateConst(const CBaseName* parent) const
 {
-	//константное значение массива возможно только для строк
+	//РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјР°СЃСЃРёРІР° РІРѕР·РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РґР»СЏ СЃС‚СЂРѕРє
 	if (!ConstString) return CBaseVar::CreateConst(parent);
 
-	//создание константной переменной
+	//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CArrayVar* AV = static_cast<CArrayVar*>(CArrayVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	AV->ConstString = str_new_copy(ConstString);
 	AV->ConstStringIsChar = ConstStringIsChar;
 
@@ -41,13 +41,13 @@ CBaseVar* CArrayVar::CreateConst(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CArrayVar::CreateVar(const CBaseName* parent) const
 {
 	CArrayVar* AV = new CArrayVar(parent);
 	Assign(AV);
 
-	//копирование типа в переменную
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ С‚РёРїР° РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	CBaseType *BT = NULL;
 	ArrayType->CreateType(BT);
 	AV->ArrayType = static_cast<CArrayType*>(BT);
@@ -57,7 +57,7 @@ CBaseVar* CArrayVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//инициализация массива строкой символов
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР° СЃС‚СЂРѕРєРѕР№ СЃРёРјРІРѕР»РѕРІ
 int CArrayVar::SetConstValue(const char *st)
 {
 	is_const = true;
@@ -67,36 +67,36 @@ int CArrayVar::SetConstValue(const char *st)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CArrayVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CArrayVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CArrayVar::WriteCPP(CPP_files& f)
 {
-	//поиск описания типа эл-тов массива
+	//РїРѕРёСЃРє РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° СЌР»-С‚РѕРІ РјР°СЃСЃРёРІР°
 	CArrayType *AT = static_cast<CArrayType*>(ArrayType->FindLastType());
 	
-	//объявление массива отличается наличием "[" размера "]" от объявления переменной => пишем объявление переменной
+	//РѕР±СЉСЏРІР»РµРЅРёРµ РјР°СЃСЃРёРІР° РѕС‚Р»РёС‡Р°РµС‚СЃСЏ РЅР°Р»РёС‡РёРµРј "[" СЂР°Р·РјРµСЂР° "]" РѕС‚ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ => РїРёС€РµРј РѕР±СЉСЏРІР»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 	CBaseVar* BV;
 	static_cast<CBaseType*>(AT)->CreateVar(BV, parent_element);
-	BV->external = external;				//для записи в файлы .h/.cpp (при необходимости)
-	BV->name = name;						//используется название массива для записи первой части объявления массива
+	BV->external = external;				//РґР»СЏ Р·Р°РїРёСЃРё РІ С„Р°Р№Р»С‹ .h/.cpp (РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё)
+	BV->name = name;						//РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РЅР°Р·РІР°РЅРёРµ РјР°СЃСЃРёРІР° РґР»СЏ Р·Р°РїРёСЃРё РїРµСЂРІРѕР№ С‡Р°СЃС‚Рё РѕР±СЉСЏРІР»РµРЅРёСЏ РјР°СЃСЃРёРІР°
 	BV->WriteCPP(f);
-	BV->name = NULL;						//использовано название от массива => его нельзя удалять с временной переменной
+	BV->name = NULL;						//РёСЃРїРѕР»СЊР·РѕРІР°РЅРѕ РЅР°Р·РІР°РЅРёРµ РѕС‚ РјР°СЃСЃРёРІР° => РµРіРѕ РЅРµР»СЊР·СЏ СѓРґР°Р»СЏС‚СЊ СЃ РІСЂРµРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	delete BV;
 
-	//объявление переменной уже записано => пишем размеры массива по каждому измерению
+	//РѕР±СЉСЏРІР»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ СѓР¶Рµ Р·Р°РїРёСЃР°РЅРѕ => РїРёС€РµРј СЂР°Р·РјРµСЂС‹ РјР°СЃСЃРёРІР° РїРѕ РєР°Р¶РґРѕРјСѓ РёР·РјРµСЂРµРЅРёСЋ
 	AT = ArrayType;
-	//перебор вложенных типов-массивов (если есть)
+	//РїРµСЂРµР±РѕСЂ РІР»РѕР¶РµРЅРЅС‹С… С‚РёРїРѕРІ-РјР°СЃСЃРёРІРѕРІ (РµСЃР»Рё РµСЃС‚СЊ)
 	while (AT->name_id == id_CArrayType) {
-		//запись текущего размера (0 если открытый массив)
+		//Р·Р°РїРёСЃСЊ С‚РµРєСѓС‰РµРіРѕ СЂР°Р·РјРµСЂР° (0 РµСЃР»Рё РѕС‚РєСЂС‹С‚С‹Р№ РјР°СЃСЃРёРІ)
 		if (external) fprintf(f.fh, "[%i]", AT->size);
 		fprintf(f.fc, "[%i]", AT->size);
-		//переход к след. размеру (точнее к след. типу, если есть)
+		//РїРµСЂРµС…РѕРґ Рє СЃР»РµРґ. СЂР°Р·РјРµСЂСѓ (С‚РѕС‡РЅРµРµ Рє СЃР»РµРґ. С‚РёРїСѓ, РµСЃР»Рё РµСЃС‚СЊ)
 		AT = static_cast<CArrayType*>(AT->Type);
 	}
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода объявления массива в параметрах процедуры (добавляется объявление переменных для передачи действительных размеров открытых массивов)
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ РјР°СЃСЃРёРІР° РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹ (РґРѕР±Р°РІР»СЏРµС‚СЃСЏ РѕР±СЉСЏРІР»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С… РґР»СЏ РїРµСЂРµРґР°С‡Рё РґРµР№СЃС‚РІРёС‚РµР»СЊРЅС‹С… СЂР°Р·РјРµСЂРѕРІ РѕС‚РєСЂС‹С‚С‹С… РјР°СЃСЃРёРІРѕРІ)
 void CArrayVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
 	TFileType *file = to_h ? f.fh : f.fc;
@@ -105,15 +105,15 @@ void CArrayVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 	CBaseVar* BV;
 	static_cast<CBaseType*>(AT)->CreateVar(BV, parent_element);
 
-	//генерация имени
+	//РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё
 	char *formal_name;
-	if (!is_var) {//генерация имени для переданного массива-значения
+	if (!is_var) {//РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё РґР»СЏ РїРµСЂРµРґР°РЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°-Р·РЅР°С‡РµРЅРёСЏ
 		formal_name = new char[strlen("O2M_ARR_#") + strlen(name)];
 		strcpy(formal_name, "O2M_ARR_");
 		strcat(formal_name, name);
 	} else formal_name = name;
 
-	//проверка типа массива (открытый / не открытый)
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РјР°СЃСЃРёРІР° (РѕС‚РєСЂС‹С‚С‹Р№ / РЅРµ РѕС‚РєСЂС‹С‚С‹Р№)
 	if (ArrayType->size == 0) {
 		if (BV->GetTypeModuleName()) fprintf(file, "%s::", to_h ? BV->GetTypeModuleName() : BV->GetTypeModuleAlias());
 		fprintf(file, "%s *%s", BV->GetTypeName(), formal_name);
@@ -123,11 +123,11 @@ void CArrayVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 		BV->name = NULL;
 	}
 
-	//уничтожение сгенерированного имени
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ РёРјРµРЅРё
 	if (!is_var) delete[] formal_name;
 	delete BV;
 
-	//запись размеров массива, если не открытый массив
+	//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂРѕРІ РјР°СЃСЃРёРІР°, РµСЃР»Рё РЅРµ РѕС‚РєСЂС‹С‚С‹Р№ РјР°СЃСЃРёРІ
 	AT = ArrayType;
 	if (AT->size != 0)
 		while (AT->name_id == id_CArrayType) {
@@ -135,7 +135,7 @@ void CArrayVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 			AT = static_cast<CArrayType*>(AT->Type);
 		}
 
-	//запись размерностей массива в виде переменных для открытого массива
+	//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР° РІ РІРёРґРµ РїРµСЂРµРјРµРЅРЅС‹С… РґР»СЏ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР°
 	if (ArrayType->size == 0) {
 		AT = ArrayType;
 		int dimention = 0;
@@ -150,7 +150,7 @@ void CArrayVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись объявления поля-массива в записи (в отличие от остальных переменных здесь нельзя использовать WriteCPP_fp)
+//Р·Р°РїРёСЃСЊ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРѕР»СЏ-РјР°СЃСЃРёРІР° РІ Р·Р°РїРёСЃРё (РІ РѕС‚Р»РёС‡РёРµ РѕС‚ РѕСЃС‚Р°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С… Р·РґРµСЃСЊ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ WriteCPP_fp)
 void CArrayVar::WriteCPP_rec(CPP_files& f, const bool to_h)
 {
 	TFileType *file = to_h ? f.fh : f.fc;
@@ -159,7 +159,7 @@ void CArrayVar::WriteCPP_rec(CPP_files& f, const bool to_h)
 	CBaseVar* BV;
 	static_cast<CBaseType*>(AT)->CreateVar(BV, parent_element);
 
-	//проверка типа массива (открытый / не открытый)
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РјР°СЃСЃРёРІР° (РѕС‚РєСЂС‹С‚С‹Р№ / РЅРµ РѕС‚РєСЂС‹С‚С‹Р№)
 	if (ArrayType->size == 0) {
 		if (BV->GetTypeModuleName()) fprintf(file, "%s::", to_h ? BV->GetTypeModuleName() : BV->GetTypeModuleAlias());
 		fprintf(file, "%s *%s", BV->GetTypeName(), name);
@@ -171,7 +171,7 @@ void CArrayVar::WriteCPP_rec(CPP_files& f, const bool to_h)
 
 	delete BV;
 
-	//запись размеров массива, если не открытый массив
+	//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂРѕРІ РјР°СЃСЃРёРІР°, РµСЃР»Рё РЅРµ РѕС‚РєСЂС‹С‚С‹Р№ РјР°СЃСЃРёРІ
 	AT = ArrayType;
 	if (AT->size != 0) {
 		while (AT->name_id == id_CArrayType) {
@@ -184,36 +184,36 @@ void CArrayVar::WriteCPP_rec(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CArrayVar::WriteCPP_ConstValue(CPP_files& f)
 {
-	//константное значение массива возможно только для строк
+	//РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјР°СЃСЃРёРІР° РІРѕР·РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РґР»СЏ СЃС‚СЂРѕРє
 	if (!ConstString) throw error_Internal("CArrayVar::WriteCPP_ConstValue");
 
-	//проверка строки на наличие недопустимых символов
+	//РїСЂРѕРІРµСЂРєР° СЃС‚СЂРѕРєРё РЅР° РЅР°Р»РёС‡РёРµ РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
 	char *new_st = new char[strlen(ConstString)*2 + 1];
 
 	int i = 0;
 	int j = 0;
 	for (i = 0; i < strlen(ConstString); i++, j++) {
-		//проверка наличия '\'
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ '\'
 		if (ConstString[i] == '\\') {
 			new_st[j] = '\\';
 			new_st[++j] = '\\';
 			continue;
 		}
-		//проверка наличия '"'
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ '"'
 		if (ConstString[i] == '"') {
 			new_st[j] = '\\';
 			new_st[++j] = '"';
 			continue;
 		}
-		//запрещенного символа не найдено
+		//Р·Р°РїСЂРµС‰РµРЅРЅРѕРіРѕ СЃРёРјРІРѕР»Р° РЅРµ РЅР°Р№РґРµРЅРѕ
 		new_st[j] = ConstString[i];
 	}
 	new_st[j] = '\0';
 
-	//собственно вывод строки (или символа)
+	//СЃРѕР±СЃС‚РІРµРЅРЅРѕ РІС‹РІРѕРґ СЃС‚СЂРѕРєРё (РёР»Рё СЃРёРјРІРѕР»Р°)
 	if (strlen(ConstString) == 1 && ConstStringIsChar)
 		fprintf(f.fc, "'%s'", new_st);
 	else
@@ -224,18 +224,18 @@ void CArrayVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CArrayVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CArrayVar РІ С„Р°Р№Р» .dfn
 void CArrayVar::WriteDFN(DFN_file& f)
 {
-	//в случае строковой константы пишем только данные (строку символов)
+	//РІ СЃР»СѓС‡Р°Рµ СЃС‚СЂРѕРєРѕРІРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ РїРёС€РµРј С‚РѕР»СЊРєРѕ РґР°РЅРЅС‹Рµ (СЃС‚СЂРѕРєСѓ СЃРёРјРІРѕР»РѕРІ)
 	if (is_const) {
 		fprintf(f.f, "%s = \"%s\"", name, ConstString);
 		return;
 	}
 
-	//запись названия переменной
+	//Р·Р°РїРёСЃСЊ РЅР°Р·РІР°РЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 	fprintf(f.f, "%s%s : ", name, is_read_only ? "-" : "");
-	//перечисление вложенных массивов
+	//РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РІР»РѕР¶РµРЅРЅС‹С… РјР°СЃСЃРёРІРѕРІ
 	CArrayType *AT = ArrayType;
 	while (AT->name_id == id_CArrayType) {
 		fprintf(f.f, "ARRAY ");
@@ -243,19 +243,19 @@ void CArrayVar::WriteDFN(DFN_file& f)
 		fprintf(f.f, "OF ");
 		AT = static_cast<CArrayType*>(AT->Type);
 	}
-	//запись описания типа
+	//Р·Р°РїРёСЃСЊ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР°
 	AT->WriteDFN(f);
 
 }//WriteDFN
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CBooleanVar::CreateConst(const CBaseName *parent) const
 {
 	CBooleanVar* BV = static_cast<CBooleanVar*>(CBooleanVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	BV->ConstValue = ConstValue;
 
 	return BV;
@@ -263,7 +263,7 @@ CBaseVar* CBooleanVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CBooleanVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CBooleanVar(parent);
@@ -273,26 +273,26 @@ CBaseVar* CBooleanVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CBooleanVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CBooleanVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CBooleanVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CBooleanType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CBooleanType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CBooleanType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %s", ConstValue ? "true" : "false");
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CBooleanVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -301,7 +301,7 @@ void CBooleanVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CBooleanVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	fprintf(f.fc, "%s", ConstValue ? "true" : "false");
@@ -309,7 +309,7 @@ void CBooleanVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CBooleanVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CBooleanVar РІ С„Р°Р№Р» .dfn
 void CBooleanVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -325,12 +325,12 @@ void CBooleanVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CCharVar::CreateConst(const CBaseName *parent) const
 {
 	CCharVar* CV = static_cast<CCharVar*>(CCharVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	CV->ConstValue = ConstValue;
 
 	return CV;
@@ -338,7 +338,7 @@ CBaseVar* CCharVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CCharVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CCharVar(parent);
@@ -348,7 +348,7 @@ CBaseVar* CCharVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//преобразование указанной строки в значение переменной
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓРєР°Р·Р°РЅРЅРѕР№ СЃС‚СЂРѕРєРё РІ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 void CCharVar::SetConstValue(const char ch)
 {
 	is_const = true;
@@ -357,26 +357,26 @@ void CCharVar::SetConstValue(const char ch)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCharVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCharVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CCharVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CCharType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CCharType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CCharType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %i", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CCharVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -385,7 +385,7 @@ void CCharVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CCharVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	fprintf(f.fc, "%i", ConstValue);
@@ -393,7 +393,7 @@ void CCharVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCharVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCharVar РІ С„Р°Р№Р» .dfn
 void CCharVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -409,13 +409,13 @@ void CCharVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CCommonVar::CreateVar(const CBaseName* parent) const
 {
 	CCommonVar* CV = new CCommonVar(parent);
 	Assign(CV);
 
-	//копирование параметров признака в переменную
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРёР·РЅР°РєР° РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	if (QualSpecName) CV->QualSpecName = str_new_copy(QualSpecName);
 	if (SpecName) CV->SpecName = str_new_copy(SpecName);
 	if (Tag) CV->Tag = str_new_copy(Tag);
@@ -426,33 +426,33 @@ CBaseVar* CCommonVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//поиск имени в таблице имен
+//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 CBaseName* CCommonVar::FindName(const char *search_name) const
 {
-	//получение типа специализации
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 	CBaseType* BT = FindType();
 	if (!BT) return NULL;
-	//поиск имени в таблице имен типа специализации
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 	return BT->FindName(search_name);
 }
 
 
 //-----------------------------------------------------------------------------
-//поиск типа специализации (если есть)
+//РїРѕРёСЃРє С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё (РµСЃР»Рё РµСЃС‚СЊ)
 CBaseType* CCommonVar::FindType() const
 {
-	//получение ук. на обобщенный тип
+	//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРЅС‹Р№ С‚РёРї
 	CCommonType* CT = static_cast<CCommonType*>(parent_element->GetGlobalName(type_module_name, type_name));
 	if (!CT || id_CCommonType != CT->name_id) return NULL;
 
-	//получение описания типа специализации по обобщенному типу и признаку
+	//РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РїРѕ РѕР±РѕР±С‰РµРЅРЅРѕРјСѓ С‚РёРїСѓ Рё РїСЂРёР·РЅР°РєСѓ
 	const CCommonType::SSpec* spec = CT->FindSpec(QualSpecName, SpecName, Tag);
 	if (!spec) return NULL;
 
-	//получение названия модуля, содержащего тип специализации
+	//РїРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёСЏ РјРѕРґСѓР»СЏ, СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ С‚РёРї СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 	const char* ModuleName = spec->QualName ? spec->QualName : (spec->IsExtended ? NULL : CT->GetModuleAlias());
 
-	//получение типа специализации из текущей области видимости по описанию типа специализации
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РёР· С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё РІРёРґРёРјРѕСЃС‚Рё РїРѕ РѕРїРёСЃР°РЅРёСЋ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 	CBaseName* BN = parent_element->GetGlobalName(ModuleName, spec->Name);
 	if (!BN || !CBaseType::IsTypeId(BN->name_id)) return NULL;
 
@@ -461,7 +461,7 @@ CBaseType* CCommonVar::FindType() const
 
 
 //-----------------------------------------------------------------------------
-//получение имени признака
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РїСЂРёР·РЅР°РєР°
 void CCommonVar::GetTagName(const char* &QualName, const char* &Name, const char* &TagName)
 {
 	QualName = QualSpecName;
@@ -471,7 +471,7 @@ void CCommonVar::GetTagName(const char* &QualName, const char* &Name, const char
 
 
 //-----------------------------------------------------------------------------
-//проверка отсутствия параметризации переменной конкретным типом
+//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїР°СЂР°РјРµС‚СЂРёР·Р°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№ РєРѕРЅРєСЂРµС‚РЅС‹Рј С‚РёРїРѕРј
 bool CCommonVar::IsPureCommon()
 {
 	return (NULL == Tag) && (NULL == SpecName);
@@ -479,26 +479,26 @@ bool CCommonVar::IsPureCommon()
 
 
 //-----------------------------------------------------------------------------
-//установка имени признака
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСЂРёР·РЅР°РєР°
 int CCommonVar::SetTagName(const char *QualName, const char *Name)
 {
-	//зарещен повторный вызов данной процедуры
+	//Р·Р°СЂРµС‰РµРЅ РїРѕРІС‚РѕСЂРЅС‹Р№ РІС‹Р·РѕРІ РґР°РЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
 	if (QualSpecName || Tag) return s_e_CommonTypeExpected;
 
-	//получение ук. на обобщенный тип
+	//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРЅС‹Р№ С‚РёРї
 	CCommonType* CT = static_cast<CCommonType*>(parent_element->GetGlobalName(type_module_name, type_name));
 	if (!CT || id_CCommonType != CT->name_id) return s_m_Error;
 
-	//получение описания типа специализации по обобщенному типу и признаку
+	//РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РїРѕ РѕР±РѕР±С‰РµРЅРЅРѕРјСѓ С‚РёРїСѓ Рё РїСЂРёР·РЅР°РєСѓ
 	const CCommonType::SSpec* spec = CT->FindSpec(QualName, Name, Name);
 	if (!spec) return s_e_SpecTypeTag;
 
-	//копирование параметров признака
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРёР·РЅР°РєР°
 	if (spec->Tag) Tag = str_new_copy(Name);
 	if (spec->QualName) QualSpecName = str_new_copy(spec->QualName);
-	if (spec->Name) SpecName = str_new_copy(spec->Name);	//NULL == spec->Name при типе NIL
+	if (spec->Name) SpecName = str_new_copy(spec->Name);	//NULL == spec->Name РїСЂРё С‚РёРїРµ NIL
 
-	//установка составного имени, используемого при генерации кода
+	//СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚Р°РІРЅРѕРіРѕ РёРјРµРЅРё, РёСЃРїРѕР»СЊР·СѓРµРјРѕРіРѕ РїСЂРё РіРµРЅРµСЂР°С†РёРё РєРѕРґР°
 	if (Tag)
 		CPPCompoundName = str_new_copy(Tag);
 	else {
@@ -521,15 +521,15 @@ int CCommonVar::SetTagName(const char *QualName, const char *Name)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCommonVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCommonVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CCommonVar::WriteCPP(CPP_files& f)
 {
-	//проверка наличия имени типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР°
 	if (type_name) {
-		//запись имени модуля перед типом переменной		
+		//Р·Р°РїРёСЃСЊ РёРјРµРЅРё РјРѕРґСѓР»СЏ РїРµСЂРµРґ С‚РёРїРѕРј РїРµСЂРµРјРµРЅРЅРѕР№		
 		if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 
-		//проверка, экспортируется ли переменная
+		//РїСЂРѕРІРµСЂРєР°, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµС‚СЃСЏ Р»Рё РїРµСЂРµРјРµРЅРЅР°СЏ
 		if (external) {
 			fprintf(f.fh, "extern ");
 			if (type_module_name) {
@@ -541,7 +541,7 @@ void CCommonVar::WriteCPP(CPP_files& f)
 		} else
 			fprintf(f.fc, "%s %s(", type_name, name);
 
-		//генерация кода вызова конструктора, специализирующего обобщение
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РІС‹Р·РѕРІР° РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°, СЃРїРµС†РёР°Р»РёР·РёСЂСѓСЋС‰РµРіРѕ РѕР±РѕР±С‰РµРЅРёРµ
 		if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 		fprintf(f.fc, "%s::O2M_INIT_%s)", type_name, CPPCompoundName);
 	}
@@ -549,20 +549,20 @@ void CCommonVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CCommonVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	if (to_h) {//запись кода в .h файл
+	if (to_h) {//Р·Р°РїРёСЃСЊ РєРѕРґР° РІ .h С„Р°Р№Р»
 		if (type_module_name) {
-			//поиск модуля по его псевдониму
+			//РїРѕРёСЃРє РјРѕРґСѓР»СЏ РїРѕ РµРіРѕ РїСЃРµРІРґРѕРЅРёРјСѓ
 			CBaseName* BN = parent_element->GetGlobalName(type_module_name);
-			//запись префикса по настоящему имени модуля
+			//Р·Р°РїРёСЃСЊ РїСЂРµС„РёРєСЃР° РїРѕ РЅР°СЃС‚РѕСЏС‰РµРјСѓ РёРјРµРЅРё РјРѕРґСѓР»СЏ
 			if ( BN && (BN->name_id == id_CImportModule) )
 				fprintf(f.fh, "%s::", static_cast<CImportModule*>(BN)->real_name);
 		}
-		//запись типа и названия переменной
+		//Р·Р°РїРёСЃСЊ С‚РёРїР° Рё РЅР°Р·РІР°РЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 		fprintf(f.fh, "%s* %s", type_name, name);
-	} else {//запись кода в .cpp файл
+	} else {//Р·Р°РїРёСЃСЊ РєРѕРґР° РІ .cpp С„Р°Р№Р»
 		if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 		fprintf(f.fc, "%s* %s", type_name, name);
 	}//else
@@ -570,21 +570,21 @@ void CCommonVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCommonVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCommonVar РІ С„Р°Р№Р» .dfn
 void CCommonVar::WriteDFN(DFN_file& f)
 {
-	//обобщенная переменная не может быть константой и всегда именованного типа
+	//РѕР±РѕР±С‰РµРЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РєРѕРЅСЃС‚Р°РЅС‚РѕР№ Рё РІСЃРµРіРґР° РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	WriteDFN_named_type(f);
 }//WriteDFN
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CIntegerVar::CreateConst(const CBaseName *parent) const
 {
 	CIntegerVar* IV = static_cast<CIntegerVar*>(CIntegerVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	IV->ConstValue = ConstValue;
 	
 	return IV;
@@ -592,7 +592,7 @@ CBaseVar* CIntegerVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CIntegerVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CIntegerVar(parent);
@@ -602,7 +602,7 @@ CBaseVar* CIntegerVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//преобразование указанной строки в значение переменной
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓРєР°Р·Р°РЅРЅРѕР№ СЃС‚СЂРѕРєРё РІ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 void CIntegerVar::SetConstValue(const char *st)
 {
 	ConstValue = atoi(st);
@@ -610,26 +610,26 @@ void CIntegerVar::SetConstValue(const char *st)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CIntegerVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CIntegerVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CIntegerVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CIntegerType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CIntegerType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CIntegerType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %i", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CIntegerVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -638,7 +638,7 @@ void CIntegerVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CIntegerVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	if (INT_MIN == ConstValue)
@@ -649,7 +649,7 @@ void CIntegerVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CIntegerVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CIntegerVar РІ С„Р°Р№Р» .dfn
 void CIntegerVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -665,12 +665,12 @@ void CIntegerVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CLongintVar::CreateConst(const CBaseName *parent) const
 {
 	CLongintVar* LV = static_cast<CLongintVar*>(CLongintVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	LV->ConstValue = ConstValue;
 
 	return LV;
@@ -678,7 +678,7 @@ CBaseVar* CLongintVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CLongintVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CLongintVar(parent);
@@ -688,26 +688,26 @@ CBaseVar* CLongintVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CLongintVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CLongintVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CLongintVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CLongintType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CLongintType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CLongintType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %i", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CLongintVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -716,7 +716,7 @@ void CLongintVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CLongintVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	if (LONG_MIN == ConstValue)
@@ -727,7 +727,7 @@ void CLongintVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CLongintVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CLongintVar РІ С„Р°Р№Р» .dfn
 void CLongintVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -743,12 +743,12 @@ void CLongintVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CLongrealVar::CreateConst(const CBaseName *parent) const
 {
 	CLongrealVar* LV = static_cast<CLongrealVar*>(CLongrealVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	LV->ConstValue = ConstValue;
 
 	return LV;
@@ -756,7 +756,7 @@ CBaseVar* CLongrealVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CLongrealVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CLongrealVar(parent);
@@ -766,7 +766,7 @@ CBaseVar* CLongrealVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//преобразование указанной строки в значение переменной
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓРєР°Р·Р°РЅРЅРѕР№ СЃС‚СЂРѕРєРё РІ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 void CLongrealVar::SetConstValue(const char *st)
 {
 	is_const = true;
@@ -775,26 +775,26 @@ void CLongrealVar::SetConstValue(const char *st)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CLongrealVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CLongrealVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CLongrealVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CLongrealType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CLongrealType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CLongrealType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %g", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CLongrealVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -803,7 +803,7 @@ void CLongrealVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CLongrealVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	fprintf(f.fc, "%g", ConstValue);
@@ -811,7 +811,7 @@ void CLongrealVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CLongrealVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CLongrealVar РІ С„Р°Р№Р» .dfn
 void CLongrealVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -827,17 +827,17 @@ void CLongrealVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//проверка завершенности типа данной переменной
+//РїСЂРѕРІРµСЂРєР° Р·Р°РІРµСЂС€РµРЅРЅРѕСЃС‚Рё С‚РёРїР° РґР°РЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 int CPointerVar::CheckComplete(CLexBuf *lb)
 {
-	//поиск типа
+	//РїРѕРёСЃРє С‚РёРїР°
 	CBaseName* BN = FindType();
-	//проверка наличия объявленного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕР±СЉСЏРІР»РµРЅРЅРѕРіРѕ С‚РёРїР°
 	if (!BN) {
 		lb->SetCurrPos(TypePos);
 		return s_e_UndeclaredIdent;
 	}
-	//проверка допустимости типа (допускаются только типы запись, массив и обобщение)
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё С‚РёРїР° (РґРѕРїСѓСЃРєР°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ С‚РёРїС‹ Р·Р°РїРёСЃСЊ, РјР°СЃСЃРёРІ Рё РѕР±РѕР±С‰РµРЅРёРµ)
 	switch (BN->name_id) {
 	case id_CArrayType:
 		IsArray = true;
@@ -858,24 +858,24 @@ int CPointerVar::CheckComplete(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CPointerVar::CreateConst(const CBaseName *parent) const
 {
-	//константным значением указателя может быть только NIL => не требуется копирование данных
+	//РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј СѓРєР°Р·Р°С‚РµР»СЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ NIL => РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	return CPointerVar::CreateVar(parent);
 }
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CPointerVar::CreateVar(const CBaseName* parent) const
 {
-	//создание переменной и копирование основных атрибутов
+	//СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ РѕСЃРЅРѕРІРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 	CPointerVar* PV = new CPointerVar(parent);
 	Assign(PV);
-	//копирование типа (в случае неименованного типа)
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ С‚РёРїР° (РІ СЃР»СѓС‡Р°Рµ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°)
 	if (Type) Type->CreateType(PV->Type);
-	//копирование доп. атрибутов
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґРѕРї. Р°С‚СЂРёР±СѓС‚РѕРІ
 	PV->IsArray = IsArray;
 	PV->IsRecord = IsRecord;
 	PV->qualident_type = qualident_type;
@@ -885,14 +885,14 @@ CBaseVar* CPointerVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//поиск имени в таблице имен указываемого типа, имеет смысл только при ук. на запись
+//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ СѓРєР°Р·С‹РІР°РµРјРѕРіРѕ С‚РёРїР°, РёРјРµРµС‚ СЃРјС‹СЃР» С‚РѕР»СЊРєРѕ РїСЂРё СѓРє. РЅР° Р·Р°РїРёСЃСЊ
 CBaseName* CPointerVar::FindName(const char *search_name) const
 {
-	//проверка наличия типа запись (вообще-то в данном случае функция не должна вызываться)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚РёРїР° Р·Р°РїРёСЃСЊ (РІРѕРѕР±С‰Рµ-С‚Рѕ РІ РґР°РЅРЅРѕРј СЃР»СѓС‡Р°Рµ С„СѓРЅРєС†РёСЏ РЅРµ РґРѕР»Р¶РЅР° РІС‹Р·С‹РІР°С‚СЊСЃСЏ)
 	if (!IsRecord) return NULL;
-	//получение типа
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°
 	CBaseType* BT = FindType();
-	//поиск имени в списке имен типа
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРїРёСЃРєРµ РёРјРµРЅ С‚РёРїР°
 	if (id_CSpecType == BT->name_id)
 		return static_cast<CSpecType*>(BT)->FindName(search_name);
 	else
@@ -901,47 +901,47 @@ CBaseName* CPointerVar::FindName(const char *search_name) const
 
 
 //-----------------------------------------------------------------------------
-//поиск типа (не QualidentType, не PointerType), на кот. указывает указатель
+//РїРѕРёСЃРє С‚РёРїР° (РЅРµ QualidentType, РЅРµ PointerType), РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ
 CBaseType* CPointerVar::FindType() const
 {
-	//проверка наличия неименованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (Type) return Type;
 
-	//поиск по цепочке именованных типов
+	//РїРѕРёСЃРє РїРѕ С†РµРїРѕС‡РєРµ РёРјРµРЅРѕРІР°РЅРЅС‹С… С‚РёРїРѕРІ
 	CBaseName* BN = parent_element->GetGlobalName(type_module_name, type_name);
 	while (BN && id_CQualidentType == BN->name_id)
 		BN = BN->parent_element->GetGlobalName(static_cast<CQualidentType*>(BN)->Qualident->pref_ident, static_cast<CQualidentType*>(BN)->Qualident->ident);
 
-	//при обнаружении типа ук. используется его метод поиска типа
-	//(только в случае, если переменная была объявлена через QualidentType)
+	//РїСЂРё РѕР±РЅР°СЂСѓР¶РµРЅРёРё С‚РёРїР° СѓРє. РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РµРіРѕ РјРµС‚РѕРґ РїРѕРёСЃРєР° С‚РёРїР°
+	//(С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ, РµСЃР»Рё РїРµСЂРµРјРµРЅРЅР°СЏ Р±С‹Р»Р° РѕР±СЉСЏРІР»РµРЅР° С‡РµСЂРµР· QualidentType)
 	if (qualident_type && BN && id_CPointerType == BN->name_id)
 		return static_cast<CPointerType*>(BN)->FindType();
 
-	//возврат найденного типа (или NULL)
+	//РІРѕР·РІСЂР°С‚ РЅР°Р№РґРµРЅРЅРѕРіРѕ С‚РёРїР° (РёР»Рё NULL)
 	return static_cast<CBaseType*>(BN);
 }
 
 
 //-----------------------------------------------------------------------------
-//запись кода доп. переменных, содержащих размерности в случае открытого массива
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РґРѕРї. РїРµСЂРµРјРµРЅРЅС‹С…, СЃРѕРґРµСЂР¶Р°С‰РёС… СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР°
 void CPointerVar::WriteCPP_array(CPP_files &f)
 {
-	//проверка отсутствия массива
+	//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РјР°СЃСЃРёРІР°
 	if (!IsArray) return;
-	//получение типа, на кот. указывает POINTER
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ POINTER
 	CArrayType* AT = static_cast<CArrayType*>(FindType());
-	//генерация переменной для каждой открытой размерности
-	int dimension = 0;	//отсчет размерностей с 0
+	//РіРµРЅРµСЂР°С†РёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ РєР°Р¶РґРѕР№ РѕС‚РєСЂС‹С‚РѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
+	int dimension = 0;	//РѕС‚СЃС‡РµС‚ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ СЃ 0
 	while (id_CArrayType == AT->name_id) {
-		//при отсутствии открытой размерности прекращаем генерацию
+		//РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё РѕС‚РєСЂС‹С‚РѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РїСЂРµРєСЂР°С‰Р°РµРј РіРµРЅРµСЂР°С†РёСЋ
 		if (AT->size) break;
-		//генерация переменной для хранения текущей размерности
+		//РіРµРЅРµСЂР°С†РёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚РµРєСѓС‰РµР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 		if (external) {
 			fprintf(f.fh, ";\nextern int O2M_ARR_%i_%s", dimension, name);
 			fprintf(f.fc, ";\nint %s::O2M_ARR_%i_%s", parent_element->name, dimension, name);
 		} else
 			fprintf(f.fc, ";\nint O2M_ARR_%i_%s", dimension, name);
-		//переход к следующей размерности
+		//РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 		++dimension;
 		AT = static_cast<CArrayType*>(AT->Type);
 	}//while
@@ -949,12 +949,12 @@ void CPointerVar::WriteCPP_array(CPP_files &f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CPointerVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CPointerVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CPointerVar::WriteCPP(CPP_files& f)
 {
-	//проверка именованного типа (есть имя типа)
+	//РїСЂРѕРІРµСЂРєР° РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° (РµСЃС‚СЊ РёРјСЏ С‚РёРїР°)
 	if (type_name) {
-		//запись кода объявления переменной
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 		if (external) {
 			fprintf(f.fh, "extern ");
 			if (type_module_name) {
@@ -967,35 +967,35 @@ void CPointerVar::WriteCPP(CPP_files& f)
 			if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 			fprintf(f.fc, "%s* %s", type_name, name);
 		}
-		//в случае открытого массива требуется генерация доп. переменных
+		//РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР° С‚СЂРµР±СѓРµС‚СЃСЏ РіРµРЅРµСЂР°С†РёСЏ РґРѕРї. РїРµСЂРµРјРµРЅРЅС‹С…
 		WriteCPP_array(f);
 		return;
 	}
 
-	//неименованный тип (записывается с генерацией искусственного имени вида O2M_UNNM_<имя переменной>)
+	//РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї (Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ СЃ РіРµРЅРµСЂР°С†РёРµР№ РёСЃРєСѓСЃСЃС‚РІРµРЅРЅРѕРіРѕ РёРјРµРЅРё РІРёРґР° O2M_UNNM_<РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№>)
 	if (Type) {
-		//генерация кода типа, на кот. указывает указатель
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РёРїР°, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ
 		Type->name = new char[strlen("O2M_UNNM_") + strlen(name) + 1];
 		strcpy(Type->name, "O2M_UNNM_");
 		strcat(Type->name, name);
-		//для типа RECORD генерируем RuntimeId
+		//РґР»СЏ С‚РёРїР° RECORD РіРµРЅРµСЂРёСЂСѓРµРј RuntimeId
 		if (id_CRecordType == Type->name_id) static_cast<CRecordType*>(Type)->InitRuntimeId();
-		//запись кода типа
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° С‚РёРїР°
 		Type->WriteCPP(f, external);
-		//запись кода объявления переменной
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 		if (external) {
 			fprintf(f.fh, "extern O2M_UNNM_%s* %s", name, name);
 			fprintf(f.fc, "O2M_UNNM_%s* %s::%s", name, parent_element->name, name);
 		} else {
-			//собственно запись кода объявления переменной
+			//СЃРѕР±СЃС‚РІРµРЅРЅРѕ Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 			fprintf(f.fc, "O2M_UNNM_%s* %s", name, name);
 		}
-		//в случае открытого массива требуется генерация доп. переменных
+		//РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР° С‚СЂРµР±СѓРµС‚СЃСЏ РіРµРЅРµСЂР°С†РёСЏ РґРѕРї. РїРµСЂРµРјРµРЅРЅС‹С…
 		WriteCPP_array(f);
 		return;
 	}
 
-	//объявление константы
+	//РѕР±СЉСЏРІР»РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	if (is_const) {
 		fprintf(f.fc, "void %s = 0", name);
 		return;
@@ -1005,30 +1005,30 @@ void CPointerVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CPointerVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//для упрощения вывода информации
+	//РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РІС‹РІРѕРґР° РёРЅС„РѕСЂРјР°С†РёРё
 	TFileType* ff = to_h ? f.fh : f.fc;
 
-	//проверка именованного типа (есть имя типа)
+	//РїСЂРѕРІРµСЂРєР° РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° (РµСЃС‚СЊ РёРјСЏ С‚РёРїР°)
 	if (type_name) {
 		if (type_module_name) fprintf(ff, "%s::", type_module_name);
 		fprintf(ff, "%s* %s%s", type_name, is_var ? "&" : "", name);
 		return;
 	} else {
 
-		//неименованный тип (записывается с генерацией искусственного имени вида O2M_UNNM_<имя переменной>)
+		//РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї (Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ СЃ РіРµРЅРµСЂР°С†РёРµР№ РёСЃРєСѓСЃСЃС‚РІРµРЅРЅРѕРіРѕ РёРјРµРЅРё РІРёРґР° O2M_UNNM_<РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№>)
 		if (Type) {
-			//генерация кода типа, на кот. указывает указатель
+			//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РёРїР°, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ
 			Type->name = new char[strlen("O2M_UNNM_") + strlen(name) + 1];
 			strcpy(Type->name, "O2M_UNNM_");
 			strcat(Type->name, name);
-			//для типа RECORD генерируем RuntimeId
+			//РґР»СЏ С‚РёРїР° RECORD РіРµРЅРµСЂРёСЂСѓРµРј RuntimeId
 			if (id_CRecordType == Type->name_id) static_cast<CRecordType*>(Type)->InitRuntimeId();
-			//запись кода типа
+			//Р·Р°РїРёСЃСЊ РєРѕРґР° С‚РёРїР°
 			Type->WriteCPP(f, to_h);
-			//запись кода объявления переменной
+			//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 			fprintf(ff, "O2M_UNNM_%s* %s", name, name);
 			return;
 		}
@@ -1036,38 +1036,38 @@ void CPointerVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 	}//else
 
 	/**/
-	//в дальнейшем, для ук. на неименованный тип, объявленный в параметрах процедуры,
-	//объявлять тип с искусственным именем в доп. пространстве имен процедуры
+	//РІ РґР°Р»СЊРЅРµР№С€РµРј, РґР»СЏ СѓРє. РЅР° РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї, РѕР±СЉСЏРІР»РµРЅРЅС‹Р№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹,
+	//РѕР±СЉСЏРІР»СЏС‚СЊ С‚РёРї СЃ РёСЃРєСѓСЃСЃС‚РІРµРЅРЅС‹Рј РёРјРµРЅРµРј РІ РґРѕРї. РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ РёРјРµРЅ РїСЂРѕС†РµРґСѓСЂС‹
 }
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CPointerVar::WriteCPP_ConstValue(CPP_files& f)
 {
-	//константным значением указателя может быть только NIL
+	//РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј СѓРєР°Р·Р°С‚РµР»СЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ NIL
 	fprintf(f.fc, "0");
 }
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CPointerVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CPointerVar РІ С„Р°Р№Р» .dfn
 void CPointerVar::WriteDFN(DFN_file& f)
 {
-	//запись в случае именованного типа
+	//Р·Р°РїРёСЃСЊ РІ СЃР»СѓС‡Р°Рµ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name) {
 		fprintf(f.f, "%s : ", name);
-		//в случае ук. на именованный тип нужно вставлять "POINTER TO"
+		//РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї РЅСѓР¶РЅРѕ РІСЃС‚Р°РІР»СЏС‚СЊ "POINTER TO"
 		if (!qualident_type) fprintf(f.f, "POINTER TO ");
 		if (type_module_name) fprintf(f.f, "%s.", type_module_name);
 		fprintf(f.f, "%s", type_name);
 		return;
 	}//if
 
-	//запись начала объявления неименованного типа указатель
+	//Р·Р°РїРёСЃСЊ РЅР°С‡Р°Р»Р° РѕР±СЉСЏРІР»РµРЅРёСЏ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЊ
 	fprintf(f.f, "%s%s : POINTER TO ", name, is_read_only ? "-" : "");
 
-	//получение и запись объявления неименованного типа
+	//РїРѕР»СѓС‡РµРЅРёРµ Рё Р·Р°РїРёСЃСЊ РѕР±СЉСЏРІР»РµРЅРёСЏ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	CBaseType* BT = FindType();
 	BT->WriteDFN(f);
 
@@ -1075,14 +1075,14 @@ void CPointerVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CProcedureVar::CreateVar(const CBaseName* parent) const
 {
-	//создание переменной
+	//СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 	CBaseVar* BV = new CProcedureVar(parent);
 	Assign(BV);
 
-	//копирование формальных параметров в созданную переменную
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РІ СЃРѕР·РґР°РЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	FormalPars.Assign(static_cast<CProcedureVar*>(BV)->FormalPars, parent);
 
 	return BV;
@@ -1090,21 +1090,21 @@ CBaseVar* CProcedureVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//получение типа результата выражения (для процедуры - функции) или id_CBaseName
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° СЂРµР·СѓР»СЊС‚Р°С‚Р° РІС‹СЂР°Р¶РµРЅРёСЏ (РґР»СЏ РїСЂРѕС†РµРґСѓСЂС‹ - С„СѓРЅРєС†РёРё) РёР»Рё id_CBaseName
 EName_id CProcedureVar::GetResultId() const
 {
-	//проверка переменной-процедуры (не имеет типа результата)
+	//РїСЂРѕРІРµСЂРєР° РїРµСЂРµРјРµРЅРЅРѕР№-РїСЂРѕС†РµРґСѓСЂС‹ (РЅРµ РёРјРµРµС‚ С‚РёРїР° СЂРµР·СѓР»СЊС‚Р°С‚Р°)
 	if (!FormalPars.Qualident) return id_CBaseName;
-	//возврат типа результата выражения
+	//РІРѕР·РІСЂР°С‚ С‚РёРїР° СЂРµР·СѓР»СЊС‚Р°С‚Р° РІС‹СЂР°Р¶РµРЅРёСЏ
 	return FormalPars.Qualident->TypeResultId;
 }
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CProcedureVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CProcedureVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CProcedureVar::WriteCPP(CPP_files& f)
 {
-	//проверка наличия имени типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР°
 	if (type_name) {
 		if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 
@@ -1122,10 +1122,10 @@ void CProcedureVar::WriteCPP(CPP_files& f)
 		return;
 	}
 
-	//для упрощения выбора целевого файла (.h или .cpp)
+	//РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РІС‹Р±РѕСЂР° С†РµР»РµРІРѕРіРѕ С„Р°Р№Р»Р° (.h РёР»Рё .cpp)
 	TFileType* const ff = external ? f.fh : f.fc;
 
-	//запись типа для функции (если есть) или void
+	//Р·Р°РїРёСЃСЊ С‚РёРїР° РґР»СЏ С„СѓРЅРєС†РёРё (РµСЃР»Рё РµСЃС‚СЊ) РёР»Рё void
 	if (FormalPars.Qualident) FormalPars.Qualident->WriteCPP_type(f, external, parent_element);
 	else fprintf(ff, "void");
 	fprintf(ff, " (*%s) (", name);
@@ -1136,17 +1136,17 @@ void CProcedureVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CProcedureVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия имени типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else {
-		//для упрощения выбора целевого файла (.h или .cpp)
+		//РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РІС‹Р±РѕСЂР° С†РµР»РµРІРѕРіРѕ С„Р°Р№Р»Р° (.h РёР»Рё .cpp)
 		TFileType* const ff = external ? f.fh : f.fc;
 
-		//запись типа для функции (если есть) или void
+		//Р·Р°РїРёСЃСЊ С‚РёРїР° РґР»СЏ С„СѓРЅРєС†РёРё (РµСЃР»Рё РµСЃС‚СЊ) РёР»Рё void
 		if (FormalPars.Qualident) FormalPars.Qualident->WriteCPP_type(f, external, parent_element);
 		else fprintf(ff, "void");
 		fprintf(ff, " (*%s) (", name);
@@ -1157,7 +1157,7 @@ void CProcedureVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CProcedureVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CProcedureVar РІ С„Р°Р№Р» .dfn
 void CProcedureVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) throw error_Internal("CProcedureVar::WriteDFN");
@@ -1170,7 +1170,7 @@ void CProcedureVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CPtrVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CPtrVar(parent);
@@ -1180,7 +1180,7 @@ CBaseVar* CPtrVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CPtrVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CPtrVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CPtrVar::WriteCPP(CPP_files& f)
 {
 	if (external) {
@@ -1193,21 +1193,21 @@ void CPtrVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CPtrVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия имени типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР°
 	if (type_name) {
 		WriteCPP_fp_named_type(f, to_h);
 		return;
 	}
-	//запись информации в файл
+	//Р·Р°РїРёСЃСЊ РёРЅС„РѕСЂРјР°С†РёРё РІ С„Р°Р№Р»
 	fprintf(to_h ? f.fh : f.fc, "bool %s%s", is_var ? "&" : "", name);
 }
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CPtrVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CPtrVar РІ С„Р°Р№Р» .dfn
 void CPtrVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) throw error_Internal("CPtrVar::WriteDFN");
@@ -1220,12 +1220,12 @@ void CPtrVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CRealVar::CreateConst(const CBaseName *parent) const
 {
 	CRealVar* RV = static_cast<CRealVar*>(CRealVar::CreateVar(parent));
 
-	//копирование данных
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 	RV->ConstValue = ConstValue;
 
 	return RV;
@@ -1233,7 +1233,7 @@ CBaseVar* CRealVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CRealVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CRealVar(parent);
@@ -1243,7 +1243,7 @@ CBaseVar* CRealVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//преобразование указанной строки в значение переменной
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓРєР°Р·Р°РЅРЅРѕР№ СЃС‚СЂРѕРєРё РІ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 void CRealVar::SetConstValue(const char *st)
 {
 	is_const = true;
@@ -1252,26 +1252,26 @@ void CRealVar::SetConstValue(const char *st)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CRealVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CRealVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CRealVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CRealType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CRealType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CRealType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %g", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CRealVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -1280,7 +1280,7 @@ void CRealVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CRealVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	fprintf(f.fc, "%g", ConstValue);
@@ -1288,7 +1288,7 @@ void CRealVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CRealVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CRealVar РІ С„Р°Р№Р» .dfn
 void CRealVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {
@@ -1304,7 +1304,7 @@ void CRealVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//добавление указанного эл-та в список полей
+//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ СЃРїРёСЃРѕРє РїРѕР»РµР№
 void CRecordVar::AddName(CBaseName* BN) const
 {
 	if (!CBaseVar::IsVarId(BN->name_id)) throw error_Internal("CRecordVar::AddName");
@@ -1313,12 +1313,12 @@ void CRecordVar::AddName(CBaseName* BN) const
 
 
 //-----------------------------------------------------------------------------
-//проверка завершенности типов у всех полей записи
+//РїСЂРѕРІРµСЂРєР° Р·Р°РІРµСЂС€РµРЅРЅРѕСЃС‚Рё С‚РёРїРѕРІ Сѓ РІСЃРµС… РїРѕР»РµР№ Р·Р°РїРёСЃРё
 int CRecordVar::CheckComplete(CLexBuf *lb)
 {
-	//проверка импортированности типа переменной (тогда он уже проверен при инициализации DFN модуля)
+	//РїСЂРѕРІРµСЂРєР° РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕСЃС‚Рё С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№ (С‚РѕРіРґР° РѕРЅ СѓР¶Рµ РїСЂРѕРІРµСЂРµРЅ РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё DFN РјРѕРґСѓР»СЏ)
 	if (GetTypeModuleAlias()) return 0;
-	//проверка завершенности полей записи
+	//РїСЂРѕРІРµСЂРєР° Р·Р°РІРµСЂС€РµРЅРЅРѕСЃС‚Рё РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci) {
 		int err_num = (*ci)->CheckComplete(lb);
@@ -1329,12 +1329,12 @@ int CRecordVar::CheckComplete(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CRecordVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CRecordVar(parent);
 	Assign(BV);
-	//копирование полей записи
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci)
 		BV->AddName((*ci)->CreateVar(BV));
@@ -1343,53 +1343,53 @@ CBaseVar* CRecordVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта CRecordVar
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° CRecordVar
 CRecordVar::~CRecordVar()
 {
-	//очистка списка полей записи
+	//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci)
 		delete *ci;
-	//очистка имени базового типа
+	//РѕС‡РёСЃС‚РєР° РёРјРµРЅРё Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 	delete Qualident;
 }//~CRecordVar
 
 
 //-----------------------------------------------------------------------------
-//поиск имени в списке полей, NULL - если имя не найдено
+//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРїРёСЃРєРµ РїРѕР»РµР№, NULL - РµСЃР»Рё РёРјСЏ РЅРµ РЅР°Р№РґРµРЅРѕ
 CBaseName* CRecordVar::FindName(const char* search_name) const
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name) {
-		//используется поиск среди полей типа на случай наличия связанной с типом процедуры
+		//РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїРѕРёСЃРє СЃСЂРµРґРё РїРѕР»РµР№ С‚РёРїР° РЅР° СЃР»СѓС‡Р°Р№ РЅР°Р»РёС‡РёСЏ СЃРІСЏР·Р°РЅРЅРѕР№ СЃ С‚РёРїРѕРј РїСЂРѕС†РµРґСѓСЂС‹
 		CBaseName* BN = parent_element->GetGlobalName(type_module_name, type_name);
 		return static_cast<CRecordType*>(BN)->FindName(search_name);
 	}
 
-	//поиск имени в собственном списке полей записи
-	//(используется для переменных неименованного типа)
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРѕР±СЃС‚РІРµРЅРЅРѕРј СЃРїРёСЃРєРµ РїРѕР»РµР№ Р·Р°РїРёСЃРё
+	//(РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРµСЂРµРјРµРЅРЅС‹С… РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°)
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci)
 		if (!strcmp( (*ci)->name, search_name ))
 			return *ci;
 
-	//проверка наличия базового типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 	if (Qualident) {
-		//получение ук. на объект базового типа (должен присутствовать)
+		//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° РѕР±СЉРµРєС‚ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР° (РґРѕР»Р¶РµРЅ РїСЂРёСЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ)
 		CBaseName* BN = parent_element->GetGlobalName(Qualident->pref_ident, Qualident->ident);
 		return static_cast<CRecordType*>(BN)->FindName(search_name);
 	}
 
-	//имя не найдено
+	//РёРјСЏ РЅРµ РЅР°Р№РґРµРЅРѕ
 	return NULL;
 }//FindName
 
 
 //-----------------------------------------------------------------------------
-//генерация кода при объявлении переменной
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CRecordVar::WriteCPP(CPP_files& f)
 {
-	//проверка наличия имени типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР°
 	if (type_name) {
 		if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 
@@ -1407,21 +1407,21 @@ void CRecordVar::WriteCPP(CPP_files& f)
 		return;
 	}
 
-	//генерация объявления переменной неименованного типа
+	//РіРµРЅРµСЂР°С†РёСЏ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 
-	//для объявления переменной как extern требуется указать имя типа
+	//РґР»СЏ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РєР°Рє extern С‚СЂРµР±СѓРµС‚СЃСЏ СѓРєР°Р·Р°С‚СЊ РёРјСЏ С‚РёРїР°
 	if (external)
 		fprintf(f.fh, "struct O2M_UNNM_%s {\n", name);
 	else
 		fprintf(f.fc, "struct {\n");
-	//генерация кода полей записи
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci) {
 		fprintf(external ? f.fh : f.fc, "\t");
 		(*ci)->WriteCPP_fp(f, external);
 		fprintf(external ? f.fh : f.fc, ";\n");
 	}
-	//генерация объявления переменной с учетом экспорта
+	//РіРµРЅРµСЂР°С†РёСЏ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃ СѓС‡РµС‚РѕРј СЌРєСЃРїРѕСЂС‚Р°
 	if (external) {
 		fprintf(f.fh, "};\nextern O2M_UNNM_%s %s", name, name);
 		fprintf(f.fc, "O2M_UNNM_%s %s::%s", name, parent_element->name, name);
@@ -1431,30 +1431,30 @@ void CRecordVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CRecordVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия имени типа и отсутствия признака параметра-переменной
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР° Рё РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїСЂРёР·РЅР°РєР° РїР°СЂР°РјРµС‚СЂР°-РїРµСЂРµРјРµРЅРЅРѕР№
 	if (type_name && !is_var) {
 		WriteCPP_fp_named_type(f, to_h);
 		return;
 	}
 
-	//проверка признака параметра-переменной
+	//РїСЂРѕРІРµСЂРєР° РїСЂРёР·РЅР°РєР° РїР°СЂР°РјРµС‚СЂР°-РїРµСЂРµРјРµРЅРЅРѕР№
 	if (is_var) {
-		if (!to_h) {//запись кода в .cpp файл
+		if (!to_h) {//Р·Р°РїРёСЃСЊ РєРѕРґР° РІ .cpp С„Р°Р№Р»
 			if (type_module_name) fprintf(f.fc, "%s::", type_module_name);
 			fprintf(f.fc, "%s* %s", type_name, name);
 		}
-		else {//запись кода в .h файл
+		else {//Р·Р°РїРёСЃСЊ РєРѕРґР° РІ .h С„Р°Р№Р»
 			if (type_module_name) {
-				//поиск модуля по его псевдониму
+				//РїРѕРёСЃРє РјРѕРґСѓР»СЏ РїРѕ РµРіРѕ РїСЃРµРІРґРѕРЅРёРјСѓ
 				CBaseName* BN = parent_element->GetGlobalName(type_module_name);
-				//запись префикса по настоящему имени модуля
+				//Р·Р°РїРёСЃСЊ РїСЂРµС„РёРєСЃР° РїРѕ РЅР°СЃС‚РѕСЏС‰РµРјСѓ РёРјРµРЅРё РјРѕРґСѓР»СЏ
 				if ( BN && (BN->name_id == id_CImportModule) )
 					fprintf(f.fh, "%s::", static_cast<CImportModule*>(BN)->real_name);
 			}
-			//запись типа и названия переменной
+			//Р·Р°РїРёСЃСЊ С‚РёРїР° Рё РЅР°Р·РІР°РЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 			fprintf(f.fh, "%s* %s", type_name, name);
 		}//else
 
@@ -1462,10 +1462,10 @@ void CRecordVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 	}//if
 
 
-	//неименованный тип запись (например, внутри другой записи)
-	//генерация описания типа (переменная неименованного типа)
+	//РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї Р·Р°РїРёСЃСЊ (РЅР°РїСЂРёРјРµСЂ, РІРЅСѓС‚СЂРё РґСЂСѓРіРѕР№ Р·Р°РїРёСЃРё)
+	//РіРµРЅРµСЂР°С†РёСЏ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° (РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°)
 	fprintf(to_h ? f.fh : f.fc, "struct {\n\t");
-	//запись кода полей записи
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci) {
 		(*ci)->WriteCPP_fp(f, to_h);
@@ -1477,14 +1477,14 @@ void CRecordVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использования CRecordVar для описания типа указателя
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ CRecordVar РґР»СЏ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЏ
 void CRecordVar::WriteCPP_pointer(CPP_files& f)
 {
-	//запись в .h файл
+	//Р·Р°РїРёСЃСЊ РІ .h С„Р°Р№Р»
 	if (external) {
 		fprintf(f.fh, "struct %s", name);
 		
-		//запись базового типа (если есть)
+		//Р·Р°РїРёСЃСЊ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР° (РµСЃР»Рё РµСЃС‚СЊ)
 		if (Qualident) {
 			fprintf(f.fh, " : ");
 			CBaseName* BN = parent_element->GetGlobalName(Qualident->pref_ident);
@@ -1493,36 +1493,36 @@ void CRecordVar::WriteCPP_pointer(CPP_files& f)
 		}
 		fprintf(f.fh, " {\n");
 
-		//запись кода метода для получения ид. типа времени исполнения во время исполнения
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° РјРµС‚РѕРґР° РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РёРґ. С‚РёРїР° РІСЂРµРјРµРЅРё РёСЃРїРѕР»РЅРµРЅРёСЏ РІРѕ РІСЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ
 		fprintf(f.fh, "\t%sconst char* O2M_SYS_ID() {return \"%s\";};\n", Qualident ? "" : "virtual ", name);
 
-		//запись кода полей записи
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 		TFieldStore::const_iterator ci;
 		for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci) {
 			(*ci)->WriteCPP_fp(f, true);
 			fprintf(f.fh, ";\n");
 		}
-		//завершение записи кода записи
+		//Р·Р°РІРµСЂС€РµРЅРёРµ Р·Р°РїРёСЃРё РєРѕРґР° Р·Р°РїРёСЃРё
 		fprintf(f.fh, "};\n");
 
 		return;
 	}
 
 
-	//запись в .cpp файл
+	//Р·Р°РїРёСЃСЊ РІ .cpp С„Р°Р№Р»
 	fprintf(f.fc, "struct %s", name);
 
-	//запись базового типа (если есть)
+	//Р·Р°РїРёСЃСЊ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР° (РµСЃР»Рё РµСЃС‚СЊ)
 	if (Qualident) {
 		fprintf(f.fc, " : ");
 		Qualident->WriteCPP_type(f, false, parent_element);
 	}
 	fprintf(f.fc, " {\n");
 
-	//запись кода метода для получения ид. типа времени исполнения во время исполнения
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РјРµС‚РѕРґР° РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РёРґ. С‚РёРїР° РІСЂРµРјРµРЅРё РёСЃРїРѕР»РЅРµРЅРёСЏ РІРѕ РІСЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ
 	fprintf(f.fc, "\t%sconst char* O2M_SYS_ID() {return \"%s\";};\n", Qualident ? "" : "virtual ", name);
 
-	//запись кода полей записи
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	TFieldStore::const_iterator ci;
 	for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci) {
 		(*ci)->WriteCPP_fp(f, false);
@@ -1534,7 +1534,7 @@ void CRecordVar::WriteCPP_pointer(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CRecordVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CRecordVar РІ С„Р°Р№Р» .dfn
 void CRecordVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) throw error_Internal("CRecordVar::WriteDFN");
@@ -1542,20 +1542,20 @@ void CRecordVar::WriteDFN(DFN_file& f)
 	if (!type_name) {
 
 		fprintf(f.f, "%s%s : RECORD", name, is_read_only ? "-" : "");
-		//генерация кода базового типа
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 		if (Qualident) {
 			fprintf(f.f, " (");
 			Qualident->WriteDFN(f);
 			fprintf(f.f, ")");
 		}
 
-		//увеличение отступа в DFN файле
+		//СѓРІРµР»РёС‡РµРЅРёРµ РѕС‚СЃС‚СѓРїР° РІ DFN С„Р°Р№Р»Рµ
 		f.tab_level++;
 
 		fprintf(f.f, "\n");
 		f.tab();
 
-		//генерация кода полей записи
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 		TFieldStore::const_iterator ci;
 		for (ci = FieldStore.begin(); ci != FieldStore.end(); ++ci)
 			if ((*ci)->external)
@@ -1564,10 +1564,10 @@ void CRecordVar::WriteDFN(DFN_file& f)
 				fprintf(f.f, ";\n");
 				f.tab();
 			}
-		//конец генерации кода записи
+		//РєРѕРЅРµС† РіРµРЅРµСЂР°С†РёРё РєРѕРґР° Р·Р°РїРёСЃРё
 		fprintf(f.f, "END");
 
-		//уменьшение отступа в DFN файле
+		//СѓРјРµРЅСЊС€РµРЅРёРµ РѕС‚СЃС‚СѓРїР° РІ DFN С„Р°Р№Р»Рµ
 		f.tab_level--;
 
 	} else
@@ -1576,23 +1576,23 @@ void CRecordVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CSetVar::CreateConst(const CBaseName *parent) const
 {
-	//создание переменной
+	//СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 	CSetVar* SV = static_cast<CSetVar*>(CSetVar::CreateVar(parent));
-	//копирование константного значения
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	SV->ConstValue = ConstValue;
-	//константа создана
+	//РєРѕРЅСЃС‚Р°РЅС‚Р° СЃРѕР·РґР°РЅР°
 	return SV;
 }
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CSetVar::CreateVar(const CBaseName* parent) const
 {
-	//создание копии переменной с атрибутами
+	//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
 	CSetVar* SV = new CSetVar(parent);
 	Assign(SV);
 	return SV;
@@ -1600,7 +1600,7 @@ CBaseVar* CSetVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта CSetVar
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° CSetVar
 CSetVar::~CSetVar()
 {
 	CBaseVector::iterator vi;
@@ -1610,53 +1610,53 @@ CSetVar::~CSetVar()
 
 
 //-----------------------------------------------------------------------------
-//обработка конструктора множества, если есть (может не быть), при возникновении ошибок
-//должно обеспечиваться уничтожение всех временных объектов
+//РѕР±СЂР°Р±РѕС‚РєР° РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° РјРЅРѕР¶РµСЃС‚РІР°, РµСЃР»Рё РµСЃС‚СЊ (РјРѕР¶РµС‚ РЅРµ Р±С‹С‚СЊ), РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РѕС€РёР±РѕРє
+//РґРѕР»Р¶РЅРѕ РѕР±РµСЃРїРµС‡РёРІР°С‚СЊСЃСЏ СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РІСЃРµС… РІСЂРµРјРµРЅРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 int CSetVar::SetInit(CLexBuf *lb)
 {
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//для проверки константности конструктора множества
+	//РґР»СЏ РїСЂРѕРІРµСЂРєРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕСЃС‚Рё РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° РјРЅРѕР¶РµСЃС‚РІР°
 	is_const = true;
 	
-	//проверка наличия "}" (отсутствие элементов - константный конструктор пустого множества)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "}" (РѕС‚СЃСѓС‚СЃС‚РІРёРµ СЌР»РµРјРµРЅС‚РѕРІ - РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїСѓСЃС‚РѕРіРѕ РјРЅРѕР¶РµСЃС‚РІР°)
 	if (lb->ReadLex(li) && lex_k_cl_brace == li.lex) return 0;
 
 	RESTORE_POS
 
 	while (true) {
-		//создание эл-та множества
+		//СЃРѕР·РґР°РЅРёРµ СЌР»-С‚Р° РјРЅРѕР¶РµСЃС‚РІР°
 		CSetVarElem *SE = new CSetVarElem(parent_element);
 		int err_num = SE->Init(lb);
 		if (err_num) {
 			delete SE;
 			return err_num;
 		}
-		//занесение эл-та множества в список
+		//Р·Р°РЅРµСЃРµРЅРёРµ СЌР»-С‚Р° РјРЅРѕР¶РµСЃС‚РІР° РІ СЃРїРёСЃРѕРє
 		SetElems.push_back(SE);
 
-		//проверка, является ли данный конструктор множества константным (все эл-ты должны быть константами)
+		//РїСЂРѕРІРµСЂРєР°, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґР°РЅРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РјРЅРѕР¶РµСЃС‚РІР° РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рј (РІСЃРµ СЌР»-С‚С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Р°РјРё)
 		is_const = is_const && SE->IsConst();
 
-		//проверка наличия ","
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 		if (!lb->ReadLex(li) || lex_k_comma != li.lex) break;
 	}
 
-	//проверка наличия "}" (конец конструктора множества)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "}" (РєРѕРЅРµС† РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° РјРЅРѕР¶РµСЃС‚РІР°)
 	if (lex_k_cl_brace != li.lex) return s_e_ClBraceMissing;
 
-	//в случае, если все эл-ты множества константны, вычисляем ConstValue
+	//РІ СЃР»СѓС‡Р°Рµ, РµСЃР»Рё РІСЃРµ СЌР»-С‚С‹ РјРЅРѕР¶РµСЃС‚РІР° РєРѕРЅСЃС‚Р°РЅС‚РЅС‹, РІС‹С‡РёСЃР»СЏРµРј ConstValue
 	if (is_const) {
 		CBaseVector::iterator vi;
 		for (vi = SetElems.begin(); vi != SetElems.end(); vi++) {
-			//собственно вычисление ConstValue
+			//СЃРѕР±СЃС‚РІРµРЅРЅРѕ РІС‹С‡РёСЃР»РµРЅРёРµ ConstValue
 			ConstValue |= static_cast<CSetVarElem*>(*vi)->GetConstValue();
-			//эл-т SetVarElem уже не нужен
+			//СЌР»-С‚ SetVarElem СѓР¶Рµ РЅРµ РЅСѓР¶РµРЅ
 			delete *vi;
 		}
-		//очищаем список (он уже не нужен)
+		//РѕС‡РёС‰Р°РµРј СЃРїРёСЃРѕРє (РѕРЅ СѓР¶Рµ РЅРµ РЅСѓР¶РµРЅ)
 		SetElems.clear();
 	}
 
@@ -1665,17 +1665,17 @@ int CSetVar::SetInit(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CSetVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CSetVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CSetVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CSetType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CSetType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CSetType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) {
 		fprintf(f.fc, " = ");
 		CSetVar::WriteCPP_ConstValue(f);
@@ -1684,10 +1684,10 @@ void CSetVar::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CSetVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -1696,14 +1696,14 @@ void CSetVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CSetVar::WriteCPP_ConstValue(CPP_files& f)
 {
-	//проверка наличия рассчитанного константного значения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРіРѕ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	if (is_const)
 		fprintf(f.fc, "%i", ConstValue);
 	else {
-		//проверка наличия эл-тов в множестве
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЌР»-С‚РѕРІ РІ РјРЅРѕР¶РµСЃС‚РІРµ
 		if (SetElems.empty())
 			fprintf(f.fc, "0");
 		else {
@@ -1721,7 +1721,7 @@ void CSetVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CSetVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CSetVar РІ С„Р°Р№Р» .dfn
 void CSetVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) throw error_Internal("CSetVar::WriteDFN");
@@ -1734,7 +1734,7 @@ void CSetVar::WriteDFN(DFN_file& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта CSetVarElem
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° CSetVarElem
 CSetVarElem::~CSetVarElem()
 {
 	delete LowExpr;
@@ -1743,18 +1743,18 @@ CSetVarElem::~CSetVarElem()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта CSetVarElem
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° CSetVarElem
 int CSetVarElem::Init(CLexBuf *lb)
 {
-	//инициализация первого выражения
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	LowExpr = new CExpr(parent_element);
 	int err_num = LowExpr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(LowExpr->GetResultId())) return s_e_SetElemType;
 
-	//попытка вычисления константы
+	//РїРѕРїС‹С‚РєР° РІС‹С‡РёСЃР»РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	CBaseVar* BV;
 	err_num = LowExpr->CreateConst(BV);
 	if (!err_num) {
@@ -1762,17 +1762,17 @@ int CSetVarElem::Init(CLexBuf *lb)
 		delete BV;
 		delete LowExpr;
 		LowExpr = NULL;
-		//проверка допустимого значения константы
+		//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹
 		if (SET_MAX < LowBoundValue || 0 > LowBoundValue) return s_e_SetElemRange;
-		//преобразование числового значения в множество
+		//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‡РёСЃР»РѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ РјРЅРѕР¶РµСЃС‚РІРѕ
 		SetValue = 1 << LowBoundValue;
 	}
 
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия ".." (второго выражения)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ".." (РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
 	if (!lb->ReadLex(li) || lex_k_dots != li.lex) {
 		RESTORE_POS
 		return 0;
@@ -1780,26 +1780,26 @@ int CSetVarElem::Init(CLexBuf *lb)
 
 	IsRange = true;
 
-	//инициализация второго выражения
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	HighExpr = new CExpr(parent_element);
 	err_num = HighExpr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа второго выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(HighExpr->GetResultId())) return s_e_SetElemType;
 
-	//попытка вычисления константы для второго выражения
+	//РїРѕРїС‹С‚РєР° РІС‹С‡РёСЃР»РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹ РґР»СЏ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	err_num = HighExpr->CreateConst(BV);
 	if (!err_num) {
 		HighBoundValue = BV->GetIntValue();
 		delete BV;
 		delete HighExpr;
 		HighExpr = NULL;
-		//проверка допустимого значения константы
+		//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹
 		if (SET_MAX < HighBoundValue || 0 > HighBoundValue) return s_e_SetElemRange;
-		//проверка возможности получения константного множества
+		//РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїРѕР»СѓС‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ РјРЅРѕР¶РµСЃС‚РІР°
 		if (!LowExpr) {
-			//вычисление множества - диапазона с учетом предыдущего значения диапазона
+			//РІС‹С‡РёСЃР»РµРЅРёРµ РјРЅРѕР¶РµСЃС‚РІР° - РґРёР°РїР°Р·РѕРЅР° СЃ СѓС‡РµС‚РѕРј РїСЂРµРґС‹РґСѓС‰РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ РґРёР°РїР°Р·РѕРЅР°
 			if (LowBoundValue > HighBoundValue) return s_e_SetRange;
 			for (int i = LowBoundValue + 1; i <= HighBoundValue; i++) SetValue |= 1 << i;
 		}
@@ -1810,34 +1810,34 @@ int CSetVarElem::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CSetVarElem
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CSetVarElem
 void CSetVarElem::WriteCPP(CPP_files &f)
 {
-	//проверка возможности использования рассчитанных констант
+	//РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЂР°СЃСЃС‡РёС‚Р°РЅРЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚
 	if (IsRange && (LowExpr || HighExpr)) {
-		fprintf(f.fc, "O2M_SET_RANGE(");	//аргументы данной функции - целочисленные границы диапазона (не множества)
-		if (LowExpr) LowExpr->WriteCPP(f); else fprintf(f.fc, "%i", LowBoundValue);	//можно исп. рассчитанную нижнюю границу диапазона
+		fprintf(f.fc, "O2M_SET_RANGE(");	//Р°СЂРіСѓРјРµРЅС‚С‹ РґР°РЅРЅРѕР№ С„СѓРЅРєС†РёРё - С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Рµ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР° (РЅРµ РјРЅРѕР¶РµСЃС‚РІР°)
+		if (LowExpr) LowExpr->WriteCPP(f); else fprintf(f.fc, "%i", LowBoundValue);	//РјРѕР¶РЅРѕ РёСЃРї. СЂР°СЃСЃС‡РёС‚Р°РЅРЅСѓСЋ РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ РґРёР°РїР°Р·РѕРЅР°
 		fprintf(f.fc, ",");
-		if (HighExpr) HighExpr->WriteCPP(f); else fprintf(f.fc, "%i", HighBoundValue);	//можно исп. рассчитанную верхнюю границу диапазона
+		if (HighExpr) HighExpr->WriteCPP(f); else fprintf(f.fc, "%i", HighBoundValue);	//РјРѕР¶РЅРѕ РёСЃРї. СЂР°СЃСЃС‡РёС‚Р°РЅРЅСѓСЋ РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ РґРёР°РїР°Р·РѕРЅР°
 		fprintf(f.fc, ")");
 	} else
 		if (LowExpr) {
-			//нет диапазона или константного множества, требуется преобразование целочисленного выражения в множество
+			//РЅРµС‚ РґРёР°РїР°Р·РѕРЅР° РёР»Рё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ РјРЅРѕР¶РµСЃС‚РІР°, С‚СЂРµР±СѓРµС‚СЃСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ РІ РјРЅРѕР¶РµСЃС‚РІРѕ
 			fprintf(f.fc, "1 << (");
 			LowExpr->WriteCPP(f);
 			fprintf(f.fc, ")");
 		} else
-			fprintf(f.fc, "%i", SetValue);	//можно использовать полностью рассчитанное множество
+			fprintf(f.fc, "%i", SetValue);	//РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїРѕР»РЅРѕСЃС‚СЊСЋ СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРµ РјРЅРѕР¶РµСЃС‚РІРѕ
 }
 
 
 //-----------------------------------------------------------------------------
-//создание константы, подразумевается, что is_const == true
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 CBaseVar* CShortintVar::CreateConst(const CBaseName *parent) const
 {
 	CShortintVar* SV = static_cast<CShortintVar*>(CShortintVar::CreateVar(parent));
 
-	//копирование данных в созданную переменную
+	//РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РІ СЃРѕР·РґР°РЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	SV->ConstValue = ConstValue;
 
 	return SV;
@@ -1845,7 +1845,7 @@ CBaseVar* CShortintVar::CreateConst(const CBaseName *parent) const
 
 
 //-----------------------------------------------------------------------------
-//создание копии переменной (без копирования данных в случае констант)
+//СЃРѕР·РґР°РЅРёРµ РєРѕРїРёРё РїРµСЂРµРјРµРЅРЅРѕР№ (Р±РµР· РєРѕРїРёСЂРѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚)
 CBaseVar* CShortintVar::CreateVar(const CBaseName* parent) const
 {
 	CBaseVar* BV = new CShortintVar(parent);
@@ -1855,26 +1855,26 @@ CBaseVar* CShortintVar::CreateVar(const CBaseName* parent) const
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CShortintVar при объявлении переменной
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CShortintVar РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 void CShortintVar::WriteCPP(CPP_files& f)
 {
-	//запись декларации переменной
+	//Р·Р°РїРёСЃСЊ РґРµРєР»Р°СЂР°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	if (external) {
 		fprintf(f.fh, "extern %s %s", CShortintType::GetCPPTypeName(), name);
 		fprintf(f.fc, "%s %s::%s%s", CShortintType::GetCPPTypeName(), parent_element->name, is_var ? "&" : "", name);
 	} else
 		fprintf(f.fc, "%s %s%s", CShortintType::GetCPPTypeName(), is_var ? "&" : "", name);
 
-	//запись инициализации константы (если надо)
+	//Р·Р°РїРёСЃСЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅСЃС‚Р°РЅС‚С‹ (РµСЃР»Рё РЅР°РґРѕ)
 	if (is_const) fprintf(f.fc, " = %i", ConstValue);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода переменной в параметрах процедуры
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹
 void CShortintVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 {
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (type_name)
 		WriteCPP_fp_named_type(f, to_h);
 	else
@@ -1883,7 +1883,7 @@ void CShortintVar::WriteCPP_fp(CPP_files& f, const bool to_h)
 
 
 //-----------------------------------------------------------------------------
-//запись кода при использовании константного значения, подразумевается, что is_const == true
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ, С‡С‚Рѕ is_const == true
 void CShortintVar::WriteCPP_ConstValue(CPP_files& f)
 {
 	fprintf(f.fc, "%hi", ConstValue);
@@ -1891,7 +1891,7 @@ void CShortintVar::WriteCPP_ConstValue(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CShortintVar в файл .dfn
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CShortintVar РІ С„Р°Р№Р» .dfn
 void CShortintVar::WriteDFN(DFN_file& f)
 {
 	if (is_const) {

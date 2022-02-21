@@ -1,12 +1,12 @@
 //=============================================================================
-// Содержимое файлов _O2M_sys.h, _O2M_sys.cpp
+// РЎРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»РѕРІ _O2M_sys.h, _O2M_sys.cpp
 //=============================================================================
 
 #ifndef O2M_SRC_sys_h
 #define O2M_SRC_sys_h
 
 
-//содержимое файла _O2M_sys.h
+//СЃРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р° _O2M_sys.h
 static const int O2M_sys_h_size = 9;
 
 static char *O2M_sys_h[O2M_sys_h_size] =
@@ -22,7 +22,7 @@ static char *O2M_sys_h[O2M_sys_h_size] =
 	"int O2M_SET_RANGE(const int l, const int h);\n"
 };
 
-//содержимое файла _O2M_sys.cpp
+//СЃРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р° _O2M_sys.cpp
 static const int O2M_sys_cpp_size = 17;
 
 static char *O2M_sys_cpp[O2M_sys_cpp_size] =
@@ -46,7 +46,7 @@ static char *O2M_sys_cpp[O2M_sys_cpp_size] =
 	"\treturn res;\n}"
 };
 
-//создание _O2M_sys файлов с проверкой наличия директории CPP
+//СЃРѕР·РґР°РЅРёРµ _O2M_sys С„Р°Р№Р»РѕРІ СЃ РїСЂРѕРІРµСЂРєРѕР№ РЅР°Р»РёС‡РёСЏ РґРёСЂРµРєС‚РѕСЂРёРё CPP
 bool create_O2M_sys_files();
 
 #endif	//O2M_SRC_sys_h

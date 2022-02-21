@@ -1,5 +1,5 @@
 //=============================================================================
-// Объявление классов типов (Type)
+// РћР±СЉСЏРІР»РµРЅРёРµ РєР»Р°СЃСЃРѕРІ С‚РёРїРѕРІ (Type)
 //=============================================================================
 
 #ifndef O2M_Type_h
@@ -17,11 +17,11 @@ class CRecordType;
 
 
 //-----------------------------------------------------------------------------
-//декларация объектов
+//РґРµРєР»Р°СЂР°С†РёСЏ РѕР±СЉРµРєС‚РѕРІ
 class CDeclSeq
 {
 public:
-	void WriteCPP_mod_init(CPP_files& f);	//инициализация импортируемых модулей
+	void WriteCPP_mod_init(CPP_files& f);	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… РјРѕРґСѓР»РµР№
 	int LoadDfnModule(const CProject *project, const char* module_name, const char* alias_name);
 	CDeclSeq(const CBaseName* parent) : DfnModuleSeq(NULL),
 		parent_element(parent) {};
@@ -34,16 +34,16 @@ public:
 	int WriteCPP_proc(CPP_files& f);
 	int WriteCPP_var(CPP_files& f);
 	void WriteDFN(DFN_file& f);
-	//поиск имени в таблице имен
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 	CBaseName* FindName(const char* search_name) const;
-	//добавление указанного эл-та в таблицу имен
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ
 	void AddName(CBaseName* BN) const;
-	//используемые модули (в виде dfn)
+	//РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РјРѕРґСѓР»Рё (РІ РІРёРґРµ dfn)
 	CDfnModuleSeq* DfnModuleSeq;
     mutable CBaseNameVector BaseNameStore;
 protected:
 	int CheckCompleteRoot(CLexBuf *lb);
-	//контейнер объектов, объявленных в послед-ти деклараций
+	//РєРѕРЅС‚РµР№РЅРµСЂ РѕР±СЉРµРєС‚РѕРІ, РѕР±СЉСЏРІР»РµРЅРЅС‹С… РІ РїРѕСЃР»РµРґ-С‚Рё РґРµРєР»Р°СЂР°С†РёР№
     //mutable CBaseNameVector BaseNameStore;
 	int ConstInit(CLexBuf *lb);
 	int TypeInit(CLexBuf *lb);
@@ -55,7 +55,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//декларация объектов в dfn модуле
+//РґРµРєР»Р°СЂР°С†РёСЏ РѕР±СЉРµРєС‚РѕРІ РІ dfn РјРѕРґСѓР»Рµ
 class CDfnDeclSeq : public CDeclSeq
 {
 public:
@@ -66,7 +66,7 @@ protected:
 
 
 //-----------------------------------------------------------------------------
-//приемник (Receiver) типа PROCEDURE
+//РїСЂРёРµРјРЅРёРє (Receiver) С‚РёРїР° PROCEDURE
 class CReceiver
 {
 public:
@@ -75,37 +75,37 @@ public:
 		type_name(NULL),
 		Recv(NULL) {};
 	~CReceiver();
-	//поиск имени в таблице имен, NULL - если имя не найдено
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ, NULL - РµСЃР»Рё РёРјСЏ РЅРµ РЅР°Р№РґРµРЅРѕ
 	CBaseName* FindName(const char* search_name) const;
-	//инициализация
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 	int Init(CLexBuf *lb, const CBaseName* parent_element);
-	//генерация кода приемника
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРёРµРјРЅРёРєР°
 	void WriteCPP(CPP_files &f) {fprintf(f.fc, "\t%s* %s = this;\n", type_name, name);};
-	//запись кода приемника
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРёРµРјРЅРёРєР°
 	void WriteCPP_fp(CPP_files& f, const bool external, const bool single_param);
-	//признак наличия кл. слова VAR (true означает связывание с записью, false - с ук. на запись)
+	//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° VAR (true РѕР·РЅР°С‡Р°РµС‚ СЃРІСЏР·С‹РІР°РЅРёРµ СЃ Р·Р°РїРёСЃСЊСЋ, false - СЃ СѓРє. РЅР° Р·Р°РїРёСЃСЊ)
 	bool is_var;
-	//название объекта-приемника (запись или ук. на запись)
+	//РЅР°Р·РІР°РЅРёРµ РѕР±СЉРµРєС‚Р°-РїСЂРёРµРјРЅРёРєР° (Р·Р°РїРёСЃСЊ РёР»Рё СѓРє. РЅР° Р·Р°РїРёСЃСЊ)
 	char* name;
-	//название типа объекта-приемника
+	//РЅР°Р·РІР°РЅРёРµ С‚РёРїР° РѕР±СЉРµРєС‚Р°-РїСЂРёРµРјРЅРёРєР°
 	char* type_name;
 //private:
-	//переменная-приемник (т.к. Receiver - это таблица имен с одной переменной)
+	//РїРµСЂРµРјРµРЅРЅР°СЏ-РїСЂРёРµРјРЅРёРє (С‚.Рє. Receiver - СЌС‚Рѕ С‚Р°Р±Р»РёС†Р° РёРјРµРЅ СЃ РѕРґРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№)
 	CBaseVar* Recv;
 };//CReceiver
 
 
 //-----------------------------------------------------------------------------
-//класс для создания списка формальных параметров одного типа
+//РєР»Р°СЃСЃ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРїРёСЃРєР° С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРґРЅРѕРіРѕ С‚РёРїР°
 class CFPSection
 {
 protected:
 	bool is_var;
 	const CBaseName *parent_element;
 	CBaseType *BaseType;
-	//тип списка загруженных имен
+	//С‚РёРї СЃРїРёСЃРєР° Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РёРјРµРЅ
 	typedef StringVector TmpIdents_type;
-	//список загруженных имен
+	//СЃРїРёСЃРѕРє Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РёРјРµРЅ
 	TmpIdents_type tmp_idents;
 public:
 	CFPSection(const CBaseName* parent) : parent_element(parent), BaseType(NULL) {};
@@ -115,44 +115,44 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//список формальных параметров (FormalPars) типа PROCEDURE
+//СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ (FormalPars) С‚РёРїР° PROCEDURE
 class CFormalPars
 {
 public:
 	CBaseName* FindName(const char* search_name) const;
-	//поиск имени в списке формальных параметров по номеру
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРїРёСЃРєРµ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕ РЅРѕРјРµСЂСѓ
     CBaseName* GetNameByIndex(int index);
 	CFormalPars() : Qualident(NULL), have_arrays(false) {}
 	~CFormalPars();
 	void Assign(CFormalPars& FP, const CBaseName* parent_element) const;
-	//тип процедуры-функции
+	//С‚РёРї РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё
 	CQualident* Qualident;
-	//список формальных параметров
+	//СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	CBaseVarVector FPStore;
 	int Init(CLexBuf *lb, const CBaseName* parent_element);
-	//генерация кода типа процедуры
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РёРїР° РїСЂРѕС†РµРґСѓСЂС‹
 	void WriteCPP_type(CPP_files& f, const bool to_h, const CBaseName* parent_element);
-	//генерация кода формальных параметров
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	void WriteCPP_pars(CPP_files& f, const bool to_h);
-	//запись списка имен формальных параметров через ","
+	//Р·Р°РїРёСЃСЊ СЃРїРёСЃРєР° РёРјРµРЅ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ С‡РµСЂРµР· ","
 	void WriteCPP_names(CPP_files& f, const bool to_h);
-	//генерация кода для инициализации массивов-значений
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґР»СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјР°СЃСЃРёРІРѕРІ-Р·РЅР°С‡РµРЅРёР№
     void WriteCPP_begin(CPP_files& f);
-	//генерация кода для деинициализации массивов-значений
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґР»СЏ РґРµРёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјР°СЃСЃРёРІРѕРІ-Р·РЅР°С‡РµРЅРёР№
 	void WriteCPP_end(CPP_files& f, const bool ret_present);
-	//запись объявления формальных параметров процедуры в dfn файл
+	//Р·Р°РїРёСЃСЊ РѕР±СЉСЏРІР»РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС†РµРґСѓСЂС‹ РІ dfn С„Р°Р№Р»
 	void WriteDFN(DFN_file& f);
-	//запись типа процедуры в dfn файл
+	//Р·Р°РїРёСЃСЊ С‚РёРїР° РїСЂРѕС†РµРґСѓСЂС‹ РІ dfn С„Р°Р№Р»
 	void WriteDFN_type(DFN_file& f);
 protected:
 	int CheckCompleteRoot(CLexBuf *lb);
-	//признак наличия массивов в качестве параметров-значений (требуют инициализации)
+	//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РјР°СЃСЃРёРІРѕРІ РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂРѕРІ-Р·РЅР°С‡РµРЅРёР№ (С‚СЂРµР±СѓСЋС‚ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё)
 	bool have_arrays;
 };//CFormalPars
 
 
 //-----------------------------------------------------------------------------
-//класс для создания списка формальных обобщенных параметров одного типа
+//РєР»Р°СЃСЃ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРїРёСЃРєР° С„РѕСЂРјР°Р»СЊРЅС‹С… РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРґРЅРѕРіРѕ С‚РёРїР°
 class CCommonFPSection : public CFPSection
 {
 public:
@@ -162,13 +162,13 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//класс для создания списка формальных специализированных обобщенных параметров одного типа
+//РєР»Р°СЃСЃ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРїРёСЃРєР° С„РѕСЂРјР°Р»СЊРЅС‹С… СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРґРЅРѕРіРѕ С‚РёРїР°
 class CSpecFPSection
 {
 	bool is_var;
 	const CBaseName *parent_element;
 	CBaseType *BaseType;
-	//тип объекта для хранения информации об 1 загруженном параметре
+	//С‚РёРї РѕР±СЉРµРєС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё РѕР± 1 Р·Р°РіСЂСѓР¶РµРЅРЅРѕРј РїР°СЂР°РјРµС‚СЂРµ
 	struct SSFPElem{
 		char* ident;
 		bool IsNeedDefaultSpec;
@@ -176,9 +176,9 @@ class CSpecFPSection
 		char* TagName;
 		CLexBufPos pos;
 	};
-	//тип списка загруженных специализированных параметров
+	//С‚РёРї СЃРїРёСЃРєР° Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	typedef std::vector<SSFPElem*> TSFPElemStore;
-	//список загруженных специализированных параметров
+	//СЃРїРёСЃРѕРє Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	TSFPElemStore SFPElemStore;
 public:
 	CSpecFPSection(const CBaseName* parent) : parent_element(parent), BaseType(NULL) {};
@@ -188,91 +188,91 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//список обобщающих параметров
+//СЃРїРёСЃРѕРє РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 class CCommonPars : public CFormalPars
 {
 public:
-	//инициализация обобщенных параметров обобщающей процедуры
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±РѕР±С‰Р°СЋС‰РµР№ РїСЂРѕС†РµРґСѓСЂС‹
 	int Init(CLexBuf *lb, CBaseName* parent_element);
-	//инициализация обобщенных параметров обработчика парам. спец-ции
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїР°СЂР°Рј. СЃРїРµС†-С†РёРё
 	int InitSpec(CLexBuf *lb, CBaseName* parent_element);
 };
 
 
 //-----------------------------------------------------------------------------
-//модуль
+//РјРѕРґСѓР»СЊ
 class CModule : public CBaseName
 {
 public:
 	CModule(const CBaseName* parent) : CBaseName(id_CModule, parent), DeclSeq(NULL), StatementSeq(NULL) {};
 	~CModule();
-	//поиск импортированного имени в таблице имен, NULL - если имя не найдено
+	//РїРѕРёСЃРє РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ, NULL - РµСЃР»Рё РёРјСЏ РЅРµ РЅР°Р№РґРµРЅРѕ
 	CBaseName* FindImportedName(const char* module_name, const char* search_name) const;
 	void WriteDFN(DFN_file& f);
-	//создание файла _O2M_main.cpp с функцией O2M_SYS_main_init
+	//СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° _O2M_main.cpp СЃ С„СѓРЅРєС†РёРµР№ O2M_SYS_main_init
 	bool WriteCPP_main();
-	//декларации
+	//РґРµРєР»Р°СЂР°С†РёРё
 	CDeclSeq* DeclSeq;
-	//последовательность операторов
+	//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	CStatementSeq* StatementSeq;
-	//процедура инициализации модуля (с передачей объекта project)
+	//РїСЂРѕС†РµРґСѓСЂР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјРѕРґСѓР»СЏ (СЃ РїРµСЂРµРґР°С‡РµР№ РѕР±СЉРµРєС‚Р° project)
 	int Init(const CProject *project, CLexBuf *lb);
-	//заглушка для виртуального метода базового класса
+	//Р·Р°РіР»СѓС€РєР° РґР»СЏ РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ РјРµС‚РѕРґР° Р±Р°Р·РѕРІРѕРіРѕ РєР»Р°СЃСЃР°
 	int Init(CLexBuf*) {throw error_Internal("CModule::Init(CLexBuf*)");};
-	//генерация кода C++
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° C++
 	void WriteCPP(CPP_files& f);
-	//поиск имени в таблице имен
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 	CBaseName* FindName(const char* search_name) const;
-	//добавление указанного эл-та в таблицу имен
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ
 	void AddName(CBaseName* BN) const;
 };//CModule
 
 
 //-----------------------------------------------------------------------------
-//модуль сгенерированный из .dfn
+//РјРѕРґСѓР»СЊ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Р№ РёР· .dfn
 class CDfnModule : public CBaseName
 {
 public:
 	CBaseName* FindImportedName(const char *module_name, const char *search_name) const;
-	//добавление указанного эл-та в таблицу имен
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ
 	void AddName(CBaseName* BN) const;
 	CDfnModule(const CBaseName* parent) : CBaseName(id_CDfnModule, parent),
 		DfnDeclSeq(NULL), full_path(NULL), alias_name(NULL) {};
 	~CDfnModule();
 	void WriteCPP(CPP_files& f);
-	//процедура инициализации модуля (с передачей объекта project)
+	//РїСЂРѕС†РµРґСѓСЂР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјРѕРґСѓР»СЏ (СЃ РїРµСЂРµРґР°С‡РµР№ РѕР±СЉРµРєС‚Р° project)
 	virtual int Init(const CProject *project, CLexBuf *lb);
-	//заглушка для виртуального метода базового класса
+	//Р·Р°РіР»СѓС€РєР° РґР»СЏ РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ РјРµС‚РѕРґР° Р±Р°Р·РѕРІРѕРіРѕ РєР»Р°СЃСЃР°
 	int Init(CLexBuf*) {throw error_Internal("CDfnModule::Init(CLexBuf*)");};
-	//поиск имени в таблице имен
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 	CBaseName* FindName(const char* search_name) const;
-	//dfn декларации
+	//dfn РґРµРєР»Р°СЂР°С†РёРё
 	CDfnDeclSeq* DfnDeclSeq;
-	//путь к dfn модулю, если он во внешней директории (иначе NULL)
+	//РїСѓС‚СЊ Рє dfn РјРѕРґСѓР»СЋ, РµСЃР»Рё РѕРЅ РІРѕ РІРЅРµС€РЅРµР№ РґРёСЂРµРєС‚РѕСЂРёРё (РёРЅР°С‡Рµ NULL)
 	char* full_path;
-	//псевдоним модуля (AliasName := RealName) 
+	//РїСЃРµРІРґРѕРЅРёРј РјРѕРґСѓР»СЏ (AliasName := RealName) 
 	char* alias_name;
 };//CDfnModule
 
 
 //-----------------------------------------------------------------------------
-//модуль SYSTEM (его .dfn файл должен быть пустым)
+//РјРѕРґСѓР»СЊ SYSTEM (РµРіРѕ .dfn С„Р°Р№Р» РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј)
 class CDfnModuleSystem : public CDfnModule
 {
 public:
 	CDfnModuleSystem(const CBaseName* parent);
-	//процедура инициализации модуля (с передачей объекта project)
+	//РїСЂРѕС†РµРґСѓСЂР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјРѕРґСѓР»СЏ (СЃ РїРµСЂРµРґР°С‡РµР№ РѕР±СЉРµРєС‚Р° project)
 	int Init(const CProject *project, CLexBuf *lb);
 };//CDfnModuleSystem
 
 
 //-----------------------------------------------------------------------------
-//импортированный модуль
+//РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјРѕРґСѓР»СЊ
 class CImportModule : public CBaseName
 {
 public:
 	void WriteDFN(DFN_file &f);
-	char *real_name;				//настоящее имя модуля
+	char *real_name;				//РЅР°СЃС‚РѕСЏС‰РµРµ РёРјСЏ РјРѕРґСѓР»СЏ
 	CImportModule(const CBaseName* parent) : CBaseName(id_CImportModule, parent), real_name(NULL) {};
 	~CImportModule() {delete[] real_name;};
 	int Init(CLexBuf *lb);
@@ -281,22 +281,22 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//процедура
+//РїСЂРѕС†РµРґСѓСЂР°
 class CProcedure : public CBaseName
 {
 public:
-	//добавление указанного эл-та в таблицу имен
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ
 	void AddName(CBaseName* BN) const;
 	bool CompareProcNames(const CProcedure* P) const;
 	CProcedure(const CBaseName* parent) : CBaseName(id_CProcedure, parent),
 		Receiver(NULL), FormalPars(NULL), DeclSeq(NULL), StatementSeq(NULL), have_return(hr_No) {}
 	~CProcedure();
 	CBaseName* FindImportedName(const char *module_name, const char *search_name) const;
-	//поиск имени в таблице имен
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 	CBaseName* FindName(const char* search_name) const;
-	//количество обобщенных параметров процедуры (если есть)
+	//РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС†РµРґСѓСЂС‹ (РµСЃР»Рё РµСЃС‚СЊ)
 	virtual int GetCommonParsCount() {return 0;};
-	//количество формальных параметров процедуры
+	//РєРѕР»РёС‡РµСЃС‚РІРѕ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС†РµРґСѓСЂС‹
 	int GetFormalParsCount() {return FormalPars->FPStore.size();};
 	EName_id GetResultId() const;
 	int Init(CLexBuf *lb);
@@ -305,45 +305,45 @@ public:
 	void WriteCPP_RECORD(CPP_files& f, const CRecordType* RT, const bool to_h);
 	void WriteDFN(DFN_file& f);
 	CReceiver* Receiver;
-	//список формальных параметров
+	//СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	CFormalPars *FormalPars;
-	//декларации
+	//РґРµРєР»Р°СЂР°С†РёРё
 	CDeclSeq *DeclSeq;
-	//последовательность операторов
+	//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	CStatementSeq *StatementSeq;
 protected:
-	//признак наличия в теле процедуры(функции) оператора RETURN
+	//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РІ С‚РµР»Рµ РїСЂРѕС†РµРґСѓСЂС‹(С„СѓРЅРєС†РёРё) РѕРїРµСЂР°С‚РѕСЂР° RETURN
 	EHaveRet have_return;
 };//CProcedure
 
 
 //-----------------------------------------------------------------------------
-//обработчик параметрической специализации
+//РѕР±СЂР°Р±РѕС‚С‡РёРє РїР°СЂР°РјРµС‚СЂРёС‡РµСЃРєРѕР№ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 class CHandlerProc : public CProcedure
 {
-	//преобразование обобщающих параметров в формальные
+	//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ РІ С„РѕСЂРјР°Р»СЊРЅС‹Рµ
 	int ConvertParams();
 public:
-	//количество обобщенных параметров процедуры
+	//РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС†РµРґСѓСЂС‹
 	int GetCommonParsCount() {return CommonPars->FPStore.size();};
 	CHandlerProc(const CBaseName* parent);
 	~CHandlerProc();
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-	//обработчик парам. спец-ции не заносится в DFN файл
+	//РѕР±СЂР°Р±РѕС‚С‡РёРє РїР°СЂР°Рј. СЃРїРµС†-С†РёРё РЅРµ Р·Р°РЅРѕСЃРёС‚СЃСЏ РІ DFN С„Р°Р№Р»
 	void WriteDFN(DFN_file& f) {throw error_Internal("CHandlerProc::WriteDFN");};
-	//список обобщающих параметров
+	//СЃРїРёСЃРѕРє РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 	CCommonPars *CommonPars;
 //private:
-	//имя модуля (NULL для текущего модуля), экспортирующего обобщенную процедуру, к которой привязан данный обработчик
+	//РёРјСЏ РјРѕРґСѓР»СЏ (NULL РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РјРѕРґСѓР»СЏ), СЌРєСЃРїРѕСЂС‚РёСЂСѓСЋС‰РµРіРѕ РѕР±РѕР±С‰РµРЅРЅСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ, Рє РєРѕС‚РѕСЂРѕР№ РїСЂРёРІСЏР·Р°РЅ РґР°РЅРЅС‹Р№ РѕР±СЂР°Р±РѕС‚С‡РёРє
 	char* QualName;
-	//числ. значение для создания уникального (в пределах модуля) имени обработчика
+	//С‡РёСЃР». Р·РЅР°С‡РµРЅРёРµ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ (РІ РїСЂРµРґРµР»Р°С… РјРѕРґСѓР»СЏ) РёРјРµРЅРё РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 	int UID;
 };//CHandlerProc
 
 
 //-----------------------------------------------------------------------------
-//опрережающее описание процедуры ForwardDecl
+//РѕРїСЂРµСЂРµР¶Р°СЋС‰РµРµ РѕРїРёСЃР°РЅРёРµ РїСЂРѕС†РµРґСѓСЂС‹ ForwardDecl
 class CForwardDecl : public CProcedure
 {
 public:
@@ -353,40 +353,40 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 private:
-	//позиция в потоке лексем на случай отсутствия процедуры для данного опережающего описания
+	//РїРѕР·РёС†РёСЏ РІ РїРѕС‚РѕРєРµ Р»РµРєСЃРµРј РЅР° СЃР»СѓС‡Р°Р№ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїСЂРѕС†РµРґСѓСЂС‹ РґР»СЏ РґР°РЅРЅРѕРіРѕ РѕРїРµСЂРµР¶Р°СЋС‰РµРіРѕ РѕРїРёСЃР°РЅРёСЏ
 	CLexBufPos FDeclPos;
-	//признак наличия процедуры для данного опережающего описания
+	//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ РґР»СЏ РґР°РЅРЅРѕРіРѕ РѕРїРµСЂРµР¶Р°СЋС‰РµРіРѕ РѕРїРёСЃР°РЅРёСЏ
 	bool Satisfied;
 };//CForwardDecl
 
 
 //-----------------------------------------------------------------------------
-//обобщающая процедура
+//РѕР±РѕР±С‰Р°СЋС‰Р°СЏ РїСЂРѕС†РµРґСѓСЂР°
 class CCommonProc : public CProcedure
 {
 protected:
-	//запись кода одного параметра при вызове обработчика параметрической специализации
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕРґРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РїСЂРё РІС‹Р·РѕРІРµ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїР°СЂР°РјРµС‚СЂРёС‡РµСЃРєРѕР№ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 	void WriteCPP_HPar(CPP_files& f, CBaseVar* par);
-	//проверка совпадения имен формальных и обобщающих параметров, конвертация записей в обобщенные переменные
+	//РїСЂРѕРІРµСЂРєР° СЃРѕРІРїР°РґРµРЅРёСЏ РёРјРµРЅ С„РѕСЂРјР°Р»СЊРЅС‹С… Рё РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ, РєРѕРЅРІРµСЂС‚Р°С†РёСЏ Р·Р°РїРёСЃРµР№ РІ РѕР±РѕР±С‰РµРЅРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 	int CheckParams();
 public:
-	//количество обобщенных параметров процедуры
+	//РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС†РµРґСѓСЂС‹
 	int GetCommonParsCount() {return CommonPars->FPStore.size();};
 	CCommonProc(const CBaseName* parent);
 	~CCommonProc();
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-	CCommonPars *CommonPars;		//список обобщающих параметров
-	//запись в .dfn файл
+	CCommonPars *CommonPars;		//СЃРїРёСЃРѕРє РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ
+	//Р·Р°РїРёСЃСЊ РІ .dfn С„Р°Р№Р»
 	void WriteDFN(DFN_file& f);
 private:
-	//признак наличия обработчика по умолчанию
+	//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	bool DefH;
 };//CCommonProc
 
 
 //-----------------------------------------------------------------------------
-//процедура, объявленная в DFN
+//РїСЂРѕС†РµРґСѓСЂР°, РѕР±СЉСЏРІР»РµРЅРЅР°СЏ РІ DFN
 class CDfnProcedure : public CProcedure
 {
 public:
@@ -396,7 +396,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//обобщающая процедура, объявленная в DFN
+//РѕР±РѕР±С‰Р°СЋС‰Р°СЏ РїСЂРѕС†РµРґСѓСЂР°, РѕР±СЉСЏРІР»РµРЅРЅР°СЏ РІ DFN
 class CDfnCommonProc : public CCommonProc
 {
 public:
@@ -406,14 +406,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип PTR (тип модуля SYSTEM)
+//С‚РёРї PTR (С‚РёРї РјРѕРґСѓР»СЏ SYSTEM)
 class CPtrType : public CBaseType
 {
 public:
 	CPtrType(const CBaseName* parent);
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//тип PTR не инициализируется из потока лексем
+	//С‚РёРї PTR РЅРµ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚СЃСЏ РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 	int Init(CLexBuf *lb) {return 0;};
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
@@ -421,14 +421,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип BOOEAN (основной тип)
+//С‚РёРї BOOEAN (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CBooleanType : public CBaseType
 {
 public:
 	CBooleanType(const CBaseName* parent) : CBaseType(id_CBooleanType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "bool";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -437,14 +437,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип CHAR (основной тип)
+//С‚РёРї CHAR (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CCharType : public CBaseType
 {
 public:
 	CCharType(const CBaseName* parent) : CBaseType(id_CCharType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "char";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -453,14 +453,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип SHORTINT (основной тип)
+//С‚РёРї SHORTINT (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CShortintType : public CBaseType
 {
 public:
 	CShortintType(const CBaseName* parent) : CBaseType(id_CShortintType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "short";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -469,14 +469,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип INTEGER (основной тип)
+//С‚РёРї INTEGER (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CIntegerType : public CBaseType
 {
 public:
 	CIntegerType(const CBaseName* parent) : CBaseType(id_CIntegerType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "int";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -485,14 +485,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип LONGINT (основной тип)
+//С‚РёРї LONGINT (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CLongintType : public CBaseType
 {
 public:
 	CLongintType(const CBaseName* parent) : CBaseType(id_CLongintType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "long";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -501,14 +501,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип REAL (основной тип)
+//С‚РёРї REAL (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CRealType : public CBaseType
 {
 public:
 	CRealType(const CBaseName* parent) : CBaseType(id_CRealType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "double";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -517,14 +517,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип LONGREAL (основной тип)
+//С‚РёРї LONGREAL (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CLongrealType : public CBaseType
 {
 public:
 	CLongrealType(const CBaseName* parent) : CBaseType(id_CLongrealType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "long double";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -533,14 +533,14 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип SET (основной тип)
+//С‚РёРї SET (РѕСЃРЅРѕРІРЅРѕР№ С‚РёРї)
 class CSetType : public CBaseType
 {
 public:
 	CSetType(const CBaseName* parent) : CBaseType(id_CSetType, parent) {};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение кода названия данного типа в C++
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РЅР°Р·РІР°РЅРёСЏ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РІ C++
 	static const char* GetCPPTypeName() {return "int";};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
@@ -549,7 +549,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//тип Qualident
+//С‚РёРї Qualident
 class CQualidentType : public CBaseType
 {
 public:
@@ -557,19 +557,19 @@ public:
 	~CQualidentType() {delete Qualident;};
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение ук. на действительный тип (не QualidentType), имя которого содержит QualidentType (с проверкой экспорта типа)
+	//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° РґРµР№СЃС‚РІРёС‚РµР»СЊРЅС‹Р№ С‚РёРї (РЅРµ QualidentType), РёРјСЏ РєРѕС‚РѕСЂРѕРіРѕ СЃРѕРґРµСЂР¶РёС‚ QualidentType (СЃ РїСЂРѕРІРµСЂРєРѕР№ СЌРєСЃРїРѕСЂС‚Р° С‚РёРїР°)
 	int GetNamedType(CBaseType* &NamedType, const bool check_external) const;
 	EName_id GetResultId() const;
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//имя типа
+	//РёРјСЏ С‚РёРїР°
 	CQualident* Qualident;
 };//CQualidentType
 
 
 //-----------------------------------------------------------------------------
-//тип ARRAY (одномерный массив)
+//С‚РёРї ARRAY (РѕРґРЅРѕРјРµСЂРЅС‹Р№ РјР°СЃСЃРёРІ)
 class CArrayType : public CBaseType
 {
 public:
@@ -578,33 +578,33 @@ public:
 	int CheckComplete(CLexBuf *lb) const;
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//получение ук. на тип эл-тов массива (последний тип в цепочке типов, не являющийся массивом)
+	//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° С‚РёРї СЌР»-С‚РѕРІ РјР°СЃСЃРёРІР° (РїРѕСЃР»РµРґРЅРёР№ С‚РёРї РІ С†РµРїРѕС‡РєРµ С‚РёРїРѕРІ, РЅРµ СЏРІР»СЏСЋС‰РёР№СЃСЏ РјР°СЃСЃРёРІРѕРј)
 	CBaseType* FindLastType() const;
-	//для перекрытия метода CBaseName::FindName, который не должен вызываться
+	//РґР»СЏ РїРµСЂРµРєСЂС‹С‚РёСЏ РјРµС‚РѕРґР° CBaseName::FindName, РєРѕС‚РѕСЂС‹Р№ РЅРµ РґРѕР»Р¶РµРЅ РІС‹Р·С‹РІР°С‚СЊСЃСЏ
 	CBaseName* FindName(const char*) const {return NULL;};
-	//вычисление максимального количества размерностей массива
+	//РІС‹С‡РёСЃР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 	long GetDimCount();
 	EName_id GetResultId(int dimension) const;
-	//получение типа для указанной размерности массива, отсчет размерностей с 0
-	//при указании недопустимой размерности возврат NULL
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°, РѕС‚СЃС‡РµС‚ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ СЃ 0
+	//РїСЂРё СѓРєР°Р·Р°РЅРёРё РЅРµРґРѕРїСѓСЃС‚РёРјРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РІРѕР·РІСЂР°С‚ NULL
 	CBaseType* GetType(const int dimension);
 	int Init(CLexBuf *lb);
-	//запись кода объявления CArrayType
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±СЉСЏРІР»РµРЅРёСЏ CArrayType
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//размер массива, если 0 == size, массив является открытым
+	//СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°, РµСЃР»Рё 0 == size, РјР°СЃСЃРёРІ СЏРІР»СЏРµС‚СЃСЏ РѕС‚РєСЂС‹С‚С‹Рј
 	long size;
-	//тип эл-тов массива: ARRAY OF Type
+	//С‚РёРї СЌР»-С‚РѕРІ РјР°СЃСЃРёРІР°: ARRAY OF Type
 	CBaseType *Type;
 };//CArrayType
 
 
 //-----------------------------------------------------------------------------
-//тип RECORD
+//С‚РёРї RECORD
 class CRecordType : public CBaseType
 {
 public:
-	//добавление указанного эл-та в таблицу имен
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ
 	void AddName(CBaseName* BN) const;
 	int AddProcReference(CProcedure* P) const;
 	int CheckComplete(CLexBuf *lb) const;
@@ -615,41 +615,41 @@ public:
 		in_checking_complete(false),
 		RuntimeId(NULL) {};
 	~CRecordType();
-	//поиск имени в списке полей
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРїРёСЃРєРµ РїРѕР»РµР№
 	CBaseName* FindName(const char* search_name) const;
-	//получение ид. типа времени исполнения
+	//РїРѕР»СѓС‡РµРЅРёРµ РёРґ. С‚РёРїР° РІСЂРµРјРµРЅРё РёСЃРїРѕР»РЅРµРЅРёСЏ
 	const char* GetRuntimeId() {return RuntimeId;};
 	int Init(CLexBuf *lb);
-	//инициализация строкового ид. типа времени исполнения
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃС‚СЂРѕРєРѕРІРѕРіРѕ РёРґ. С‚РёРїР° РІСЂРµРјРµРЅРё РёСЃРїРѕР»РЅРµРЅРёСЏ
 	int InitRuntimeId();
 	CRecordType* IsExtension(const char* module_name, const char* type_name);
-	//генерация кода
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР°
 	void WriteCPP(CPP_files& f, const bool to_h);
-	//запись в DFN объявления типа
+	//Р·Р°РїРёСЃСЊ РІ DFN РѕР±СЉСЏРІР»РµРЅРёСЏ С‚РёРїР°
 	void WriteDFN(DFN_file& f);
-	//описание приемника
+	//РѕРїРёСЃР°РЅРёРµ РїСЂРёРµРјРЅРёРєР°
 	CQualident* Qualident;
 //private:
-	//список полей записи и ссылок (не требующих очистки) на связанные с данным типом процедуры
+	//СЃРїРёСЃРѕРє РїРѕР»РµР№ Р·Р°РїРёСЃРё Рё СЃСЃС‹Р»РѕРє (РЅРµ С‚СЂРµР±СѓСЋС‰РёС… РѕС‡РёСЃС‚РєРё) РЅР° СЃРІСЏР·Р°РЅРЅС‹Рµ СЃ РґР°РЅРЅС‹Рј С‚РёРїРѕРј РїСЂРѕС†РµРґСѓСЂС‹
 	mutable CBaseNameVector FieldStore;
-	//для проверки объявления рекурсивного указателя (ук. на объект того же типа, в кот. он объявлен)
+	//РґР»СЏ РїСЂРѕРІРµСЂРєРё РѕР±СЉСЏРІР»РµРЅРёСЏ СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ (СѓРє. РЅР° РѕР±СЉРµРєС‚ С‚РѕРіРѕ Р¶Рµ С‚РёРїР°, РІ РєРѕС‚. РѕРЅ РѕР±СЉСЏРІР»РµРЅ)
 	mutable bool in_checking_complete;
-	//строковый ид. типа времени исполнения
+	//СЃС‚СЂРѕРєРѕРІС‹Р№ РёРґ. С‚РёРїР° РІСЂРµРјРµРЅРё РёСЃРїРѕР»РЅРµРЅРёСЏ
 	char* RuntimeId;
 };//CRecordType
 
 
 //-----------------------------------------------------------------------------
-//тип параметрическое обобщение
+//С‚РёРї РїР°СЂР°РјРµС‚СЂРёС‡РµСЃРєРѕРµ РѕР±РѕР±С‰РµРЅРёРµ
 class CCommonType : public CBaseType
 {
 public:
-	//описание эл-та обобщения
+	//РѕРїРёСЃР°РЅРёРµ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ
 	struct SSpec {
-		char* Tag;		//действителен только при TagType != tt_Type
-		char* QualName;	//имя модуля в случае импорта эл-та обобщения
-		char* Name;		//имя эл-та обобщения
-		bool IsExtended;//специализация добавлена путем расширения обобщения
+		char* Tag;		//РґРµР№СЃС‚РІРёС‚РµР»РµРЅ С‚РѕР»СЊРєРѕ РїСЂРё TagType != tt_Type
+		char* QualName;	//РёРјСЏ РјРѕРґСѓР»СЏ РІ СЃР»СѓС‡Р°Рµ РёРјРїРѕСЂС‚Р° СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ
+		char* Name;		//РёРјСЏ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ
+		bool IsExtended;//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґРѕР±Р°РІР»РµРЅР° РїСѓС‚РµРј СЂР°СЃС€РёСЂРµРЅРёСЏ РѕР±РѕР±С‰РµРЅРёСЏ
 	};
 	const SSpec* FindSpec(const char* QualName, const char* Name, const char *Tag);
 	const SSpec* FindSpecByName(const char *QualName, const char* Name) const;
@@ -662,49 +662,49 @@ public:
 	~CCommonType();
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
-	//уничтожение эл-та обобщения
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ
 	static void DelSpec(SSpec* sp);
 	int Init(CLexBuf *lb);
 	int InitExtension(CLexBuf *lb, CDeclSeq* DS);
-	//создание нового эл-та обобщения
+	//СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ
 	static SSpec* NewSpec(const char* newTag, const char* newQual, const char* newName, const bool newIsExtended);
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//признак локальности обобщения (объявлено с признаком LOCAL)
+	//РїСЂРёР·РЅР°Рє Р»РѕРєР°Р»СЊРЅРѕСЃС‚Рё РѕР±РѕР±С‰РµРЅРёСЏ (РѕР±СЉСЏРІР»РµРЅРѕ СЃ РїСЂРёР·РЅР°РєРѕРј LOCAL)
 	bool IsLocal;
-	//список эл-тов обобщения
+	//СЃРїРёСЃРѕРє СЌР»-С‚РѕРІ РѕР±РѕР±С‰РµРЅРёСЏ
 	typedef std::vector<SSpec*> SpecStore_type;
 	SpecStore_type SpecStore;
-	//тип параметров обобщения
+	//С‚РёРї РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±РѕР±С‰РµРЅРёСЏ
 	enum {tt_Default, tt_Type} TagType;
 private:
-	//добавление эл-та обобщения в список
+	//РґРѕР±Р°РІР»РµРЅРёРµ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ РІ СЃРїРёСЃРѕРє
 	void AddSpec(const char* newTag, const char* newQual, const char* newName, const bool newIsExtended);
-	//проверка допустимости типа обобщения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё С‚РёРїР° РѕР±РѕР±С‰РµРЅРёСЏ
 	int CheckSpecType(const char* pref_ident, const char* ident, const CBaseName* parent) const;
-	//очистка списка признаков
+	//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° РїСЂРёР·РЅР°РєРѕРІ
 	void ClearTmpTagStore();
-	//занесение в .2ml файл информации об одном эл-те обобщения
+	//Р·Р°РЅРµСЃРµРЅРёРµ РІ .2ml С„Р°Р№Р» РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕРґРЅРѕРј СЌР»-С‚Рµ РѕР±РѕР±С‰РµРЅРёСЏ
 	static void WriteCPP_SpecInfo(TFileType* f2ml, const bool IsDef, const CBaseName* parent_element, const SSpec* sp);
-	//тип списка признаков
+	//С‚РёРї СЃРїРёСЃРєР° РїСЂРёР·РЅР°РєРѕРІ
 	typedef StringVector TmpTagStore_type;
-	//специализация по умолчанию
+	//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	SSpec* DefaultSpec;
-	//список признаков
+	//СЃРїРёСЃРѕРє РїСЂРёР·РЅР°РєРѕРІ
 	TmpTagStore_type TmpTagStore;
 };
 
 
 //-----------------------------------------------------------------------------
-//расширение параметрического обобщения
-//используется только для занесения в .2ml файл информации о расширении обобщения
+//СЂР°СЃС€РёСЂРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ РѕР±РѕР±С‰РµРЅРёСЏ
+//РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ Р·Р°РЅРµСЃРµРЅРёСЏ РІ .2ml С„Р°Р№Р» РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЂР°СЃС€РёСЂРµРЅРёРё РѕР±РѕР±С‰РµРЅРёСЏ
 class CCommonExtensionType : public CBaseType
 {
 	int CreateType(CBaseType* &BaseType) const {return 0;};
 	int Init(CLexBuf *lb) {return 0;};
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const {return 0;};
 public:
-	//добавление эл-та обобщения в список
+	//РґРѕР±Р°РІР»РµРЅРёРµ СЌР»-С‚Р° РѕР±РѕР±С‰РµРЅРёСЏ РІ СЃРїРёСЃРѕРє
 	void AddSpec(const char* newTag, const char* newQual, const char* newName);
 	~CCommonExtensionType();
 	CCommonExtensionType(const CBaseName* parent) : CBaseType(id_CCommonExtensionType, parent),
@@ -714,7 +714,7 @@ public:
 		name = str_new_copy("");
 	};
 	void WriteCPP(CPP_files& f, const bool to_h);
-	//список эл-тов обобщения
+	//СЃРїРёСЃРѕРє СЌР»-С‚РѕРІ РѕР±РѕР±С‰РµРЅРёСЏ
 	CCommonType::SpecStore_type SpecStore;
 	char* TypeModuleName;
 	char* TypeName;
@@ -722,13 +722,13 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//обобщенный тип, специализированный конкретным признаком
+//РѕР±РѕР±С‰РµРЅРЅС‹Р№ С‚РёРї, СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹Р№ РєРѕРЅРєСЂРµС‚РЅС‹Рј РїСЂРёР·РЅР°РєРѕРј
 class CSpecType : public CBaseType
 {
 public:
 	const char* GetQualSpecName() const;
 	const char* GetSpecName() const {return TagName;};
-	//данная процедура не должна использоваться для SpecType
+	//РґР°РЅРЅР°СЏ РїСЂРѕС†РµРґСѓСЂР° РЅРµ РґРѕР»Р¶РЅР° РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РґР»СЏ SpecType
 	int CreateType(CBaseType* &BaseType) const;
 	int CreateVar(CBaseVar* &BaseVar, const CBaseName* parent) const;
 	CSpecType(const CBaseName* parent) : CBaseType(id_CSpecType, parent),
@@ -745,18 +745,18 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//имя обобщенного типа
+	//РёРјСЏ РѕР±РѕР±С‰РµРЅРЅРѕРіРѕ С‚РёРїР°
 	CQualident* Qualident;
 private:
-	//уточнение названия признака
+	//СѓС‚РѕС‡РЅРµРЅРёРµ РЅР°Р·РІР°РЅРёСЏ РїСЂРёР·РЅР°РєР°
 	char* QualTagName;
-	//название признака
+	//РЅР°Р·РІР°РЅРёРµ РїСЂРёР·РЅР°РєР°
 	char* TagName;
 };
 
 
 //-----------------------------------------------------------------------------
-//тип POINTER
+//С‚РёРї POINTER
 class CPointerType : public CBaseType
 {
 public:
@@ -773,19 +773,19 @@ public:
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
 //private:
-	//признак использования еще не объявленного имени
+	//РїСЂРёР·РЅР°Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РµС‰Рµ РЅРµ РѕР±СЉСЏРІР»РµРЅРЅРѕРіРѕ РёРјРµРЅРё
 	bool forward;
-	//не NULL в случае ук. на именованный тип
+	//РЅРµ NULL РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї
 	CQualident* Qualident;
-	//не NULL в случае ук. на  неименованный тип RECORD
+	//РЅРµ NULL РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР°  РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї RECORD
 	CBaseType *Type;
-	//позиция описания именованного типа в буфере лексем (при отсутствии описания типа в локальном блоке)
+	//РїРѕР·РёС†РёСЏ РѕРїРёСЃР°РЅРёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° РІ Р±СѓС„РµСЂРµ Р»РµРєСЃРµРј (РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° РІ Р»РѕРєР°Р»СЊРЅРѕРј Р±Р»РѕРєРµ)
 	CLexBufPos TypePos;
 };//CPointerType
 
 
 //-----------------------------------------------------------------------------
-//тип PROCEDURE
+//С‚РёРї PROCEDURE
 class CProcedureType : public CBaseType
 {
 public:
@@ -796,22 +796,22 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//список формальных параметров
+	//СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	CFormalPars FormalPars;
 };//CProcedureType
 
 
 //-----------------------------------------------------------------------------
-//последовательнось загруженных dfn модулей
+//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃСЊ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… dfn РјРѕРґСѓР»РµР№
 class CDfnModuleSeq
 {
 public:
 	CDfnModuleSeq(const CBaseName* parent);
 	~CDfnModuleSeq();
 	void EnumDfnModules(CProject &project);
-	//добавление эл-та в список модулей
+	//РґРѕР±Р°РІР»РµРЅРёРµ СЌР»-С‚Р° РІ СЃРїРёСЃРѕРє РјРѕРґСѓР»РµР№
 	void AddModule(CDfnModule* DM);
-	//поиск имени в таблице имен
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ
 	CDfnModule* FindName(const char* search_name) const;
 	const CBaseName* parent_element;
 	void WriteCPP(CPP_files& f);

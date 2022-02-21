@@ -1,5 +1,5 @@
 //===============================================================
-// Объявление объектов - стандартных процедур
+// РћР±СЉСЏРІР»РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ - СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РїСЂРѕС†РµРґСѓСЂ
 //===============================================================
 
 #ifndef O2M_StdProc_h
@@ -21,7 +21,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//целое выражение
+	CExpr Expr;			//С†РµР»РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -35,8 +35,8 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr ExprX;			//целое выражение
-	CExpr ExprN;			//целое выражение
+	CExpr ExprX;			//С†РµР»РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
+	CExpr ExprN;			//С†РµР»РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -50,7 +50,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//символьное выражение
+	CExpr Expr;			//СЃРёРјРІРѕР»СЊРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -64,7 +64,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//целое выражение
+	CExpr Expr;			//С†РµР»РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -79,7 +79,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//вещественное выражение
+	CExpr Expr;			//РІРµС‰РµСЃС‚РІРµРЅРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -94,9 +94,9 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	char * array_name;	//название измеряемого массива
-	long dimension;		//проверяемая размерность (измерение) массива
-	long array_size;	//найденная длина массива в заданном измерении
+	char * array_name;	//РЅР°Р·РІР°РЅРёРµ РёР·РјРµСЂСЏРµРјРѕРіРѕ РјР°СЃСЃРёРІР°
+	long dimension;		//РїСЂРѕРІРµСЂСЏРµРјР°СЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ (РёР·РјРµСЂРµРЅРёРµ) РјР°СЃСЃРёРІР°
+	long array_size;	//РЅР°Р№РґРµРЅРЅР°СЏ РґР»РёРЅР° РјР°СЃСЃРёРІР° РІ Р·Р°РґР°РЅРЅРѕРј РёР·РјРµСЂРµРЅРёРё
 };//CLenStdProc
 
 
@@ -125,7 +125,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	//признак использования для типа SET, применим только при id_CIntegerVar == ResultId
+	//РїСЂРёР·РЅР°Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РґР»СЏ С‚РёРїР° SET, РїСЂРёРјРµРЅРёРј С‚РѕР»СЊРєРѕ РїСЂРё id_CIntegerVar == ResultId
 	bool AppliedToSET;
 };
 
@@ -141,7 +141,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	//признак использования для типа SET, применим только при id_CIntegerVar == ResultId
+	//РїСЂРёР·РЅР°Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РґР»СЏ С‚РёРїР° SET, РїСЂРёРјРµРЅРёРј С‚РѕР»СЊРєРѕ РїСЂРё id_CIntegerVar == ResultId
 	bool AppliedToSET;
 };
 
@@ -156,7 +156,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//целый тип
+	CExpr Expr;			//С†РµР»С‹Р№ С‚РёРї
 };
 
 
@@ -170,7 +170,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;			//символьное выражение
+	CExpr Expr;			//СЃРёРјРІРѕР»СЊРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 };
 
 
@@ -198,7 +198,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CQualident Qualident;	//любой тип
+	CQualident Qualident;	//Р»СЋР±РѕР№ С‚РёРї
 };
 
 
@@ -214,13 +214,13 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	//для хранения признака в случае ук. на обобщение
+	//РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїСЂРёР·РЅР°РєР° РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРёРµ
 	CQualident qual;
-	//для получения названия переменной-указателя
+	//РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РЅР°Р·РІР°РЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№-СѓРєР°Р·Р°С‚РµР»СЏ
 	CDesignator Des;
-	//тип списка выражений для хранения размерностей
+	//С‚РёРї СЃРїРёСЃРєР° РІС‹СЂР°Р¶РµРЅРёР№ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№
 	typedef CExprVector TExprStore;
-	//список выражений (размерностей)
+	//СЃРїРёСЃРѕРє РІС‹СЂР°Р¶РµРЅРёР№ (СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№)
 	TExprStore ExprStore;
 };//CNewStdProc
 
@@ -243,8 +243,8 @@ public:
 class CDecStdProc : public CBase
 {
 public:
-	CExpr Expr1;		//целый тип, l-value (первый параметр)
-	CExpr *Expr2;		//целый тип, r-value (второй параметр)
+	CExpr Expr1;		//С†РµР»С‹Р№ С‚РёРї, l-value (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ)
+	CExpr *Expr2;		//С†РµР»С‹Р№ С‚РёРї, r-value (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ)
 	CDecStdProc(const CBaseName* parent) : CBase(parent), Expr1(parent), Expr2(NULL) {};
 	~CDecStdProc() {delete Expr2;};
 	int Init(CLexBuf *lb);
@@ -257,8 +257,8 @@ public:
 class CExclStdProc : public CBase
 {
 public:
-	CExpr Expr1;		//целый тип, l-value (первый параметр)
-	CExpr Expr2;		//целый тип, r-value (второй параметр)
+	CExpr Expr1;		//С†РµР»С‹Р№ С‚РёРї, l-value (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ)
+	CExpr Expr2;		//С†РµР»С‹Р№ С‚РёРї, r-value (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ)
 	CExclStdProc(const CBaseName *parent) : CBase(parent), Expr1(parent), Expr2(parent) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
@@ -274,8 +274,8 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr Expr;		//выражение, для которого утверждается истинность (иначе прерывание)
-	long AssertVal;	//возвращаемое в систему значение
+	CExpr Expr;		//РІС‹СЂР°Р¶РµРЅРёРµ, РґР»СЏ РєРѕС‚РѕСЂРѕРіРѕ СѓС‚РІРµСЂР¶РґР°РµС‚СЃСЏ РёСЃС‚РёРЅРЅРѕСЃС‚СЊ (РёРЅР°С‡Рµ РїСЂРµСЂС‹РІР°РЅРёРµ)
+	long AssertVal;	//РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ РІ СЃРёСЃС‚РµРјСѓ Р·РЅР°С‡РµРЅРёРµ
 };//CAssertStdProc
 
 
@@ -288,7 +288,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 private:
-	long HaltVal;	//возвращаемое в систему значение
+	long HaltVal;	//РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ РІ СЃРёСЃС‚РµРјСѓ Р·РЅР°С‡РµРЅРёРµ
 };//CHaltStdProc
 
 
@@ -297,8 +297,8 @@ private:
 class CIncStdProc : public CBase
 {
 public:
-	CExpr Expr1;		//целый тип, l-value (первый параметр)
-	CExpr *Expr2;		//целый тип, r-value (второй параметр)
+	CExpr Expr1;		//С†РµР»С‹Р№ С‚РёРї, l-value (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ)
+	CExpr *Expr2;		//С†РµР»С‹Р№ С‚РёРї, r-value (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ)
 	CIncStdProc(const CBaseName *parent) : CBase(parent), Expr1(parent), Expr2(NULL) {};;
 	~CIncStdProc() {delete Expr2;};
 	int Init(CLexBuf *lb);
@@ -311,8 +311,8 @@ public:
 class CInclStdProc : public CBase
 {
 public:
-	CExpr Expr1;		//целый тип, l-value (первый параметр)
-	CExpr Expr2;		//целый тип, r-value (второй параметр)
+	CExpr Expr1;		//С†РµР»С‹Р№ С‚РёРї, l-value (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ)
+	CExpr Expr2;		//С†РµР»С‹Р№ С‚РёРї, r-value (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ)
 	CInclStdProc(const CBaseName *parent) : CBase(parent), Expr1(parent), Expr2(parent) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
@@ -320,8 +320,8 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//запись кода размерности массива в качестве параметра при вызове COPY
-//предполагается, что BN является массивом символов или ук. на массив символов
+//Р·Р°РїРёСЃСЊ РєРѕРґР° СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР° РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° РїСЂРё РІС‹Р·РѕРІРµ COPY
+//РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ BN СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј СЃРёРјРІРѕР»РѕРІ РёР»Рё СѓРє. РЅР° РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ
 void WriteCPP_COPY_Par(CPP_files &f, CBaseName* BN);
 
 

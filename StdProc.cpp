@@ -1,5 +1,5 @@
 //=============================================================================
-// Описание объектов - стандартных процедур
+// РћРїРёСЃР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ - СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РїСЂРѕС†РµРґСѓСЂ
 //=============================================================================
 
 #include "StdProc.h"
@@ -11,13 +11,13 @@
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CAbsStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	switch (ResultId) {
 	case id_CShortintVar:
 		static_cast<CShortintVar*>(BaseConst)->ConstValue = abs(static_cast<CShortintVar*>(BaseConst)->ConstValue);
@@ -39,25 +39,25 @@ int CAbsStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции ABS
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ABS
 int CAbsStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex)
 		return s_e_OpBracketMissing;
 
-	//получение выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	ResultId = Expr.GetResultId();
 	if (!CBaseVar::IsDigitId(ResultId)) return s_e_Incompatible;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex)
 		return s_e_ClBracketMissing;
 
@@ -66,7 +66,7 @@ int CAbsStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции ABS
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ABS
 void CAbsStdProcFunc::WriteCPP(CPP_files& f)
 {
 	if (id_CLongintVar == ResultId) fprintf(f.fc, "l"); else
@@ -78,24 +78,24 @@ void CAbsStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CAshStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из x-выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· x-РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	CBaseVar* vX;
 	int err_num = ExprX.CreateConst(vX);
 	if (err_num) return err_num;
-	//получение константы из n-выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· n-РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	CBaseVar* vN;
 	err_num = ExprN.CreateConst(vN);
 	if (err_num) {
 		delete vX;
 		return err_num;
 	}
-	//создание целочисленной константы, расчет и занесение в нее значения функции
+	//СЃРѕР·РґР°РЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹, СЂР°СЃС‡РµС‚ Рё Р·Р°РЅРµСЃРµРЅРёРµ РІ РЅРµРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё
 	BaseConst = new CLongintVar(parent_element);
 	static_cast<CLongintVar*>(BaseConst)->ConstValue = vX->GetIntValue() << vN->GetIntValue();
-	//уничтожение промежуточных констант
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚
 	delete vX;
 	delete vN;
 
@@ -104,33 +104,33 @@ int CAshStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции ASH
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ASH
 int CAshStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex)
 		return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = ExprX.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия ","
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 	if (!lb->ReadLex(li) || lex_k_comma != li.lex) return s_e_CommaMissing;
 
-	//получение второго выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	err_num = ExprN.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типов выражений
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїРѕРІ РІС‹СЂР°Р¶РµРЅРёР№
 	if (!CBaseVar::IsIntId(ExprX.GetResultId())) return s_e_Incompatible;
 	if (!CBaseVar::IsIntId(ExprN.GetResultId())) return s_e_Incompatible;
 	ResultId = id_CLongintVar;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex)
 		return s_e_ClBracketMissing;
 
@@ -139,7 +139,7 @@ int CAshStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции ASH
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ASH
 void CAshStdProcFunc::WriteCPP(CPP_files& f)
 {
 	fprintf(f.fc, "((");
@@ -151,39 +151,39 @@ void CAshStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CCapStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	static_cast<CCharVar*>(BaseConst)->ConstValue = toupper(static_cast<CCharVar*>(BaseConst)->ConstValue);
 	return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры CAP
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ CAP
 int CCapStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (Expr.GetResultId() != id_CCharVar) return s_e_Incompatible;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
-	//CAP всегда возвращает значение типа CHAR
+	//CAP РІСЃРµРіРґР° РІРѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ С‚РёРїР° CHAR
 	ResultId = id_CCharVar;
 
 	return 0;
@@ -191,18 +191,18 @@ int CCapStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры-функции CAP
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё CAP
 void CCapStdProcFunc::WriteCPP(CPP_files& f)
 {
-	//проверка наличия символьной переменной
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРёРјРІРѕР»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CArrayVar* AV = static_cast<CArrayVar*>(Expr.FindLastName());
 	if (AV && (id_CArrayVar == AV->name_id) && AV->ConstString) {
-		//имеем строку из 1 символа (проверено в Init), выводим 1 символ
+		//РёРјРµРµРј СЃС‚СЂРѕРєСѓ РёР· 1 СЃРёРјРІРѕР»Р° (РїСЂРѕРІРµСЂРµРЅРѕ РІ Init), РІС‹РІРѕРґРёРј 1 СЃРёРјРІРѕР»
 		fprintf(f.fc, "toupper('%c')", AV->ConstString[0]);
 		return;
 	}
 
-	//запись выражения целиком
+	//Р·Р°РїРёСЃСЊ РІС‹СЂР°Р¶РµРЅРёСЏ С†РµР»РёРєРѕРј
 	fprintf(f.fc, "toupper(");
 	Expr.WriteCPP(f);
 	fprintf(f.fc, ")");
@@ -210,42 +210,42 @@ void CCapStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CChrStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//получение целочисленного значения
+	//РїРѕР»СѓС‡РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	long int_data = BaseConst->GetIntValue();
-	//замена целочисленной константы на символьную
+	//Р·Р°РјРµРЅР° С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° СЃРёРјРІРѕР»СЊРЅСѓСЋ
 	delete BaseConst;
 	BaseConst = new CCharVar(parent_element);
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	static_cast<CCharVar*>(BaseConst)->ConstValue = int_data;
 	return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции CHR
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё CHR
 int CChrStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(Expr.GetResultId())) return s_e_Incompatible;
 	ResultId = id_CCharVar;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -253,7 +253,7 @@ int CChrStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции CHR
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё CHR
 void CChrStdProcFunc::WriteCPP(CPP_files& f)
 {
 	Expr.WriteCPP(f);
@@ -261,13 +261,13 @@ void CChrStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CEntierStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//получение вещественного значения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	double real_data;
 	switch (BaseConst->GetResultId()) {
 	case id_CRealVar:
@@ -276,37 +276,37 @@ int CEntierStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 	case id_CLongrealVar:
 		real_data = static_cast<CLongrealVar*>(BaseConst)->ConstValue;
 	default:
-		//такого быть не должно, см. CEntierStdProcFunc::Init
+		//С‚Р°РєРѕРіРѕ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ, СЃРј. CEntierStdProcFunc::Init
 		real_data = 0;
 	}
-	//замена вещественной константы на целочисленную (LONGINT)
+	//Р·Р°РјРµРЅР° РІРµС‰РµСЃС‚РІРµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° С†РµР»РѕС‡РёСЃР»РµРЅРЅСѓСЋ (LONGINT)
 	delete BaseConst;
 	BaseConst = new CLongintVar(parent_element);
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	static_cast<CLongintVar*>(BaseConst)->ConstValue = static_cast<long>(floor(real_data));
 	return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции ENTIER
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ENTIER
 int CEntierStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsRealId(Expr.GetResultId())) return s_e_Incompatible;
 	ResultId = id_CLongintVar;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -314,7 +314,7 @@ int CEntierStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции ENTIER
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ENTIER
 void CEntierStdProcFunc::WriteCPP(CPP_files& f)
 {
 	fprintf(f.fc, "long(floor(");
@@ -324,7 +324,7 @@ void CEntierStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//конструктор
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 CLenStdProcFunc::CLenStdProcFunc(const CBaseName *parent) : CStdProcFunc(parent),
 	array_name(NULL),
 	dimension(0),
@@ -334,7 +334,7 @@ CLenStdProcFunc::CLenStdProcFunc(const CBaseName *parent) : CStdProcFunc(parent)
 
 
 //-----------------------------------------------------------------------------
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 CLenStdProcFunc::~CLenStdProcFunc()
 {
 	delete[] array_name;
@@ -342,12 +342,12 @@ CLenStdProcFunc::~CLenStdProcFunc()
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CLenStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//проверка типа массива (для открытого массива нельзя создать константу)
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РјР°СЃСЃРёРІР° (РґР»СЏ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР° РЅРµР»СЊР·СЏ СЃРѕР·РґР°С‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Сѓ)
 	if (!array_size) return s_e_ExprNotConst;
-	//создание константы (тип LONGINT)
+	//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (С‚РёРї LONGINT)
 	BaseConst = new CLongintVar(parent_element);
 	static_cast<CLongintVar*>(BaseConst)->ConstValue = array_size;
 	return 0;
@@ -355,71 +355,71 @@ int CLenStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры LEN
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ LEN
 int CLenStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//результат выражения в любом случае id_CLongintVar
+	//СЂРµР·СѓР»СЊС‚Р°С‚ РІС‹СЂР°Р¶РµРЅРёСЏ РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ id_CLongintVar
 	ResultId = id_CLongintVar;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//проверка наличия названия массива или текстовой строки
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅР°Р·РІР°РЅРёСЏ РјР°СЃСЃРёРІР° РёР»Рё С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё
 	if (!lb->ReadLex(li) || (lex_i != li.lex && lex_s != li.lex)) return s_e_LEN_NotArray;
 
-	//обработка текстовой строки
+	//РѕР±СЂР°Р±РѕС‚РєР° С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё
 	if (lex_s == li.lex) {
-		//определение длины строки
+		//РѕРїСЂРµРґРµР»РµРЅРёРµ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё
 		array_size = strlen(li.st);
 		if (array_size <= 1) return s_e_LEN_NotArray;
-		//проверка наличия ")"
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 		if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
-		//обработка текстовой строки закончена
+		//РѕР±СЂР°Р±РѕС‚РєР° С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё Р·Р°РєРѕРЅС‡РµРЅР°
 		return 0;
 	}
 
-	//запоминаем название массива
+	//Р·Р°РїРѕРјРёРЅР°РµРј РЅР°Р·РІР°РЅРёРµ РјР°СЃСЃРёРІР°
 	array_name = str_new_copy(li.st);
 
-	//проверяем наличие массива с указанным именем
+	//РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ РјР°СЃСЃРёРІР° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
 	CBaseName *BN = parent_element->GetGlobalName(array_name);
 	if (!BN || (id_CArrayVar != BN->name_id)) return s_e_LEN_NotArray;
 
-	//проверка наличия "," или ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "," РёР»Рё ")"
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	if (lex_k_comma == li.lex) {
-		//создание константы
+		//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 		CBaseVar* BV;
 		int err_num = ConstSelector(lb, BV, parent_element);
 		if (err_num) return err_num;
-		//получение номера требуемой размерности массива
+		//РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° С‚СЂРµР±СѓРµРјРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 		if (CBaseVar::IsIntId(BV->name_id))
 			dimension = static_cast<CBaseVar*>(BV)->GetIntValue();
 		else {
 			delete BV;
 			return s_e_ParamNotIntConst;
 		}
-		//уничтожение константы (больше не нужна)
+		//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (Р±РѕР»СЊС€Рµ РЅРµ РЅСѓР¶РЅР°)
 		delete BV;
-		//проверка наличия след. лексемы
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃР»РµРґ. Р»РµРєСЃРµРјС‹
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	}
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
-	//поверка допустимости значения константы (превышения допустимого количества измерений)
+	//РїРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё Р·РЅР°С‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РїСЂРµРІС‹С€РµРЅРёСЏ РґРѕРїСѓСЃС‚РёРјРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РёР·РјРµСЂРµРЅРёР№)
 	if (dimension < 0 ||
 		dimension >= static_cast<CArrayVar*>(BN)->ArrayType->GetDimCount())
 		return s_e_LEN_Dimension;
 
-	//получение описания требуемой размерности массива
+	//РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ С‚СЂРµР±СѓРµРјРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 	BN = static_cast<CArrayVar*>(BN)->ArrayType->GetType(dimension);
 	if (!BN || (id_CArrayType != BN->name_id)) return s_m_Error;	//?!
 
-	//сохранение размера массива в требуемой размерности
+	//СЃРѕС…СЂР°РЅРµРЅРёРµ СЂР°Р·РјРµСЂР° РјР°СЃСЃРёРІР° РІ С‚СЂРµР±СѓРµРјРѕР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 	array_size = static_cast<CArrayType*>(BN)->size;
 
 	return 0;
@@ -427,10 +427,10 @@ int CLenStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры LEN
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ LEN
 void CLenStdProcFunc::WriteCPP(CPP_files& f)
 {
-	//проверка типа массива (открытый / обычный)
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РјР°СЃСЃРёРІР° (РѕС‚РєСЂС‹С‚С‹Р№ / РѕР±С‹С‡РЅС‹Р№)
 	if (array_size)
 		fprintf(f.fc, "%i", array_size);
 	else
@@ -439,16 +439,16 @@ void CLenStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CLongStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//переменные для временного хранения значения констант
+	//РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РІСЂРµРјРµРЅРЅРѕРіРѕ С…СЂР°РЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚
 	int int_data;
 	double real_data;
-	//проверка типа аргумента и замена константы на константу нужного типа
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р° Рё Р·Р°РјРµРЅР° РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ РЅСѓР¶РЅРѕРіРѕ С‚РёРїР°
 	switch (BaseConst->GetResultId()) {
 	case id_CShortintVar:
 		int_data = static_cast<CShortintVar*>(BaseConst)->ConstValue;
@@ -474,20 +474,20 @@ int CLongStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции LONG
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё LONG
 int CLongStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа аргумента
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р°
 	switch (Expr.GetResultId()) {
 	case id_CShortintVar:
 		ResultId = id_CIntegerVar;
@@ -502,7 +502,7 @@ int CLongStdProcFunc::Init(CLexBuf *lb)
 		return s_e_Incompatible;
 	}
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -510,7 +510,7 @@ int CLongStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции LONG
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё LONG
 void CLongStdProcFunc::WriteCPP(CPP_files& f)
 {
 	Expr.WriteCPP(f);
@@ -518,10 +518,10 @@ void CLongStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CMaxStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//проверка типа, для которого вычисляется максимальное значение
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР°, РґР»СЏ РєРѕС‚РѕСЂРѕРіРѕ РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 	switch (ResultId) {
 	case id_CBooleanVar:
 		BaseConst = new CBooleanVar(parent_element);
@@ -537,7 +537,7 @@ int CMaxStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 		break;
 	case id_CIntegerVar:
 		BaseConst = new CIntegerVar(parent_element);
-		//выбор между SET и INTEGER
+		//РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
 		static_cast<CIntegerVar*>(BaseConst)->ConstValue = AppliedToSET ? SET_MAX : INT_MAX;
 		break;
 	case id_CLongintVar:
@@ -558,21 +558,21 @@ int CMaxStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции MAX
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MAX
 int CMaxStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//инициализация аргумента - основного типа
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р°СЂРіСѓРјРµРЅС‚Р° - РѕСЃРЅРѕРІРЅРѕРіРѕ С‚РёРїР°
 	CQualident TmpQual;
 	int err_num = TmpQual.InitTypeName(lb, parent_element);
 	if (err_num) return err_num;
 
-	//допускается указание только базового типа
+	//РґРѕРїСѓСЃРєР°РµС‚СЃСЏ СѓРєР°Р·Р°РЅРёРµ С‚РѕР»СЊРєРѕ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 	switch (TmpQual.TypeResultId) {
 	case id_CBooleanVar:
 	case id_CCharVar:
@@ -591,7 +591,7 @@ int CMaxStdProcFunc::Init(CLexBuf *lb)
 		return s_e_MAX_NotType;
 	}//switch
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -599,7 +599,7 @@ int CMaxStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции MAX
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MAX
 void CMaxStdProcFunc::WriteCPP(CPP_files& f)
 {
 	switch (ResultId) {
@@ -613,7 +613,7 @@ void CMaxStdProcFunc::WriteCPP(CPP_files& f)
 		fprintf(f.fc, "%hi", SHRT_MAX);
 		break;
 	case id_CIntegerVar:
-		//выбор между SET и INTEGER
+		//РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
 		fprintf(f.fc, "%i", AppliedToSET ? SET_MAX : INT_MAX);
 		break;
 	case id_CLongintVar:
@@ -621,7 +621,7 @@ void CMaxStdProcFunc::WriteCPP(CPP_files& f)
 		break;
 	case id_CRealVar:
 	case id_CLongrealVar:
-		//double по размеру совпадает с long double
+		//double РїРѕ СЂР°Р·РјРµСЂСѓ СЃРѕРІРїР°РґР°РµС‚ СЃ long double
 		fprintf(f.fc, "%g", DBL_MAX);
 		break;
 	}//switch
@@ -629,10 +629,10 @@ void CMaxStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CMinStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//проверка типа, для которого вычисляется минимальное значение
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР°, РґР»СЏ РєРѕС‚РѕСЂРѕРіРѕ РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 	switch (ResultId) {
 	case id_CBooleanVar:
 		BaseConst = new CBooleanVar(parent_element);
@@ -648,7 +648,7 @@ int CMinStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 		break;
 	case id_CIntegerVar:
 		BaseConst = new CIntegerVar(parent_element);
-		//выбор между SET и INTEGER
+		//РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
 		static_cast<CIntegerVar*>(BaseConst)->ConstValue = AppliedToSET ? 0 : INT_MIN;
 		break;
 	case id_CLongintVar:
@@ -669,21 +669,21 @@ int CMinStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции MIN
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MIN
 int CMinStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//инициализация аргумента - основного типа
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р°СЂРіСѓРјРµРЅС‚Р° - РѕСЃРЅРѕРІРЅРѕРіРѕ С‚РёРїР°
 	CQualident TmpQual;
 	int err_num = TmpQual.InitTypeName(lb, parent_element);
 	if (err_num) return err_num;
 
-	//допускается указание только базового типа
+	//РґРѕРїСѓСЃРєР°РµС‚СЃСЏ СѓРєР°Р·Р°РЅРёРµ С‚РѕР»СЊРєРѕ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 	switch (TmpQual.TypeResultId) {
 	case id_CBooleanVar:
 	case id_CCharVar:
@@ -702,7 +702,7 @@ int CMinStdProcFunc::Init(CLexBuf *lb)
 		return s_e_MIN_NotType;
 	}//switch
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -710,7 +710,7 @@ int CMinStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции MIN
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MIN
 void CMinStdProcFunc::WriteCPP(CPP_files& f)
 {
 	switch (ResultId) {
@@ -724,7 +724,7 @@ void CMinStdProcFunc::WriteCPP(CPP_files& f)
 		fprintf(f.fc, "%hi", SHRT_MIN);
 		break;
 	case id_CIntegerVar:
-		//выбор между SET и INTEGER
+		//РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
 		if (AppliedToSET)
 			fprintf(f.fc, "0");
 		else
@@ -735,7 +735,7 @@ void CMinStdProcFunc::WriteCPP(CPP_files& f)
 		break;
 	case id_CRealVar:
 	case id_CLongrealVar:
-		//double по размеру совпадает с long double
+		//double РїРѕ СЂР°Р·РјРµСЂСѓ СЃРѕРІРїР°РґР°РµС‚ СЃ long double
 		fprintf(f.fc, "%g", DBL_MIN);
 		break;
 	}//switch
@@ -743,42 +743,42 @@ void CMinStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int COddStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//получение целочисленного значения
+	//РїРѕР»СѓС‡РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	long int_data = BaseConst->GetIntValue();
-	//замена целочисленной константы на булевскую
+	//Р·Р°РјРµРЅР° С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° Р±СѓР»РµРІСЃРєСѓСЋ
 	delete BaseConst;
 	BaseConst = new CBooleanVar(parent_element);
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	static_cast<CBooleanVar*>(BaseConst)->ConstValue = int_data % 2 == 1;
 	return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции ODD
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ODD
 int COddStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(Expr.GetResultId())) return s_e_Incompatible;
 	ResultId = id_CBooleanVar;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -786,7 +786,7 @@ int COddStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции ODD
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ODD
 void COddStdProcFunc::WriteCPP(CPP_files& f)
 {
 	fprintf(f.fc, "((");
@@ -796,41 +796,41 @@ void COddStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int COrdStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//получение символьного значения
+	//РїРѕР»СѓС‡РµРЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 	char ch = static_cast<CCharVar*>(BaseConst)->ConstValue;
-	//замена символьной константы на целочисленную
+	//Р·Р°РјРµРЅР° СЃРёРјРІРѕР»СЊРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° С†РµР»РѕС‡РёСЃР»РµРЅРЅСѓСЋ
 	delete BaseConst;
 	BaseConst = new CIntegerVar(parent_element);
-	//вычисление значения функции из известного значения формального параметра
+	//РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё РёР· РёР·РІРµСЃС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	static_cast<CIntegerVar*>(BaseConst)->ConstValue = (ch < 0) ? (ch + 256) : ch;
 	return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры ORD
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ ORD
 int COrdStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (Expr.GetResultId() != id_CCharVar) return s_e_Incompatible;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	ResultId = id_CIntegerVar;
@@ -840,18 +840,18 @@ int COrdStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры ORD
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ ORD
 void COrdStdProcFunc::WriteCPP(CPP_files& f)
 {
-	//проверка наличия символьной переменной
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРёРјРІРѕР»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CArrayVar* AV = static_cast<CArrayVar*>(Expr.FindLastName());
 	if (AV && (id_CArrayVar == AV->name_id) && AV->ConstString) {
-		//имеем строку из 1 символа (проверено в Init), выводим 1 символ
+		//РёРјРµРµРј СЃС‚СЂРѕРєСѓ РёР· 1 СЃРёРјРІРѕР»Р° (РїСЂРѕРІРµСЂРµРЅРѕ РІ Init), РІС‹РІРѕРґРёРј 1 СЃРёРјРІРѕР»
 		fprintf(f.fc, "ORD('%c')", AV->ConstString[0]);
 		return;
 	}
 
-	//запись выражения целиком
+	//Р·Р°РїРёСЃСЊ РІС‹СЂР°Р¶РµРЅРёСЏ С†РµР»РёРєРѕРј
 	fprintf(f.fc, "ORD(");
 	Expr.WriteCPP(f);
 	fprintf(f.fc, ")");
@@ -859,16 +859,16 @@ void COrdStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CShortStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
-	//получение константы из выражения в формальных параметрах
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РІС‹СЂР°Р¶РµРЅРёСЏ РІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂР°С…
 	int err_num = Expr.CreateConst(BaseConst);
 	if (err_num) return err_num;
-	//переменные для временного хранения значения констант
+	//РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РІСЂРµРјРµРЅРЅРѕРіРѕ С…СЂР°РЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚
 	int int_data;
 	double real_data;
-	//проверка типа аргумента и замена константы на константу нужного типа
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р° Рё Р·Р°РјРµРЅР° РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ РЅСѓР¶РЅРѕРіРѕ С‚РёРїР°
 	switch (BaseConst->GetResultId()) {
 	case id_CLongintVar:
 		int_data = static_cast<CLongintVar*>(BaseConst)->ConstValue;
@@ -894,20 +894,20 @@ int CShortStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции SHORT
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SHORT
 int CShortStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа аргумента
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р°
 	switch (Expr.GetResultId()) {
 	case id_CLongintVar:
 		ResultId = id_CIntegerVar;
@@ -922,7 +922,7 @@ int CShortStdProcFunc::Init(CLexBuf *lb)
 		return s_e_Incompatible;
 	}
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -930,7 +930,7 @@ int CShortStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции SHORT
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SHORT
 void CShortStdProcFunc::WriteCPP(CPP_files& f)
 {
 	Expr.WriteCPP(f);
@@ -938,25 +938,25 @@ void CShortStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//создание константы
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 int CSizeStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 {
 	/**/
-	//не до конца корректная реализация
-	//реализовать в дальнейшем
+	//РЅРµ РґРѕ РєРѕРЅС†Р° РєРѕСЂСЂРµРєС‚РЅР°СЏ СЂРµР°Р»РёР·Р°С†РёСЏ
+	//СЂРµР°Р»РёР·РѕРІР°С‚СЊ РІ РґР°Р»СЊРЅРµР№С€РµРј
 
-	//для предварительного вычисления размера типа
+	//РґР»СЏ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ СЂР°Р·РјРµСЂР° С‚РёРїР°
 	int sz;
 
 	switch (Qualident.TypeResultId) {
 	case id_CArrayType:
 		/**/
-		//заменить на вызов ф-ции
+		//Р·Р°РјРµРЅРёС‚СЊ РЅР° РІС‹Р·РѕРІ С„-С†РёРё
 		sz = 10000;
 		break;
 	case id_CRecordType:
 		/**/
-		//заменить на вызов ф-ции
+		//Р·Р°РјРµРЅРёС‚СЊ РЅР° РІС‹Р·РѕРІ С„-С†РёРё
 		sz = 100;
 		break;
 	case id_CPointerType:
@@ -989,7 +989,7 @@ int CSizeStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 		break;
 	}//switch
 
-	//выбор минимального целого типа, достаточного для хранения значения
+	//РІС‹Р±РѕСЂ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ С†РµР»РѕРіРѕ С‚РёРїР°, РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ
 	if (SHRT_MAX >= sz) {
 		BaseConst = new CShortintVar(parent_element);
 		static_cast<CShortintVar*>(BaseConst)->ConstValue = sz;
@@ -1003,23 +1003,23 @@ int CSizeStdProcFunc::CreateConst(CBaseVar *&BaseConst)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры-функции SIZE
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SIZE
 int CSizeStdProcFunc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//проверка наличия описания любого типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРёСЃР°РЅРёСЏ Р»СЋР±РѕРіРѕ С‚РёРїР°
 	int err_num = Qualident.InitTypeName(lb, parent_element);
 	if (err_num) return err_num;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
-	//на самом деле здесь может быть любой целый тип
+	//РЅР° СЃР°РјРѕРј РґРµР»Рµ Р·РґРµСЃСЊ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р»СЋР±РѕР№ С†РµР»С‹Р№ С‚РёРї
 	ResultId = id_CIntegerVar;
 
 	return 0;
@@ -1027,7 +1027,7 @@ int CSizeStdProcFunc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//запись кода процедуры-функции SIZE
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SIZE
 void CSizeStdProcFunc::WriteCPP(CPP_files& f)
 {
 	fprintf(f.fc, "sizeof(");
@@ -1037,20 +1037,20 @@ void CSizeStdProcFunc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры NEW
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ NEW
 int CNewStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение названия указателя
+	//РїРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёСЏ СѓРєР°Р·Р°С‚РµР»СЏ
 	int err_num = Des.Init(lb);
 	if (err_num) return err_num;
 
-	//получение переменной-указателя по обозначению
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№-СѓРєР°Р·Р°С‚РµР»СЏ РїРѕ РѕР±РѕР·РЅР°С‡РµРЅРёСЋ
 	if (Des.IsReadOnly()) return s_e_OperandReadOnly;
 	CPointerVar* pVar = static_cast<CPointerVar*>(Des.FindLastName());
 	if (!pVar) return s_e_UndeclaredIdent;
@@ -1058,44 +1058,44 @@ int CNewStdProc::Init(CLexBuf *lb)
 
 
 	//////////////////////////////
-	//проверка получения обобщения
+	//РїСЂРѕРІРµСЂРєР° РїРѕР»СѓС‡РµРЅРёСЏ РѕР±РѕР±С‰РµРЅРёСЏ
 
 	CBaseType* BT = pVar->FindType();
 	if (id_CCommonType == BT->name_id) {
 
-		//проверка наличия "<"
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "<"
 		if (!lb->ReadLex(li) || lex_k_lt != li.lex) return s_e_OpAngleMissing;
 
-		//проверка наличия ">" (используется специализация по умолчанию)
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ">" (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ)
 		DECL_SAVE_POS
 		if (!lb->ReadLex(li) || lex_k_gt != li.lex) {
 			RESTORE_POS
 		} else {
-			//получение параметров специализации по умолчанию
+			//РїРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 			const CCommonType::SSpec* spec = static_cast<CCommonType*>(BT)->GetDefaultSpec();
 			if (!spec) return s_e_NoDefaultSpec;
-			//сохранение параметров специализации по умолчанию
+			//СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 			if (spec->Tag)
 				qual.ident = str_new_copy(spec->Tag);
 			else {
 				qual.ident = str_new_copy(spec->Name);
 				if (spec->QualName) qual.pref_ident = str_new_copy(spec->QualName);
 			}
-			//проверка наличия ")"
+			//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 			if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 			return 0;
 		}
 
-		//инициализация описания признака
+		//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРїРёСЃР°РЅРёСЏ РїСЂРёР·РЅР°РєР°
 		int err_num = qual.Init(lb, parent_element);
 		if (err_num) return err_num;
-		//проверка допустимого признака
+		//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕРіРѕ РїСЂРёР·РЅР°РєР°
 		if (!static_cast<CCommonType*>(BT)->FindSpec(qual.pref_ident, qual.ident, qual.ident)) return s_e_SpecTypeTag;
 
-		//проверка наличия ">"
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ">"
 		if (!lb->ReadLex(li) || lex_k_gt != li.lex) return s_e_ClAngleMissing;
 
-		//проверка наличия ")"
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 		if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 		return 0;
@@ -1103,18 +1103,18 @@ int CNewStdProc::Init(CLexBuf *lb)
 
 
 	///////////////////////////////////
-	//проверка наличия списка выражений
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРїРёСЃРєР° РІС‹СЂР°Р¶РµРЅРёР№
 
-	//проверка наличия "," или ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "," РёР»Рё ")"
 	if (!lb->ReadLex(li) || lex_k_comma != li.lex)
 		if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 		else {
-			//NEW содержит только 1 параметр => он должен быть записью или ук. на массив фиксированной длины
+			//NEW СЃРѕРґРµСЂР¶РёС‚ С‚РѕР»СЊРєРѕ 1 РїР°СЂР°РјРµС‚СЂ => РѕРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р·Р°РїРёСЃСЊСЋ РёР»Рё СѓРє. РЅР° РјР°СЃСЃРёРІ С„РёРєСЃРёСЂРѕРІР°РЅРЅРѕР№ РґР»РёРЅС‹
 			if (pVar->IsArrayPointer()) {
 				CArrayType *AT = static_cast<CArrayType*>(pVar->FindType());
 				while (id_CArrayType == AT->name_id) {
 					if (!AT->size) return s_e_ParsFewer;
-					//переход к след. размерности (если есть)
+					//РїРµСЂРµС…РѕРґ Рє СЃР»РµРґ. СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё (РµСЃР»Рё РµСЃС‚СЊ)
 					AT = static_cast<CArrayType*>(AT->Type);
 				}//while
 			}//if
@@ -1122,7 +1122,7 @@ int CNewStdProc::Init(CLexBuf *lb)
 		}
 
 	while (true) {
-		//проверка наличия Expr
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Expr
 		CExpr* Ex = new CExpr(parent_element);
 		int err_num = Ex->Init(lb);
 		if (err_num) {
@@ -1130,19 +1130,19 @@ int CNewStdProc::Init(CLexBuf *lb)
 			return err_num;
 		}
 
-		//занесение Expr в список выражений
+		//Р·Р°РЅРµСЃРµРЅРёРµ Expr РІ СЃРїРёСЃРѕРє РІС‹СЂР°Р¶РµРЅРёР№
 		ExprStore.push_back(Ex);
 
-		//проверка наличия ","
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 		if (!lb->ReadLex(li) || lex_k_comma != li.lex) break;
 	}
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
-	//проверка типа, на кот. указывает переменная-указатель (должен быть массив)
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР°, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ РїРµСЂРµРјРµРЅРЅР°СЏ-СѓРєР°Р·Р°С‚РµР»СЊ (РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РјР°СЃСЃРёРІ)
 	if (!pVar->IsArrayPointer()) return s_e_OperandInappl;
-	//проверка соответствия количества размерностей количеству выражений в списке
+	//РїСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РєРѕР»РёС‡РµСЃС‚РІСѓ РІС‹СЂР°Р¶РµРЅРёР№ РІ СЃРїРёСЃРєРµ
 	int act_par_count = ExprStore.size();
 	int form_par_count = static_cast<CArrayType*>(pVar->FindType())->GetDimCount();
 	if (act_par_count != form_par_count)
@@ -1156,56 +1156,56 @@ int CNewStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры NEW
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ NEW
 void CNewStdProc::WriteCPP(CPP_files& f)
 {
-	//получение переменной по обозначению
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РїРѕ РѕР±РѕР·РЅР°С‡РµРЅРёСЋ
 	CPointerVar* pVar = static_cast<CPointerVar*>(Des.FindLastName());
-	//получения типа по переменной
+	//РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° РїРѕ РїРµСЂРµРјРµРЅРЅРѕР№
 	CBaseType* BT = pVar->FindType();
 
-	//генерация отступа
+	//РіРµРЅРµСЂР°С†РёСЏ РѕС‚СЃС‚СѓРїР°
 	f.tab_fc();
 
 
 	////////////////////////////////////////////////////
-	//сохранение размерностей в случае открытого массива
+	//СЃРѕС…СЂР°РЅРµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР°
 	if (!ExprStore.empty()) {
-		//отсчет размерностей с 0
+		//РѕС‚СЃС‡РµС‚ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ СЃ 0
 		int dimension = 0;
-		//генерация кода сохранения размерностей в переменные
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РІ РїРµСЂРµРјРµРЅРЅС‹Рµ
 		TExprStore::const_iterator ci;
 		for (ci = ExprStore.begin(); ci != ExprStore.end(); ++ci) {
-			//генерация имени переменной
+			//РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№
 			fprintf(f.fc, "O2M_ARR_%i_%s = ", dimension, pVar->name);
-			//генерация значения размерности
+			//РіРµРЅРµСЂР°С†РёСЏ Р·РЅР°С‡РµРЅРёСЏ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 			(*ci)->WriteCPP(f);
-			//генерация перевода строки и отступа
+			//РіРµРЅРµСЂР°С†РёСЏ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё Рё РѕС‚СЃС‚СѓРїР°
 			fprintf(f.fc, ";\n");
 			f.tab_fc();
-			//переход к следующей размерности
+			//РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµР№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
 			++dimension;
 		}//for
 	}//if
 
 
-	//запись имени переменной (первого выражения)
+	//Р·Р°РїРёСЃСЊ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
 	Des.WriteCPP(f);
 
 
 	////////////////////////////
-	//проверка наличия обобщения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕР±РѕР±С‰РµРЅРёСЏ
 	if (id_CCommonType == BT->name_id) {
-		//генерация кода вызова ф-ции new
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РІС‹Р·РѕРІР° С„-С†РёРё new
 		fprintf(f.fc, " = new ");
-		//генерация имени типа
+		//РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё С‚РёРїР°
 		const char* ma = BT->GetModuleAlias();
 		if (ma) fprintf(f.fc, "%s::", ma);
 		fprintf(f.fc, "%s(", BT->name);
-		//генерация параметра конструктора типа
+		//РіРµРЅРµСЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂР° РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° С‚РёРїР°
 		if (ma) fprintf(f.fc, "%s::", ma);
 		fprintf(f.fc, "%s::O2M_INIT_", BT->name);
-		//создание переменной для получения CompoundName
+		//СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ CompoundName
 		CBaseVar* BV;
 		static_cast<CCommonType*>(BT)->CreateVar(BV, parent_element);
 		static_cast<CCommonVar*>(BV)->SetTagName(qual.pref_ident, qual.ident);
@@ -1215,18 +1215,18 @@ void CNewStdProc::WriteCPP(CPP_files& f)
 	}
 
 	///////////////////////////////////////////////////////////////
-	//проверка наличия специализации (параметризованного обобщения)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё (РїР°СЂР°РјРµС‚СЂРёР·РѕРІР°РЅРЅРѕРіРѕ РѕР±РѕР±С‰РµРЅРёСЏ)
 	if (id_CSpecType == BT->name_id) {
-		//генерация кода вызова ф-ции new
+		//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РІС‹Р·РѕРІР° С„-С†РёРё new
 		fprintf(f.fc, " = new ");
-		//генерация имени типа
+		//РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё С‚РёРїР°
 		const char* ma = BT->GetModuleAlias();
 		if (ma) fprintf(f.fc, "%s::", ma);
 		fprintf(f.fc, "%s(", BT->name);
-		//генерация параметра конструктора типа
+		//РіРµРЅРµСЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂР° РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° С‚РёРїР°
 		if (ma) fprintf(f.fc, "%s::", ma);
 		fprintf(f.fc, "%s::O2M_INIT_", BT->name);
-		//создание переменной для получения CompoundName
+		//СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ CompoundName
 		CBaseVar* BV;
 		static_cast<CSpecType*>(BT)->CreateVar(BV, parent_element);
 		fprintf(f.fc, "%s)", static_cast<CCommonVar*>(BV)->GetCPPCompoundName());
@@ -1236,33 +1236,33 @@ void CNewStdProc::WriteCPP(CPP_files& f)
 
 
 	////////////////////////////////////////////////////
-	//обобщение отсутствует, генерация кода обычного new
+	//РѕР±РѕР±С‰РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚, РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РѕР±С‹С‡РЅРѕРіРѕ new
 	fprintf(f.fc, " = new(");
 
-	//запись названия модуля, если есть (может присутствовать и в случае неименованного типа)
+	//Р·Р°РїРёСЃСЊ РЅР°Р·РІР°РЅРёСЏ РјРѕРґСѓР»СЏ, РµСЃР»Рё РµСЃС‚СЊ (РјРѕР¶РµС‚ РїСЂРёСЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ Рё РІ СЃР»СѓС‡Р°Рµ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°)
 	if (pVar->GetTypeModuleAlias()) fprintf(f.fc, "%s::", pVar->GetTypeModuleAlias());
 
-	//проверка наличия именованного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР°
 	if (pVar->GetTypeName())
 		fprintf(f.fc, "%s", pVar->GetTypeName());
-	else //неименованный тип => используем искусственное имя (O2M_UNNM_<имя переменной>)
+	else //РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї => РёСЃРїРѕР»СЊР·СѓРµРј РёСЃРєСѓСЃСЃС‚РІРµРЅРЅРѕРµ РёРјСЏ (O2M_UNNM_<РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№>)
 		fprintf(f.fc, "O2M_UNNM_%s", pVar->name);
 
-	//проверка наличия списка выражений с размерностями
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРїРёСЃРєР° РІС‹СЂР°Р¶РµРЅРёР№ СЃ СЂР°Р·РјРµСЂРЅРѕСЃС‚СЏРјРё
 	if (ExprStore.empty()) {
-		//запись размерностей в случае ук. на массив фиксированной длины
+		//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РјР°СЃСЃРёРІ С„РёРєСЃРёСЂРѕРІР°РЅРЅРѕР№ РґР»РёРЅС‹
 		if (pVar->IsArrayPointer()) {
 			CArrayType *AT = static_cast<CArrayType*>(pVar->FindType());
 			while (AT->name_id == id_CArrayType) {
 				fprintf(f.fc, "[%i]", AT->size);
-				//переход к след. размерности (если есть)
+				//РїРµСЂРµС…РѕРґ Рє СЃР»РµРґ. СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё (РµСЃР»Рё РµСЃС‚СЊ)
 				AT = static_cast<CArrayType*>(AT->Type);
 			}//while
 		}//if
 	} else {
-		//запись размерностей в случае ук. на открытый массив
+		//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РѕС‚РєСЂС‹С‚С‹Р№ РјР°СЃСЃРёРІ
 		fprintf(f.fc, "[");
-		//содержимое переменных, установленных выше, перемножается
+		//СЃРѕРґРµСЂР¶РёРјРѕРµ РїРµСЂРµРјРµРЅРЅС‹С…, СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹С… РІС‹С€Рµ, РїРµСЂРµРјРЅРѕР¶Р°РµС‚СЃСЏ
 		for (int dim = 0; dim < ExprStore.size(); dim++)
 			fprintf(f.fc, "%sO2M_ARR_%i_%s", dim ? " * " : "", dim, pVar->name);
 		fprintf(f.fc, "]");
@@ -1274,48 +1274,48 @@ void CNewStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры COPY
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ COPY
 int CCopyStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//создание первого выражения
+	//СЃРѕР·РґР°РЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = ExprSource.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия символьного массива (строки)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ РјР°СЃСЃРёРІР° (СЃС‚СЂРѕРєРё)
 	if (ExprSource.GetResultId() != id_CArrayVar) return s_e_ExprCompatibility;
 
-	//проверка наличия ","
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 	if (!lb->ReadLex(li) || lex_k_comma != li.lex) return s_e_CommaMissing;
 
-	//создание второго выражения
+	//СЃРѕР·РґР°РЅРёРµ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	err_num = ExprDest.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия l-value во втором выражении
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ l-value РІРѕ РІС‚РѕСЂРѕРј РІС‹СЂР°Р¶РµРЅРёРё
 	CBaseName* BN = ExprDest.FindLValue();
 	if (!BN) return s_e_OperandNotVariable;
 	if (ExprDest.IsReadOnly()) return s_e_OperandReadOnly;
-	//проверка допустимости второго выражения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	switch (BN->GetResultId()) {
 	case id_CArrayVar:
 		/**/
-		//ввести проверку типа эл-тов массива
+		//РІРІРµСЃС‚Рё РїСЂРѕРІРµСЂРєСѓ С‚РёРїР° СЌР»-С‚РѕРІ РјР°СЃСЃРёРІР°
 		break;
 	case id_CPointerVar:
 		/**/
-		//ввести проверку типа указателя
+		//РІРІРµСЃС‚Рё РїСЂРѕРІРµСЂРєСѓ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЏ
 		break;
 	default:
 		return s_e_OperandInappl;
 	}//switch
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1323,24 +1323,24 @@ int CCopyStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры COPY
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ COPY
 void CCopyStdProc::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
 	fprintf(f.fc, "COPY(");
 
-	//запись значения первого параметра
+	//Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРІРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	ExprSource.WriteCPP(f);
 	fprintf(f.fc, ", ");
-	//получение первого параметра процедуры (переменной-массива или указателя)
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РїСЂРѕС†РµРґСѓСЂС‹ (РїРµСЂРµРјРµРЅРЅРѕР№-РјР°СЃСЃРёРІР° РёР»Рё СѓРєР°Р·Р°С‚РµР»СЏ)
 	CBaseName* BN = ExprSource.FindLastName();
 	WriteCPP_COPY_Par(f, BN);
 	fprintf(f.fc, ", ");
 
-	//запись значения второго параметра
+	//Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	ExprDest.WriteCPP(f);
 	fprintf(f.fc, ", ");
-	//получение второго параметра процедуры (переменной-массива или указателя)
+	//РїРѕР»СѓС‡РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РїСЂРѕС†РµРґСѓСЂС‹ (РїРµСЂРµРјРµРЅРЅРѕР№-РјР°СЃСЃРёРІР° РёР»Рё СѓРєР°Р·Р°С‚РµР»СЏ)
 	BN = ExprDest.FindLastName();
 	WriteCPP_COPY_Par(f, BN);
 	fprintf(f.fc, ")");
@@ -1349,41 +1349,41 @@ void CCopyStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры ASSERT
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ ASSERT
 int CAssertStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//проверка наличия логич. выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р»РѕРіРёС‡. РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа логического выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р»РѕРіРёС‡РµСЃРєРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (Expr.GetResultId() != id_CBooleanVar) return s_e_ASSERT_ExprType;
 
-	//проверка наличия "," или ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "," РёР»Рё ")"
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	if (lex_k_comma == li.lex) {
-		//создание константы (второго параметра)
+		//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°)
 		CBaseVar* BV;
 		err_num = ConstSelector(lb, BV, parent_element);
 		if (err_num) return err_num;
-		//проверка типа второго параметра
+		//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 		if (!CBaseVar::IsIntId(BV->GetResultId())) {
 			delete BV;
 			return s_e_ParamNotIntConst;
 		}
-		//получение значения целочисленной константы и ее уничтожение
+		//РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ Рё РµРµ СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ
 		AssertVal = BV->GetIntValue();
 		delete BV;
-		//проверка наличия след. лексемы
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃР»РµРґ. Р»РµРєСЃРµРјС‹
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	}
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1391,7 +1391,7 @@ int CAssertStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры ASSERT
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ ASSERT
 void CAssertStdProc::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1402,30 +1402,30 @@ void CAssertStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры HALT
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ HALT
 int CHaltStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//проверка наличия целой константы
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С†РµР»РѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	CBaseVar* BV;
 	int err_num = ConstSelector(lb, BV, parent_element);
 	if (err_num) return err_num;
 
-	//проверка типа второго параметра
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 	if (!CBaseVar::IsIntId(BV->GetResultId())) {
 		delete BV;
 		return s_e_ParamNotIntConst;
 	}
-	//получение значения целочисленной константы и ее уничтожение
+	//РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ Рё РµРµ СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ
 	HaltVal = BV->GetIntValue();
 	delete BV;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1433,7 +1433,7 @@ int CHaltStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры HALT
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ HALT
 void CHaltStdProc::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1442,37 +1442,37 @@ void CHaltStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры DEC
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ DEC
 int CDecStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr1.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия l-value в первом выражении
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ l-value РІ РїРµСЂРІРѕРј РІС‹СЂР°Р¶РµРЅРёРё
 	if (!Expr1.FindLValue()) return s_e_OperandNotVariable;
 	if (Expr1.IsReadOnly()) return s_e_OperandReadOnly;
-	//проверка допустимости первого выражения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(Expr1.GetResultId())) return s_e_OperandInappl;
 
-	//проверка наличия запятой или ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РїСЏС‚РѕР№ РёР»Рё ")"
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	if (lex_k_comma == li.lex) {
-		//создание выражения для второго аргумента
+		//СЃРѕР·РґР°РЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 		Expr2 = new CExpr(parent_element);
 		err_num = Expr2->Init(lb);
 		if (err_num) return err_num;
 		if (!CBaseVar::IsIntId(Expr2->GetResultId())) return s_e_OperandInappl;
-		//проверка след. лексемы
+		//РїСЂРѕРІРµСЂРєР° СЃР»РµРґ. Р»РµРєСЃРµРјС‹
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	}
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1480,48 +1480,48 @@ int CDecStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры DEC
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ DEC
 void CDecStdProc::WriteCPP(CPP_files& f)
 {
-	//запись имени переменной (первого выражения)
+	//Р·Р°РїРёСЃСЊ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
 	f.tab_fc();
 	Expr1.WriteCPP(f);
 	fprintf(f.fc, " -= ");
 
-	//запись второго выражения (если есть)
+	//Р·Р°РїРёСЃСЊ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ (РµСЃР»Рё РµСЃС‚СЊ)
 	if (Expr2) Expr2->WriteCPP(f); else fprintf(f.fc, "1");
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры EXCL
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ EXCL
 int CExclStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr1.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия l-value в первом выражении
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ l-value РІ РїРµСЂРІРѕРј РІС‹СЂР°Р¶РµРЅРёРё
 	if (!Expr1.FindLValue()) return s_e_OperandNotVariable;
 	if (Expr1.IsReadOnly()) return s_e_OperandReadOnly;
-	//проверка допустимости первого выражения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (id_CSetVar != Expr1.GetResultId()) return s_e_OperandInappl;
 
-	//проверка наличия ","
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 	if (!lb->ReadLex(li) || lex_k_comma != li.lex) return s_e_CommaMissing;
 
-	//создание выражения для второго аргумента
+	//СЃРѕР·РґР°РЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 	err_num = Expr2.Init(lb);
 	if (err_num) return err_num;
 	if (!CBaseVar::IsIntId(Expr2.GetResultId())) return s_e_Incompatible;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1529,7 +1529,7 @@ int CExclStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры EXCL
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ EXCL
 void CExclStdProc::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1541,38 +1541,38 @@ void CExclStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры INC
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ INC
 int CIncStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr1.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия l-value в первом выражении
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ l-value РІ РїРµСЂРІРѕРј РІС‹СЂР°Р¶РµРЅРёРё
 	if (!Expr1.FindLValue()) return s_e_OperandNotVariable;
 	if (Expr1.IsReadOnly()) return s_e_OperandReadOnly;
-	//проверка допустимости первого выражения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (!CBaseVar::IsIntId(Expr1.GetResultId())) return s_e_OperandInappl;
 
-	//проверка наличия запятой или ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РїСЏС‚РѕР№ РёР»Рё ")"
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	if (lex_k_comma == li.lex) {
-		//создание выражения для второго аргумента
+		//СЃРѕР·РґР°РЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 		Expr2 = new CExpr(parent_element);
 		err_num = Expr2->Init(lb);
 		if (err_num) return err_num;
 		if (!CBaseVar::IsIntId(Expr2->GetResultId())) return s_e_Incompatible;
-		//проверка след. лексемы
+		//РїСЂРѕРІРµСЂРєР° СЃР»РµРґ. Р»РµРєСЃРµРјС‹
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_ClBracketMissing;
 	}
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1580,48 +1580,48 @@ int CIncStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры INC
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ INC
 void CIncStdProc::WriteCPP(CPP_files& f)
 {
-	//запись имени переменной (первого выражения)
+	//Р·Р°РїРёСЃСЊ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№ (РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
 	f.tab_fc();
 	Expr1.WriteCPP(f);
 	fprintf(f.fc, " += ");
 
-	//запись второго выражения (если есть)
+	//Р·Р°РїРёСЃСЊ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ (РµСЃР»Рё РµСЃС‚СЊ)
 	if (Expr2) Expr2->WriteCPP(f); else fprintf(f.fc, "1");
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//инициализация процедуры INCL
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµРґСѓСЂС‹ INCL
 int CInclStdProc::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия "("
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "("
 	if (!lb->ReadLex(li) || lex_k_op_bracket != li.lex) return s_e_OpBracketMissing;
 
-	//получение первого выражения
+	//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr1.Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия l-value в первом выражении
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ l-value РІ РїРµСЂРІРѕРј РІС‹СЂР°Р¶РµРЅРёРё
 	if (!Expr1.FindLValue()) return s_e_OperandNotVariable;
 	if (Expr1.IsReadOnly()) return s_e_OperandReadOnly;
-	//проверка допустимости первого выражения
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (id_CSetVar != Expr1.GetResultId()) return s_e_OperandInappl;
 
-	//проверка наличия ","
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ","
 	if (!lb->ReadLex(li) || lex_k_comma != li.lex) return s_e_ColonMissing;
 
-	//создание выражения для второго аргумента
+	//СЃРѕР·РґР°РЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 	err_num = Expr2.Init(lb);
 	if (err_num) return err_num;
 	if (!CBaseVar::IsIntId(Expr2.GetResultId())) return s_e_Incompatible;
 
-	//проверка наличия ")"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ")"
 	if (!lb->ReadLex(li) || lex_k_cl_bracket != li.lex) return s_e_ClBracketMissing;
 
 	return 0;
@@ -1629,7 +1629,7 @@ int CInclStdProc::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода процедуры INCL
+//Р—Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕС†РµРґСѓСЂС‹ INCL
 void CInclStdProc::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1641,10 +1641,10 @@ void CInclStdProc::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 CNewStdProc::~CNewStdProc()
 {
-	//очистка списка выражений (размерностей)
+	//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° РІС‹СЂР°Р¶РµРЅРёР№ (СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№)
 	TExprStore::iterator i;
 	for (i = ExprStore.begin(); i != ExprStore.end(); ++i)
 		delete *i;
@@ -1652,20 +1652,20 @@ CNewStdProc::~CNewStdProc()
 
 
 //-----------------------------------------------------------------------------
-//запись кода размерности массива в качестве параметра при вызове COPY
-//предполагается, что BN является массивом символов или ук. на массив символов
+//Р·Р°РїРёСЃСЊ РєРѕРґР° СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР° РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° РїСЂРё РІС‹Р·РѕРІРµ COPY
+//РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ BN СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј СЃРёРјРІРѕР»РѕРІ РёР»Рё СѓРє. РЅР° РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ
 void WriteCPP_COPY_Par(CPP_files &f, CBaseName* BN)
 {
 	const char *arr_name = BN->name;
-	//в случае указаметя получаем тип указываемого объекта
+	//РІ СЃР»СѓС‡Р°Рµ СѓРєР°Р·Р°РјРµС‚СЏ РїРѕР»СѓС‡Р°РµРј С‚РёРї СѓРєР°Р·С‹РІР°РµРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if (id_CPointerVar == BN->name_id) BN = static_cast<CPointerVar*>(BN)->FindType();
-	//получение размера для переменной или типа
+	//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РґР»СЏ РїРµСЂРµРјРµРЅРЅРѕР№ РёР»Рё С‚РёРїР°
 	int arr_size;
 	if (id_CArrayVar == BN->name_id)
 		arr_size = static_cast<CArrayVar*>(BN)->ArrayType->size;
 	else
 		arr_size = static_cast<CArrayType*>(BN)->size;
-	//запись размера (если массив открытый (размер 0) - используется переменная)
+	//Р·Р°РїРёСЃСЊ СЂР°Р·РјРµСЂР° (РµСЃР»Рё РјР°СЃСЃРёРІ РѕС‚РєСЂС‹С‚С‹Р№ (СЂР°Р·РјРµСЂ 0) - РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїРµСЂРµРјРµРЅРЅР°СЏ)
 	if (arr_size)
 		fprintf(f.fc, "%i", arr_size);
 	else

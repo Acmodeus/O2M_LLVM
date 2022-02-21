@@ -1,10 +1,10 @@
 //===============================================================
-// Описание процедур, для компиляции с помощью LLVM
+// РћРїРёСЃР°РЅРёРµ РїСЂРѕС†РµРґСѓСЂ, РґР»СЏ РєРѕРјРїРёР»СЏС†РёРё СЃ РїРѕРјРѕС‰СЊСЋ LLVM
 //===============================================================
 
 #include "llvmdriver.h"
 
-//Деструктор объекта LLVMDriver
+//Р”РµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° LLVMDriver
 LLVMDriver::~LLVMDriver()
 {
     NamedValues.clear();
@@ -16,7 +16,7 @@ LLVMDriver::~LLVMDriver()
 }//~LLVMDriver
 
 //-----------------------------------------------------------------------------
-//Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
+//РЎРѕР·РґР°РЅРёРµ РёРЅСЃС‚СЂСѓРєС†РёРё РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РІ РЅР°С‡Р°Р»СЊРЅРѕРј Р±Р»РѕРєРµ С„СѓРЅРєС†РёРё. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРµСЂРµРјРµРЅРЅС‹С… Рё С‚Рґ
 AllocaInst *LLVMDriver::CreateEntryBlockAlloca(Function *TheFunction,
                                           std::string name,Type* type) {
   IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
@@ -25,35 +25,35 @@ AllocaInst *LLVMDriver::CreateEntryBlockAlloca(Function *TheFunction,
 }//CreateEntryBlockAlloca
 
 //-----------------------------------------------------------------------------
-//Функция приведения типов
+//Р¤СѓРЅРєС†РёСЏ РїСЂРёРІРµРґРµРЅРёСЏ С‚РёРїРѕРІ
 Value *LLVMDriver::CastToType(Value* v, Type* destType) {
-  //В случае v=Nullptr, возвращается либо Nullptr, либо NullValue типа destType
+  //Р’ СЃР»СѓС‡Р°Рµ v=Nullptr, РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ Р»РёР±Рѕ Nullptr, Р»РёР±Рѕ NullValue С‚РёРїР° destType
   if(!v){
     if(!destType) return v;
     return Constant::getNullValue(destType);
   }
   Type* valueType = v->getType();
-  //для указателей, массивов приведение типа не производится
+  //РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№, РјР°СЃСЃРёРІРѕРІ РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїР° РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
   if (valueType->isPointerTy()||valueType->isArrayTy()) return v;
   if(v->getType() == destType) return v;
-  //приведение к типу Double
+  //РїСЂРёРІРµРґРµРЅРёРµ Рє С‚РёРїСѓ Double
   if(destType==Type::getDoubleTy(TheContext)){
       return Builder.CreateSIToFP(v,destType,"castTmp");
   }
-  //приведение к целому типу размером 1 бит производится через сравнение с нулем
+  //РїСЂРёРІРµРґРµРЅРёРµ Рє С†РµР»РѕРјСѓ С‚РёРїСѓ СЂР°Р·РјРµСЂРѕРј 1 Р±РёС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ С‡РµСЂРµР· СЃСЂР°РІРЅРµРЅРёРµ СЃ РЅСѓР»РµРј
   if(destType==Type::getInt1Ty(TheContext)){
       if(valueType == Type::getDoubleTy(TheContext))
           return Builder.CreateFCmpONE(v,ConstantFP::get(valueType,0.0),"castTmp");
       else return Builder.CreateICmpNE(v,ConstantInt::get(valueType,0),"castTmp");
   }
-  //приведение к целому типу размером > 1 бит
+  //РїСЂРёРІРµРґРµРЅРёРµ Рє С†РµР»РѕРјСѓ С‚РёРїСѓ СЂР°Р·РјРµСЂРѕРј > 1 Р±РёС‚
   if(valueType == Type::getDoubleTy(TheContext))
       return Builder.CreateFPToSI(v,destType,"castTmp");
   return Builder.CreateIntCast(v,destType,true,"castTmp");
 }//CastToType
 
 //-----------------------------------------------------------------------------
-//Создание функции без аргументов
+//РЎРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 Function *LLVMDriver::createFunction(Type *retType, std::string name)
 {
     FunctionType *FT = FunctionType::get(retType,  false);
@@ -61,14 +61,14 @@ Function *LLVMDriver::createFunction(Type *retType, std::string name)
 }//createFunction
 
 //-----------------------------------------------------------------------------
-//Создание функции с аргументами
+//РЎРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 Function *LLVMDriver::createFunction(Type *retType, std::vector<Type *> typePars, StringVector namePars, std::string name)
 {
-    //получение типа функции
+    //РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° С„СѓРЅРєС†РёРё
     FunctionType *FT = FunctionType::get(retType, typePars, false);
-    //создание функции
+    //СЃРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё
     Function *F = Function::Create(FT, Function::ExternalLinkage, name, TheModule.get());
-    //именование аргументов функции
+    //РёРјРµРЅРѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё
     if (!namePars.empty()){
         StringVector::const_iterator i=namePars.begin();
         for (auto &Arg : F->args()){
@@ -80,7 +80,7 @@ Function *LLVMDriver::createFunction(Type *retType, std::vector<Type *> typePars
 }//createFunction
 
 //-----------------------------------------------------------------------------
-//получения типа LLVM для простых типов
+//РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° LLVM РґР»СЏ РїСЂРѕСЃС‚С‹С… С‚РёРїРѕРІ
 Type *LLVMDriver::GetLLVMType(EName_id name_id)
 {
     switch (name_id) {
@@ -106,12 +106,12 @@ Type *LLVMDriver::GetLLVMType(EName_id name_id)
 }//GetLLVMType
 
 //-----------------------------------------------------------------------------
-//получения типа LLVM на основе наследников класса CBaseVar
+//РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° LLVM РЅР° РѕСЃРЅРѕРІРµ РЅР°СЃР»РµРґРЅРёРєРѕРІ РєР»Р°СЃСЃР° CBaseVar
 Type *LLVMDriver::GetLLVMType(CBaseVar *v)
 {
     switch (v->name_id) {
     default:
-        //для простых типов вызывается соответствующий метод
+        //РґР»СЏ РїСЂРѕСЃС‚С‹С… С‚РёРїРѕРІ РІС‹Р·С‹РІР°РµС‚СЃСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РјРµС‚РѕРґ
         return GetLLVMType(v->GetResultId());
     case id_CArrayVar:{
         //ARRAY
@@ -136,7 +136,7 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
                 CBaseType* BT = PT->FindType();
                 type = GetLLVMType(BT);
         }//if
-        //В случае указателя на указатель возвращается первый указатель
+        //Р’ СЃР»СѓС‡Р°Рµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° СѓРєР°Р·Р°С‚РµР»СЊ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїРµСЂРІС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
         if(type->isPointerTy())
             return type;
         return type->getPointerTo();
@@ -144,17 +144,17 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
     case id_CRecordVar:{
         //RECORD
         CRecordVar* RV = static_cast<CRecordVar*>(v);
-        //Если тип уже создан - возвращаем
+        //Р•СЃР»Рё С‚РёРї СѓР¶Рµ СЃРѕР·РґР°РЅ - РІРѕР·РІСЂР°С‰Р°РµРј
         StructType* ST=TheModule->getTypeByName(RV->GetTypeName());
         if(ST){
            return ST;
         }//if
-        //создание типа
+        //СЃРѕР·РґР°РЅРёРµ С‚РёРїР°
         ST=StructType::create(TheContext,RV->GetTypeName());
         std::vector<Type*> colTypes;
         CBaseVarVector::const_iterator ci;
         int i=0;
-        //формирование тела записи, и заполнение карты Structure
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚РµР»Р° Р·Р°РїРёСЃРё, Рё Р·Р°РїРѕР»РЅРµРЅРёРµ РєР°СЂС‚С‹ Structure
         for (ci = RV->FieldStore.begin(); ci != RV->FieldStore.end(); ++ci,i++) {
             colTypes.push_back(GetLLVMType(static_cast<CBaseVar*>(*ci)));
             Structures[v->GetTypeName()][(*ci)->name] = i;
@@ -164,9 +164,9 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
     }
     case id_CCommonVar:{
         //COMMON
-        //если знаем специализацию обобщения, то возвращаем ее, если нет, то тип обобщения;
-        //предполагается что тип обобщения создастся при объявления типа,
-        //либо при объявлении переменной типа указатель на обобщение
+        //РµСЃР»Рё Р·РЅР°РµРј СЃРїРµС†РёР°Р»РёР·Р°С†РёСЋ РѕР±РѕР±С‰РµРЅРёСЏ, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµРј РµРµ, РµСЃР»Рё РЅРµС‚, С‚Рѕ С‚РёРї РѕР±РѕР±С‰РµРЅРёСЏ;
+        //РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ С‡С‚Рѕ С‚РёРї РѕР±РѕР±С‰РµРЅРёСЏ СЃРѕР·РґР°СЃС‚СЃСЏ РїСЂРё РѕР±СЉСЏРІР»РµРЅРёСЏ С‚РёРїР°,
+        //Р»РёР±Рѕ РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±РѕР±С‰РµРЅРёРµ
         CCommonVar* CV=static_cast<CCommonVar*>(v);
         CBaseType* BT = CV->FindType();
         if(!BT) return TheModule->getTypeByName(v->GetTypeName());
@@ -176,12 +176,12 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
 }//GetLLVMType
 
 //-----------------------------------------------------------------------------
-//получения типа LLVM на основе наследников класса CBaseType
+//РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° LLVM РЅР° РѕСЃРЅРѕРІРµ РЅР°СЃР»РµРґРЅРёРєРѕРІ РєР»Р°СЃСЃР° CBaseType
 Type *LLVMDriver::GetLLVMType(CBaseType *v)
 {
     switch (v->name_id) {
     default:
-        //для простых типов вызывается соответствующий метод
+        //РґР»СЏ РїСЂРѕСЃС‚С‹С… С‚РёРїРѕРІ РІС‹Р·С‹РІР°РµС‚СЃСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РјРµС‚РѕРґ
         return GetLLVMType(v->GetResultId());
     case id_CArrayType:{
         //ARRAY
@@ -189,8 +189,8 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         return ArrayType::get(GetLLVMType(AT->Type),AT->size);
     }
     case id_CQualidentType:{
-        //Именной тип
-        //Ищем именной тип в глобальной области видимости и формируем его
+        //РРјРµРЅРЅРѕР№ С‚РёРї
+        //РС‰РµРј РёРјРµРЅРЅРѕР№ С‚РёРї РІ РіР»РѕР±Р°Р»СЊРЅРѕР№ РѕР±Р»Р°СЃС‚Рё РІРёРґРёРјРѕСЃС‚Рё Рё С„РѕСЂРјРёСЂСѓРµРј РµРіРѕ
         CQualidentType* QT = static_cast<CQualidentType*>(v);
         CBaseType* BT = static_cast<CBaseType*>(QT->parent_element->GetGlobalName(QT->Qualident->pref_ident, QT->Qualident->ident));
         return GetLLVMType(BT);
@@ -213,25 +213,25 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
                 CBaseType* BT = PT->FindType();
                 type = GetLLVMType(BT);
         }//if
-        //В случае указателя на указатель возвращается первый указатель
+        //Р’ СЃР»СѓС‡Р°Рµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° СѓРєР°Р·Р°С‚РµР»СЊ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїРµСЂРІС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
         if(type->isPointerTy())
             return type;
         return type->getPointerTo();
     }
     case id_CRecordType:{
         //RECORD
-        //Если тип уже создан - возвращаем
+        //Р•СЃР»Рё С‚РёРї СѓР¶Рµ СЃРѕР·РґР°РЅ - РІРѕР·РІСЂР°С‰Р°РµРј
         StructType* ST=TheModule->getTypeByName(v->name);
         if(ST){
            return ST;
         }//if
-        //создание типа
+        //СЃРѕР·РґР°РЅРёРµ С‚РёРїР°
         ST=StructType::create(TheContext,v->name);
         CRecordType* RT=static_cast<CRecordType*>(v);
         std::vector<Type*> colTypes;
         CBaseNameVector::const_iterator ci;
         int i=0;
-        //формирование тела записи, и заполнение карты Structure
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚РµР»Р° Р·Р°РїРёСЃРё, Рё Р·Р°РїРѕР»РЅРµРЅРёРµ РєР°СЂС‚С‹ Structure
         for (ci = RT->FieldStore.begin(); ci != RT->FieldStore.end(); ++ci,++i) {
             if((*ci)->name_id==id_CProcedure) continue;
             colTypes.push_back(GetLLVMType(static_cast<CBaseVar*>(*ci)));
@@ -242,17 +242,17 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
     }
     case id_CCommonType:{
         //COMMON
-        //Если тип уже создан - возвращаем
+        //Р•СЃР»Рё С‚РёРї СѓР¶Рµ СЃРѕР·РґР°РЅ - РІРѕР·РІСЂР°С‰Р°РµРј
         StructType* ST=TheModule->getTypeByName(v->name);
         if(ST){
            return ST;
         }//if
-        //создание типа
+        //СЃРѕР·РґР°РЅРёРµ С‚РёРїР°
         ST=StructType::create(TheContext,v->name);
         CCommonType* CT=static_cast<CCommonType*>(v);
         CCommonType::SpecStore_type::const_iterator ci;
         int i=0;
-        //создание типов специализаций
+        //СЃРѕР·РґР°РЅРёРµ С‚РёРїРѕРІ СЃРїРµС†РёР°Р»РёР·Р°С†РёР№
         for(ci = CT->SpecStore.begin(); ci != CT->SpecStore.end(); ++ci,++i){
             const CBaseName* BN = CT->GetParentModule();
             while (BN->name_id!=id_CModule) {
@@ -262,8 +262,8 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
             GetLLVMType(BT);
             SpecTypes[(*ci)->Name]=i;
         }//for
-        //В качестве тела типа добавляем тип указатель на данную структуру
-        //и целый тип, отвечающий за номер специализации
+        //Р’ РєР°С‡РµСЃС‚РІРµ С‚РµР»Р° С‚РёРїР° РґРѕР±Р°РІР»СЏРµРј С‚РёРї СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РґР°РЅРЅСѓСЋ СЃС‚СЂСѓРєС‚СѓСЂСѓ
+        //Рё С†РµР»С‹Р№ С‚РёРї, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅРѕРјРµСЂ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
         std::vector<Type*> colTypes;
         colTypes.push_back(ST->getPointerTo());
         colTypes.push_back(Type::getInt32Ty(TheContext));
@@ -271,8 +271,8 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         return ST;
     }
     case id_CSpecType:{
-        //Специализация
-        //Возвращаем базовый тип
+        //РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ
+        //Р’РѕР·РІСЂР°С‰Р°РµРј Р±Р°Р·РѕРІС‹Р№ С‚РёРї
         CSpecType* CST=static_cast<CSpecType*>(v);
         CCommonType* CT = static_cast<CCommonType*>(CST->parent_element->GetGlobalName(CST->Qualident->pref_ident, CST->Qualident->ident));
         return GetLLVMType(CT);
@@ -281,15 +281,15 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
 }//GetLLVMType
 
 //-----------------------------------------------------------------------------
-//Поиск (если нет в области видисости модуля LLVM, создание) функции
+//РџРѕРёСЃРє (РµСЃР»Рё РЅРµС‚ РІ РѕР±Р»Р°СЃС‚Рё РІРёРґРёСЃРѕСЃС‚Рё РјРѕРґСѓР»СЏ LLVM, СЃРѕР·РґР°РЅРёРµ) С„СѓРЅРєС†РёРё
 Function* LLVMDriver::GetFunction(CProcedure *p)
 {
-    //В случае наличия обобщенных параметров используем указатель на CCommonProc
+    //Р’ СЃР»СѓС‡Р°Рµ РЅР°Р»РёС‡РёСЏ РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃРїРѕР»СЊР·СѓРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° CCommonProc
     CCommonProc* cp=nullptr;
     if ((id_CCommonProc == p->name_id || id_CDfnCommonProc == p->name_id ) && p->GetCommonParsCount()){
         cp=static_cast<CCommonProc*>(p);
     }//if
-    //Формирование имени функции в соответствии со стандартом С++
+    //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё С„СѓРЅРєС†РёРё РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃРѕ СЃС‚Р°РЅРґР°СЂС‚РѕРј РЎ++
     std::string firstName=p->parent_element->name;
     if (p->name_id==id_CHandlerProc&&static_cast<CHandlerProc*>(p)->QualName) firstName=static_cast<CHandlerProc*>(p)->QualName;
     std::string lastName=p->name;
@@ -328,10 +328,10 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
         }//for
     }else if(!cp) funName+="v";
 
-    //Если функция с таким именем уже создана, возвращаем ее
+    //Р•СЃР»Рё С„СѓРЅРєС†РёСЏ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃРѕР·РґР°РЅР°, РІРѕР·РІСЂР°С‰Р°РµРј РµРµ
     if(Functions[funName]) return Functions[funName];
 
-    //получаем тип возвращаемого значения функции
+    //РїРѕР»СѓС‡Р°РµРј С‚РёРї РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С„СѓРЅРєС†РёРё
     Type *FunRetType;
     if (!p->FormalPars->Qualident){
         FunRetType=Type::getVoidTy(TheContext);
@@ -342,15 +342,15 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
         }//if
     }//if
 
-    //получаем список типов формальных параметров
+    //РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     std::vector<Type *> pars=WriteLLVM_pars(p->FormalPars);
-    //получаем список имен формальных параметров
+    //РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РёРјРµРЅ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     StringVector names;
     CBaseVarVector::const_iterator i;
     i = p->FormalPars->FPStore.begin();
     for (i = p->FormalPars->FPStore.begin(); i != p->FormalPars->FPStore.end(); ++i){
       names.push_back((*i)->name);
-      //для массивов добавляются размеры измерений в качестве формальных параметров
+      //РґР»СЏ РјР°СЃСЃРёРІРѕРІ РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ СЂР°Р·РјРµСЂС‹ РёР·РјРµСЂРµРЅРёР№ РІ РєР°С‡РµСЃС‚РІРµ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
       if ((*i)->name_id==id_CArrayVar) {
           CArrayType* AT = static_cast<CArrayVar*>(*i)->ArrayType;
           int dimention = 0;
@@ -362,12 +362,12 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
           }//while
       }//if
     }//for
-    //Рессивер передаем в качестве формального параметра
+    //Р РµСЃСЃРёРІРµСЂ РїРµСЂРµРґР°РµРј РІ РєР°С‡РµСЃС‚РІРµ С„РѕСЂРјР°Р»СЊРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
     if(p->Receiver){
         pars.push_back(GetLLVMType(static_cast<CBaseVar*>(p->Receiver->FindName(p->Receiver->name)))->getPointerTo());
         names.push_back(p->Receiver->name);
     }//if
-    //для функции с обобщенными параметрами добавляем их
+    //РґР»СЏ С„СѓРЅРєС†РёРё СЃ РѕР±РѕР±С‰РµРЅРЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё РґРѕР±Р°РІР»СЏРµРј РёС…
     if(cp){
         std::vector<Type *> compars=WriteLLVM_pars(cp->CommonPars);
         pars.insert(pars.end(),compars.begin(),compars.end());
@@ -376,35 +376,35 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
         }//for
     }//if
 
-    //создание функции и заносим в карту функций
+    //СЃРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё Рё Р·Р°РЅРѕСЃРёРј РІ РєР°СЂС‚Сѓ С„СѓРЅРєС†РёР№
     Function* F = createFunction(FunRetType,pars,names,funName);
     Functions[funName]=F;
-    //в случае функции с обобщениями создаем функцию выбора специализированных функций
+    //РІ СЃР»СѓС‡Р°Рµ С„СѓРЅРєС†РёРё СЃ РѕР±РѕР±С‰РµРЅРёСЏРјРё СЃРѕР·РґР°РµРј С„СѓРЅРєС†РёСЋ РІС‹Р±РѕСЂР° СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… С„СѓРЅРєС†РёР№
     if(cp) CreateCommonFun(cp,F);
     return F;
 }//GetFunction
 
 //-----------------------------------------------------------------------------
-//создание функции выбора специализированных функций
+//СЃРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё РІС‹Р±РѕСЂР° СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… С„СѓРЅРєС†РёР№
 void LLVMDriver::CreateCommonFun(CCommonProc *p, Function *F)
 {
-    //сохранение текущей позиции в модуле LLVM и карты локальных переменных
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё РІ РјРѕРґСѓР»Рµ LLVM Рё РєР°СЂС‚С‹ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
     BasicBlock* TempBB=Builder.GetInsertBlock();
     std::map<std::string, AllocaInst *> NamedValuesTemp=NamedValues;
-    //начало записи в функцию выбора
+    //РЅР°С‡Р°Р»Рѕ Р·Р°РїРёСЃРё РІ С„СѓРЅРєС†РёСЋ РІС‹Р±РѕСЂР°
     BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
     Builder.SetInsertPoint(BB);
-    // Запись аргументов функции в карту локальных переменных
+    // Р—Р°РїРёСЃСЊ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё РІ РєР°СЂС‚Сѓ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
     NamedValues.clear();
     for (auto &Arg : F->args()) {
-        // Выделение памяти под эту переменную
+        // Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ СЌС‚Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ
         AllocaInst *Alloca = CreateEntryBlockAlloca(F,std::string(Arg.getName()),Arg.getType());
-        // Сохранение значения аргумента в выделенную память
+        // РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ Р°СЂРіСѓРјРµРЅС‚Р° РІ РІС‹РґРµР»РµРЅРЅСѓСЋ РїР°РјСЏС‚СЊ
         Builder.CreateStore(&Arg, Alloca);
-        //добавление аргумента в карту локальных переменных
+        //РґРѕР±Р°РІР»РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РІ РєР°СЂС‚Сѓ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         NamedValues[std::string(Arg.getName())] = Alloca;
     }//for
-    //обработка необобщенных параметров
+    //РѕР±СЂР°Р±РѕС‚РєР° РЅРµРѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     CBaseVarVector::const_iterator i = p->CommonPars->FPStore.begin();
     std::string funName=F->getName().str();
     std::vector<Type *> pars=WriteLLVM_pars(p->FormalPars);
@@ -415,19 +415,19 @@ void LLVMDriver::CreateCommonFun(CCommonProc *p, Function *F)
         }else
             values.push_back(Builder.CreateLoad(value.second));
     }//for
-    //обработка обобщенных параметров
+    //РѕР±СЂР°Р±РѕС‚РєР° РѕР±РѕР±С‰РµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     CreateCommonFun_loop(p,F,i,funName,values,pars);
-    //Проверка сгенерированного кода на согласованность
+    //РџСЂРѕРІРµСЂРєР° СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРґР° РЅР° СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕСЃС‚СЊ
     verifyFunction(*F);
-    //восстановление сохраненных параметров
+    //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕС…СЂР°РЅРµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     Builder.SetInsertPoint(TempBB);
     NamedValues=NamedValuesTemp;
 }//CreateCommonFun
 
 //-----------------------------------------------------------------------------
-//цикл обхода специализаций
+//С†РёРєР» РѕР±С…РѕРґР° СЃРїРµС†РёР°Р»РёР·Р°С†РёР№
 void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector::const_iterator i,std::string funName,std::vector<Value*> values,std::vector<Type *> pars){
-    //получение обобщенного типа и списка специализаций
+    //РїРѕР»СѓС‡РµРЅРёРµ РѕР±РѕР±С‰РµРЅРЅРѕРіРѕ С‚РёРїР° Рё СЃРїРёСЃРєР° СЃРїРµС†РёР°Р»РёР·Р°С†РёР№
     CCommonVar* CV=static_cast<CCommonVar*>(*i);
     const CBaseName* BN = p->GetParentModule();
     while (BN->name_id!=id_CModule) {
@@ -435,7 +435,7 @@ void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector
     }//while
     CCommonType* CT = static_cast<CCommonType*>(BN->GetGlobalName(CV->GetTypeModuleName(),CV->GetTypeName()));
     CCommonType::SpecStore_type::const_iterator ci;
-    //временные переменные для востановления параметров до обработки специализации
+    //РІСЂРµРјРµРЅРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РІРѕСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РґРѕ РѕР±СЂР°Р±РѕС‚РєРё СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
     std::string tempFunName=funName;
     std::vector<Value*> tempValues=values;
     std::vector<Type *> tempPars=pars;
@@ -443,7 +443,7 @@ void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector
         funName=tempFunName;
         values=tempValues;
         pars=tempPars;
-        //формирование имени функции с конкретной специализацией
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё С„СѓРЅРєС†РёРё СЃ РєРѕРЅРєСЂРµС‚РЅРѕР№ СЃРїРµС†РёР°Р»РёР·Р°С†РёРµР№
         if((*i)->is_var){
             funName+="R";
         }//if
@@ -454,52 +454,52 @@ void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector
         }else{
             funName+=std::string(BN->name)+"_"+(*ci)->Name;
         }//if
-        //получение типа конкретной специализацией и добавление его в список формальных параметров
+        //РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РєРѕРЅРєСЂРµС‚РЅРѕР№ СЃРїРµС†РёР°Р»РёР·Р°С†РёРµР№ Рё РґРѕР±Р°РІР»РµРЅРёРµ РµРіРѕ РІ СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
         Type* SpecType=TheModule->getTypeByName((*ci)->Name)->getPointerTo();
         pars.push_back(SpecType);
-        //получение тэга специализации
+        //РїРѕР»СѓС‡РµРЅРёРµ С‚СЌРіР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
         Value* common=Builder.CreateLoad(NamedValues[(*i)->name]);
         Value* spec=Builder.CreateStructGEP(common,1);
         spec=Builder.CreateLoad(spec);
-        //формирование инструкции if-then-else
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРЅСЃС‚СЂСѓРєС†РёРё if-then-else
         int sTag=SpecTypes[(*ci)->Name];
         Value* condV=Builder.CreateICmpEQ(spec,ConstantInt::get(Type::getInt32Ty(TheContext),sTag));
         BasicBlock *ThenBB = BasicBlock::Create(TheContext, "then", F);
         BasicBlock *ElseBB = BasicBlock::Create(TheContext, "else");
         Builder.CreateCondBr(condV, ThenBB, ElseBB);
         Builder.SetInsertPoint(ThenBB);
-        //добавление обобщенной переменной в список фактических параметров
-        //при вызове функции явное приведение типа не требуется
+        //РґРѕР±Р°РІР»РµРЅРёРµ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РІ СЃРїРёСЃРѕРє С„Р°РєС‚РёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
+        //РїСЂРё РІС‹Р·РѕРІРµ С„СѓРЅРєС†РёРё СЏРІРЅРѕРµ РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїР° РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ
         spec=Builder.CreateStructGEP(common,0);
         values.push_back(Builder.CreateLoad(spec));
-        //обработка следующей обобщенной переменной при наличии
+        //РѕР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµР№ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РїСЂРё РЅР°Р»РёС‡РёРё
         if(i+1!=p->CommonPars->FPStore.end()){
             CreateCommonFun_loop(p,F,i+1,funName,values,pars);
             F->getBasicBlockList().push_back(ElseBB);
             Builder.SetInsertPoint(ElseBB);
             continue;
         }//if
-        //создание инструкций вызова специалзированной функции и возврата ее значения
+        //СЃРѕР·РґР°РЅРёРµ РёРЅСЃС‚СЂСѓРєС†РёР№ РІС‹Р·РѕРІР° СЃРїРµС†РёР°Р»Р·РёСЂРѕРІР°РЅРЅРѕР№ С„СѓРЅРєС†РёРё Рё РІРѕР·РІСЂР°С‚Р° РµРµ Р·РЅР°С‡РµРЅРёСЏ
         Function* SpecF=Functions[funName];
         if(!SpecF) SpecF=createFunction(F->getReturnType(),pars,*new StringVector,funName);
         Value* call=Builder.CreateCall(SpecF,values);
         Builder.CreateRet(call);
-        //генерация инструкции else
+        //РіРµРЅРµСЂР°С†РёСЏ РёРЅСЃС‚СЂСѓРєС†РёРё else
         F->getBasicBlockList().push_back(ElseBB);
         Builder.SetInsertPoint(ElseBB);
     }//for
-    //генерации инструкции 'ret <NullValue>'
+    //РіРµРЅРµСЂР°С†РёРё РёРЅСЃС‚СЂСѓРєС†РёРё 'ret <NullValue>'
     Value* retVal=Constant::getNullValue(F->getReturnType());
     Builder.CreateRet(retVal);
 }//CreateCommonFun_loop
 
 //-----------------------------------------------------------------------------
-//генерация кода LLVM и запись в файл
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM Рё Р·Р°РїРёСЃСЊ РІ С„Р°Р№Р»
 int LLVMDriver::Init(CModule* m)
 {
-      //генерация кода LLVM IR для модуля O2M
+      //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM IR РґР»СЏ РјРѕРґСѓР»СЏ O2M
       WriteLLVM(m);
-      //Инициализация целевых платформ
+      //РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РµР»РµРІС‹С… РїР»Р°С‚С„РѕСЂРј
       InitializeAllTargetInfos();
       InitializeAllTargets();
       InitializeAllTargetMCs();
@@ -512,7 +512,7 @@ int LLVMDriver::Init(CModule* m)
        std::string Error;
        auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
 
-       //Печать ошибки и выход если не смогли найти целевую платформу
+       //РџРµС‡Р°С‚СЊ РѕС€РёР±РєРё Рё РІС‹С…РѕРґ РµСЃР»Рё РЅРµ СЃРјРѕРіР»Рё РЅР°Р№С‚Рё С†РµР»РµРІСѓСЋ РїР»Р°С‚С„РѕСЂРјСѓ
        if (!Target) {
          errs() << Error;
          return 1;
@@ -554,40 +554,40 @@ int LLVMDriver::Init(CModule* m)
 }//Init
 
 //-----------------------------------------------------------------------------
-//генерация кода LLVM IR модуля O2M
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM IR РјРѕРґСѓР»СЏ O2M
 Value* LLVMDriver::WriteLLVM(CModule *m)
 {
     TheModule = std::make_unique<Module>(m->name, TheContext);
 
-    //генерация кода переменных
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРµСЂРµРјРµРЅРЅС‹С…
     WriteLLVM_var(m->DeclSeq);
-    //генерация кода деклараций процедур
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґРµРєР»Р°СЂР°С†РёР№ РїСЂРѕС†РµРґСѓСЂ
     WriteLLVM_proc(m->DeclSeq);
 
-    //инициализация импортируемых модулей не используется
-    //пока что модуль с операторами считается главным,
-    //?????????доделать???????????
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… РјРѕРґСѓР»РµР№ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+    //РїРѕРєР° С‡С‚Рѕ РјРѕРґСѓР»СЊ СЃ РѕРїРµСЂР°С‚РѕСЂР°РјРё СЃС‡РёС‚Р°РµС‚СЃСЏ РіР»Р°РІРЅС‹Рј,
+    //?????????РґРѕРґРµР»Р°С‚СЊ???????????
     //DeclSeq->WriteCPP_mod_init(f);
 
-    //генерация кода для операторов (если есть)
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґР»СЏ РѕРїРµСЂР°С‚РѕСЂРѕРІ (РµСЃР»Рё РµСЃС‚СЊ)
     if (m->StatementSeq) {
-        //создание главной функции модуля main (точка входа в программу)
+        //СЃРѕР·РґР°РЅРёРµ РіР»Р°РІРЅРѕР№ С„СѓРЅРєС†РёРё РјРѕРґСѓР»СЏ main (С‚РѕС‡РєР° РІС…РѕРґР° РІ РїСЂРѕРіСЂР°РјРјСѓ)
         Function *F = createFunction(Type::getInt32Ty(TheContext),"main");
-        // Создание нового базового блока для начала записи
+        // РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р±Р°Р·РѕРІРѕРіРѕ Р±Р»РѕРєР° РґР»СЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё
         BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
         Builder.SetInsertPoint(BB);
-        //очистка карты локальных переменных
+        //РѕС‡РёСЃС‚РєР° РєР°СЂС‚С‹ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         NamedValues.clear();
-        //собственно генерация кода операторов
+        //СЃРѕР±СЃС‚РІРµРЅРЅРѕ РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РѕРїРµСЂР°С‚РѕСЂРѕРІ
         WriteLLVM(m->StatementSeq);
-        //генерации инструкции 'ret 0'
+        //РіРµРЅРµСЂР°С†РёРё РёРЅСЃС‚СЂСѓРєС†РёРё 'ret 0'
         Value* retVal=Constant::getNullValue(Type::getInt32Ty(TheContext));
         Builder.CreateRet(retVal);
-        //Проверка сгенерированного кода функции на согласованность
+        //РџСЂРѕРІРµСЂРєР° СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРґР° С„СѓРЅРєС†РёРё РЅР° СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕСЃС‚СЊ
         verifyFunction(*F);
     }//if
 
-    //печать текста модуля в поток ошибок для отладки
+    //РїРµС‡Р°С‚СЊ С‚РµРєСЃС‚Р° РјРѕРґСѓР»СЏ РІ РїРѕС‚РѕРє РѕС€РёР±РѕРє РґР»СЏ РѕС‚Р»Р°РґРєРё
     //TheModule->print(errs(),nullptr);
     //fprintf(stderr, "\n");
 
@@ -595,7 +595,7 @@ Value* LLVMDriver::WriteLLVM(CModule *m)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//генерация кода переменных
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРµСЂРµРјРµРЅРЅС‹С…
 Value *LLVMDriver::WriteLLVM_var(CDeclSeq *ds){
     CBaseNameVector::const_iterator ci;
     for(ci = ds->BaseNameStore.begin(); ci != ds->BaseNameStore.end(); ++ci){
@@ -607,7 +607,7 @@ Value *LLVMDriver::WriteLLVM_var(CDeclSeq *ds){
 }//WriteLLVM_var
 
 //-----------------------------------------------------------------------------
-//генерация кода деклараций процедур
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґРµРєР»Р°СЂР°С†РёР№ РїСЂРѕС†РµРґСѓСЂ
 Value *LLVMDriver::WriteLLVM_proc(CDeclSeq *ds){
     CBaseNameVector::const_iterator ci;
     for (ci = ds->BaseNameStore.begin(); ci != ds->BaseNameStore.end(); ++ci){
@@ -619,10 +619,10 @@ Value *LLVMDriver::WriteLLVM_proc(CDeclSeq *ds){
 }//WriteLLVM_proc
 
 //-----------------------------------------------------------------------------
-//генерация кода операторов
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РѕРїРµСЂР°С‚РѕСЂРѕРІ
 Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
 {
-    //цикл выбора и генерации кода конкретного оператора
+    //С†РёРєР» РІС‹Р±РѕСЂР° Рё РіРµРЅРµСЂР°С†РёРё РєРѕРґР° РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР°
     for(CBaseVector::iterator i = ss->StatStore.begin(); i != ss->StatStore.end(); ++i) {
         CBase* base = *i;
         if(typeid(*base) == typeid (CIfStatement)){
@@ -661,14 +661,14 @@ Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//генерация кода декларации конкретной переменной
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґРµРєР»Р°СЂР°С†РёРё РєРѕРЅРєСЂРµС‚РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 Value *LLVMDriver::WriteLLVM(CBaseVar *v)
 {
-    //признак глобальности
+    //РїСЂРёР·РЅР°Рє РіР»РѕР±Р°Р»СЊРЅРѕСЃС‚Рё
     bool is_global = id_CModule == v->parent_element->name_id;    
-    //Получение типа переменной
+    //РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№
     Type* type=GetLLVMType(v);
-    //в случае константы - инициализируем ее значением, иначе инициализируем нулем
+    //РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹ - РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РµРµ Р·РЅР°С‡РµРЅРёРµРј, РёРЅР°С‡Рµ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РЅСѓР»РµРј
     Constant *InitVal=nullptr;
     if (v->is_const) {
         switch (v->name_id) {
@@ -700,8 +700,8 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
         InitVal = Constant::getNullValue(type);
     }//if
     if(is_global){
-        //в случае глобальной переменной именуем ее в соответствии со стандартом C++
-        //и добавляем в карту глобальных переменных
+        //РІ СЃР»СѓС‡Р°Рµ РіР»РѕР±Р°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РёРјРµРЅСѓРµРј РµРµ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃРѕ СЃС‚Р°РЅРґР°СЂС‚РѕРј C++
+        //Рё РґРѕР±Р°РІР»СЏРµРј РІ РєР°СЂС‚Сѓ РіР»РѕР±Р°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         std::string firstName=v->parent_element->name;
         std::string lastName=v->name;
         std::string name="_ZN"+std::to_string(firstName.size())+firstName+std::to_string(lastName.size())+lastName+"E";
@@ -709,7 +709,7 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
         GlobalValues[v->name]=gVar;
         return gVar;
     }else{
-        //для локальных переменных выделяем память и сохраняем в карте локальных переменных
+        //РґР»СЏ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С… РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ Рё СЃРѕС…СЂР°РЅСЏРµРј РІ РєР°СЂС‚Рµ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         Function *TheFunction = Builder.GetInsertBlock()->getParent();
         AllocaInst *Alloca = CreateEntryBlockAlloca(TheFunction, v->name,type);
         Builder.CreateStore(InitVal, Alloca);
@@ -719,7 +719,7 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//генерация кода констатных значений
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РєРѕРЅСЃС‚Р°С‚РЅС‹С… Р·РЅР°С‡РµРЅРёР№
 Value *LLVMDriver::WriteLLVM_ConstValue(CBaseVar *v)
 {
     switch (v->name_id) {
@@ -744,60 +744,60 @@ Value *LLVMDriver::WriteLLVM_ConstValue(CBaseVar *v)
 }//WriteLLVM_ConstValue
 
 //-----------------------------------------------------------------------------
-//генерация кода LLVM процедуры
+//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹
 Function *LLVMDriver::WriteLLVM(CProcedure *p)
 {
-    //Для обобщенных функций код здесь не генерируется
-    //генерация происходит в функции CreateCommonFun
+    //Р”Р»СЏ РѕР±РѕР±С‰РµРЅРЅС‹С… С„СѓРЅРєС†РёР№ РєРѕРґ Р·РґРµСЃСЊ РЅРµ РіРµРЅРµСЂРёСЂСѓРµС‚СЃСЏ
+    //РіРµРЅРµСЂР°С†РёСЏ РїСЂРѕРёСЃС…РѕРґРёС‚ РІ С„СѓРЅРєС†РёРё CreateCommonFun
     if(p->name_id==id_CCommonProc) return nullptr;
-    //Получаем указатель на функцию LLVM
+    //РџРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ LLVM
     Function* F = GetFunction(p);
-    // Создание нового базового блока для начала записи
+    // РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р±Р°Р·РѕРІРѕРіРѕ Р±Р»РѕРєР° РґР»СЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё
     BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
     Builder.SetInsertPoint(BB);
-    //очистка карты локальных переменных
+    //РѕС‡РёСЃС‚РєР° РєР°СЂС‚С‹ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
     NamedValues.clear();
-    //добавление аргументов функции в карту локальных переменных
+    //РґРѕР±Р°РІР»РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё РІ РєР°СЂС‚Сѓ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
     for (auto &Arg : F->args()) {
-        // Выделение памяти для текущего аргумента
+        // Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ С‚РµРєСѓС‰РµРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
         AllocaInst *Alloca = CreateEntryBlockAlloca(F,std::string(Arg.getName()),Arg.getType());
-        // Сохранение значения аргумента в памяти.
+        // РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ Р°СЂРіСѓРјРµРЅС‚Р° РІ РїР°РјСЏС‚Рё.
         Builder.CreateStore(&Arg, Alloca);
-        //Сохранения указателя на память в карте локальных переменных
+        //РЎРѕС…СЂР°РЅРµРЅРёСЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РїР°РјСЏС‚СЊ РІ РєР°СЂС‚Рµ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
         NamedValues[std::string(Arg.getName())] = Alloca;
     }//for
-    //генерация кода переменных
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРµСЂРµРјРµРЅРЅС‹С…
     WriteLLVM_var(p->DeclSeq);
-    //генерация кода для операторов
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґР»СЏ РѕРїРµСЂР°С‚РѕСЂРѕРІ
     if (p->StatementSeq) {
         WriteLLVM(p->StatementSeq);
     }//if
-    //генерация кода возврата нулевого значения
-    //нужно так как после блока RETURN может быть еще ветвь кода
-    //для LLVM обязательно нужен возврат в конце функции
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РІРѕР·РІСЂР°С‚Р° РЅСѓР»РµРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+    //РЅСѓР¶РЅРѕ С‚Р°Рє РєР°Рє РїРѕСЃР»Рµ Р±Р»РѕРєР° RETURN РјРѕР¶РµС‚ Р±С‹С‚СЊ РµС‰Рµ РІРµС‚РІСЊ РєРѕРґР°
+    //РґР»СЏ LLVM РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РЅСѓР¶РµРЅ РІРѕР·РІСЂР°С‚ РІ РєРѕРЅС†Рµ С„СѓРЅРєС†РёРё
     Builder.CreateRet(Constant::getNullValue(Builder.getCurrentFunctionReturnType()));
-    //Проверка сгенерированного кода функции на согласованность
+    //РџСЂРѕРІРµСЂРєР° СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРґР° С„СѓРЅРєС†РёРё РЅР° СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕСЃС‚СЊ
     verifyFunction(*F);
-    //Возврат указателя на функцию
+    //Р’РѕР·РІСЂР°С‚ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ
     return F;
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//получение списка типов формальных параметров
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 std::vector<Type *> LLVMDriver::WriteLLVM_pars(CFormalPars *fp)
 {
     std::vector<Type*> values;
-    //проверка наличия формальных параметров
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     if (fp->FPStore.empty()) return values;
-    //формирование списка типов формальных параметров
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     for(CBaseVarVector::const_iterator i = fp->FPStore.begin(); i != fp->FPStore.end(); ++i) {
-        //Запись массива в список типов формальных параметров
+        //Р—Р°РїРёСЃСЊ РјР°СЃСЃРёРІР° РІ СЃРїРёСЃРѕРє С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
         if((*i)->name_id == id_CArrayVar){
             WriteLLVM_pars_array(static_cast<CArrayVar*>(*i),values);
             continue;
         }//if
-        //если параметр является переменной, записываем указатель на тип
-        //иначе сам тип
+        //РµСЃР»Рё РїР°СЂР°РјРµС‚СЂ СЏРІР»СЏРµС‚СЃСЏ РїРµСЂРµРјРµРЅРЅРѕР№, Р·Р°РїРёСЃС‹РІР°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РёРї
+        //РёРЅР°С‡Рµ СЃР°Рј С‚РёРї
         if((*i)->is_var)
             values.push_back(GetLLVMType((*i))->getPointerTo());
         else values.push_back(GetLLVMType((*i)));
@@ -806,16 +806,16 @@ std::vector<Type *> LLVMDriver::WriteLLVM_pars(CFormalPars *fp)
 }//WriteLLVM_pars
 
 //-----------------------------------------------------------------------------
-//Запись массива в список типов формальных параметров
+//Р—Р°РїРёСЃСЊ РјР°СЃСЃРёРІР° РІ СЃРїРёСЃРѕРє С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 void LLVMDriver::WriteLLVM_pars_array(CArrayVar *v, std::vector<Type *> &values)
 {
-    //записываем указатель на базовый тип в список типов формальных параметров
+    //Р·Р°РїРёСЃС‹РІР°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р±Р°Р·РѕРІС‹Р№ С‚РёРї РІ СЃРїРёСЃРѕРє С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     CArrayType* AT = static_cast<CArrayType*>(v->ArrayType->FindLastType());
     CBaseVar* BV;
     static_cast<CBaseType*>(AT)->CreateVar(BV, v->parent_element);
     values.push_back(GetLLVMType((BV)->GetResultId())->getPointerTo());
     delete BV;
-    //дополнительно записываем в список типов целый тип для каждого размера массива
+    //РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ Р·Р°РїРёСЃС‹РІР°РµРј РІ СЃРїРёСЃРѕРє С‚РёРїРѕРІ С†РµР»С‹Р№ С‚РёРї РґР»СЏ РєР°Р¶РґРѕРіРѕ СЂР°Р·РјРµСЂР° РјР°СЃСЃРёРІР°
     AT=v->ArrayType;
     while (AT->name_id == id_CArrayType) {
         values.push_back(Type::getInt32Ty(TheContext));
@@ -824,27 +824,27 @@ void LLVMDriver::WriteLLVM_pars_array(CArrayVar *v, std::vector<Type *> &values)
 }//WriteLLVM_pars_array
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора IF
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° IF
 Value *LLVMDriver::WriteLLVM(CIfStatement *s)
 {
     CIfStatement::ElsifPairList_type::iterator i = s->ElsifPairList.begin();
-    //Указатель на текущую функцию
+    //РЈРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰СѓСЋ С„СѓРЅРєС†РёСЋ
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    //Еlse блок
+    //Р•lse Р±Р»РѕРє
     BasicBlock *ElseBB;
-    //блок после всех условий
+    //Р±Р»РѕРє РїРѕСЃР»Рµ РІСЃРµС… СѓСЃР»РѕРІРёР№
     BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont");
-    //Генерация кода условий
+    //Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° СѓСЃР»РѕРІРёР№
     for(; i != s->ElsifPairList.end(); ++i) {
         ElseBB = WriteLLVM((*i),MergeBB);
         TheFunction->getBasicBlockList().push_back(ElseBB);
         Builder.SetInsertPoint(ElseBB);
     }//for
-    //Генерация кода последнего условия ELSE
+    //Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРѕСЃР»РµРґРЅРµРіРѕ СѓСЃР»РѕРІРёСЏ ELSE
     if (s->ElseStatementSeq) {
         WriteLLVM(s->ElseStatementSeq);
     }//if
-    //Переход в ветку после всех условий
+    //РџРµСЂРµС…РѕРґ РІ РІРµС‚РєСѓ РїРѕСЃР»Рµ РІСЃРµС… СѓСЃР»РѕРІРёР№
     Builder.CreateBr(MergeBB);
     TheFunction->getBasicBlockList().push_back(MergeBB);
     Builder.SetInsertPoint(MergeBB);
@@ -852,43 +852,43 @@ Value *LLVMDriver::WriteLLVM(CIfStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода условий, возвращает указатель на следующей блок условия
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° СѓСЃР»РѕРІРёР№, РІРѕР·РІСЂР°С‰Р°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃР»РµРґСѓСЋС‰РµР№ Р±Р»РѕРє СѓСЃР»РѕРІРёСЏ
 BasicBlock *LLVMDriver::WriteLLVM(CElsifPair *s, BasicBlock *bb)
 {
-    //генерация кода условия входа в блок
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° СѓСЃР»РѕРІРёСЏ РІС…РѕРґР° РІ Р±Р»РѕРє
     Value* expr = WriteLLVM(s->Expr);
     while(expr->getType()->isPointerTy()){
         expr=Builder.CreateLoad(expr,expr->getName());
     }//while
     if(expr->getType()!=Type::getInt1Ty(TheContext))
         expr=CastToType(expr,Type::getInt1Ty(TheContext));
-    //Указатель на текущую функцию
+    //РЈРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰СѓСЋ С„СѓРЅРєС†РёСЋ
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    // Создаем блоки для веток then и else.  Вставляем блок then в конец функции
+    // РЎРѕР·РґР°РµРј Р±Р»РѕРєРё РґР»СЏ РІРµС‚РѕРє then Рё else.  Р’СЃС‚Р°РІР»СЏРµРј Р±Р»РѕРє then РІ РєРѕРЅРµС† С„СѓРЅРєС†РёРё
     BasicBlock *ThenBB = BasicBlock::Create(TheContext, "then", TheFunction);
     BasicBlock *ElseBB = BasicBlock::Create(TheContext, "else");
-    //Создаем условия перехода в блоки
+    //РЎРѕР·РґР°РµРј СѓСЃР»РѕРІРёСЏ РїРµСЂРµС…РѕРґР° РІ Р±Р»РѕРєРё
     Builder.CreateCondBr(expr, ThenBB, ElseBB);
     Builder.SetInsertPoint(ThenBB);
-    //Генерация кода блока then
+    //Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° Р±Р»РѕРєР° then
     WriteLLVM(s->StatementSeq);
     Builder.CreateBr(bb);
-    //Возврат указателя на блок ELSE, ELSEIF
+    //Р’РѕР·РІСЂР°С‚ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° Р±Р»РѕРє ELSE, ELSEIF
     return ElseBB;
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора WHILE
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° WHILE
 Value *LLVMDriver::WriteLLVM(CWhileStatement *s)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    //Создаем блоки while, body, endwhile. Переходим к блоку while
+    //РЎРѕР·РґР°РµРј Р±Р»РѕРєРё while, body, endwhile. РџРµСЂРµС…РѕРґРёРј Рє Р±Р»РѕРєСѓ while
     BasicBlock *WhileBB = BasicBlock::Create(TheContext, "while",TheFunction);
     BasicBlock *BodyBB = BasicBlock::Create(TheContext, "body");
     BasicBlock *EndBB = BasicBlock::Create(TheContext, "endwhile");
     Builder.CreateBr(WhileBB);
     Builder.SetInsertPoint(WhileBB);
-    //Генерация условия перехода к блоку body или endwhile
+    //Р“РµРЅРµСЂР°С†РёСЏ СѓСЃР»РѕРІРёСЏ РїРµСЂРµС…РѕРґР° Рє Р±Р»РѕРєСѓ body РёР»Рё endwhile
     Value* expr = WriteLLVM(s->Expr);
     while(expr->getType()->isPointerTy()){
         expr=Builder.CreateLoad(expr,expr->getName());
@@ -898,28 +898,28 @@ Value *LLVMDriver::WriteLLVM(CWhileStatement *s)
     Builder.CreateCondBr(expr, BodyBB, EndBB);
     TheFunction->getBasicBlockList().push_back(BodyBB);
     Builder.SetInsertPoint(BodyBB);
-    //Генерация кода тела оператора WHILE
+    //Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РµР»Р° РѕРїРµСЂР°С‚РѕСЂР° WHILE
     WriteLLVM(s->StatementSeq);
     Builder.CreateBr(WhileBB);
-    //Переход к блоку endwhile
+    //РџРµСЂРµС…РѕРґ Рє Р±Р»РѕРєСѓ endwhile
     TheFunction->getBasicBlockList().push_back(EndBB);
     Builder.SetInsertPoint(EndBB);
     return nullptr;
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора Repeat
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° Repeat
 Value *LLVMDriver::WriteLLVM(CRepeatStatement *s)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    //создаем блоки
+    //СЃРѕР·РґР°РµРј Р±Р»РѕРєРё
     BasicBlock *RepeatBB = BasicBlock::Create(TheContext, "repeat",TheFunction);
     BasicBlock *EndBB = BasicBlock::Create(TheContext, "endrepeat");
     Builder.CreateBr(RepeatBB);
     Builder.SetInsertPoint(RepeatBB);
-    //генерация кода тела цикла
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РµР»Р° С†РёРєР»Р°
     WriteLLVM(s->StatementSeq);
-    //генерация кода условия повтора цикла
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° СѓСЃР»РѕРІРёСЏ РїРѕРІС‚РѕСЂР° С†РёРєР»Р°
     Value* expr = WriteLLVM(s->Expr);
     while(expr->getType()->isPointerTy()){
         expr=Builder.CreateLoad(expr,expr->getName());
@@ -933,20 +933,20 @@ Value *LLVMDriver::WriteLLVM(CRepeatStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора FOR
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° FOR
 Value *LLVMDriver::WriteLLVM(CForStatement *s)
 {
-    //генерация выражений For и To
+    //РіРµРЅРµСЂР°С†РёСЏ РІС‹СЂР°Р¶РµРЅРёР№ For Рё To
     Value* vToExpr=WriteLLVM(s->ToExpr);
     Value* vForExpr=WriteLLVM(s->ForExpr);
     Value* CondV;
-    //получение итерационной переменной
+    //РїРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С†РёРѕРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
     Value* store=NamedValues[s->var_name];
     if(!store) store=GlobalValues[s->var_name];
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
     }
-    //приведение типов выражений к типу переменной
+    //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ РІС‹СЂР°Р¶РµРЅРёР№ Рє С‚РёРїСѓ РїРµСЂРµРјРµРЅРЅРѕР№
     if(store->getType()->getTypeID()==Type::PointerTyID)   {
         if(store->getType()->getContainedType(0)!=vForExpr->getType())
             vForExpr=CastToType(vForExpr,store->getType()->getContainedType(0));
@@ -957,16 +957,16 @@ Value *LLVMDriver::WriteLLVM(CForStatement *s)
             vToExpr=CastToType(vToExpr,store->getType()->getContainedType(0));
     }else if(store->getType()!=vToExpr->getType())
         vToExpr=CastToType(vToExpr,store->getType());
-    //Сохраняем выражение For в переменной
+    //РЎРѕС…СЂР°РЅСЏРµРј РІС‹СЂР°Р¶РµРЅРёРµ For РІ РїРµСЂРµРјРµРЅРЅРѕР№
     Builder.CreateStore(vForExpr, store);
-    //получаем указатель на функцию, создаем блоки
+    //РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ, СЃРѕР·РґР°РµРј Р±Р»РѕРєРё
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock* ForBB = BasicBlock::Create(TheContext, "for", TheFunction);
     BasicBlock *ForBodyBB = BasicBlock::Create(TheContext, "forbody");
     BasicBlock *ExitForBB = BasicBlock::Create(TheContext, "exitfor");
     Builder.CreateBr(ForBB);
     Builder.SetInsertPoint(ForBB);
-    //генерация условия входа в тело цикла
+    //РіРµРЅРµСЂР°С†РёСЏ СѓСЃР»РѕРІРёСЏ РІС…РѕРґР° РІ С‚РµР»Рѕ С†РёРєР»Р°
     Value* vStore=Builder.CreateLoad(store,store->getName());
     if(s->step > 0){
         CondV=Builder.CreateICmpSLE(vStore,vToExpr,"forcond");
@@ -976,9 +976,9 @@ Value *LLVMDriver::WriteLLVM(CForStatement *s)
     Builder.CreateCondBr(CondV,ForBodyBB,ExitForBB);
     TheFunction->getBasicBlockList().push_back(ForBodyBB);
     Builder.SetInsertPoint(ForBodyBB);
-    //генерация кода тела цикла
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РµР»Р° С†РёРєР»Р°
     WriteLLVM(s->StatementSeq);
-    //Добавление шага к переменной
+    //Р”РѕР±Р°РІР»РµРЅРёРµ С€Р°РіР° Рє РїРµСЂРµРјРµРЅРЅРѕР№
     vStore=Builder.CreateLoad(store,store->getName());
     Value* vStep = Builder.CreateAdd(vStore,ConstantInt::get(vStore->getType(),s->step),"step");
     Builder.CreateStore(vStep, store);
@@ -990,39 +990,39 @@ Value *LLVMDriver::WriteLLVM(CForStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора LOOP
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° LOOP
 Value *LLVMDriver::WriteLLVM(CLoopStatement *s)
 {
-    //получаем указатель на функцию, создаем блоки
+    //РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ, СЃРѕР·РґР°РµРј Р±Р»РѕРєРё
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *LoopBB = BasicBlock::Create(TheContext, "loop", TheFunction);
     BasicBlock *ExitBB = BasicBlock::Create(TheContext, "exitLoop");
-    //сохраняем блок выхода из цикла в карте блоков
+    //СЃРѕС…СЂР°РЅСЏРµРј Р±Р»РѕРє РІС‹С…РѕРґР° РёР· С†РёРєР»Р° РІ РєР°СЂС‚Рµ Р±Р»РѕРєРѕРІ
     BasicBlocks[s->WithLoopLink.LoopUID]=ExitBB;
     Builder.CreateBr(LoopBB);
     Builder.SetInsertPoint(LoopBB);
-    //генерация кода тела цикла
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РµР»Р° С†РёРєР»Р°
     WriteLLVM(s->StatementSeq);
     Builder.CreateBr(LoopBB);
-    //вставка блока выхода из цикла
+    //РІСЃС‚Р°РІРєР° Р±Р»РѕРєР° РІС‹С…РѕРґР° РёР· С†РёРєР»Р°
     TheFunction->getBasicBlockList().push_back(ExitBB);
     Builder.SetInsertPoint(ExitBB);
     return nullptr;
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для оператора CASE
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° CASE
 Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
 {
-    //блок выхода, один для всех меток
+    //Р±Р»РѕРє РІС‹С…РѕРґР°, РѕРґРёРЅ РґР»СЏ РІСЃРµС… РјРµС‚РѕРє
     BasicBlock *ExitBB = BasicBlock::Create(TheContext, "exitCase");
-    //цикл перебора последовательностей меток
+    //С†РёРєР» РїРµСЂРµР±РѕСЂР° РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№ РјРµС‚РѕРє
     CCaseStatement::CaseLabelsSeqList_type::const_iterator i;
     for (i = s->CaseLabelsSeqList.begin(); i != s->CaseLabelsSeqList.end(); ++i)
     {
         WriteLLVM((*i), s->Expr,ExitBB);
     }//for
-    //проверка наличия условия ELSE
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓСЃР»РѕРІРёСЏ ELSE
     if (s->ElseStatementSeq) {
         WriteLLVM(s->ElseStatementSeq);
     }
@@ -1034,40 +1034,40 @@ Value *LLVMDriver::WriteLLVM(CCaseStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM варианта оператора CASE
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РІР°СЂРёР°РЅС‚Р° РѕРїРµСЂР°С‚РѕСЂР° CASE
 Value *LLVMDriver::WriteLLVM(CCaseLabelsSeq *cls, CExpr *e, BasicBlock *exitBB)
 {
     CCaseLabelsSeq::CaseLabelsList_type::const_iterator i = cls->CaseLabelsList.begin();
-    //генерация первой метки
+    //РіРµРЅРµСЂР°С†РёСЏ РїРµСЂРІРѕР№ РјРµС‚РєРё
     Value* expr = WriteLLVM((*i), e);
-    //цикл перебора оставшихся меток
+    //С†РёРєР» РїРµСЂРµР±РѕСЂР° РѕСЃС‚Р°РІС€РёС…СЃСЏ РјРµС‚РѕРє
     for (++i; i != cls->CaseLabelsList.end(); ++i)
     {
         Value* expr2 = WriteLLVM((*i), e);
         expr=Builder.CreateOr(expr,expr2,"cond");
     }
-    //создание блоков, генерация условия входа в блок case
+    //СЃРѕР·РґР°РЅРёРµ Р±Р»РѕРєРѕРІ, РіРµРЅРµСЂР°С†РёСЏ СѓСЃР»РѕРІРёСЏ РІС…РѕРґР° РІ Р±Р»РѕРє case
     BasicBlock *caseBB = BasicBlock::Create(TheContext, "case");
     BasicBlock *elseBB = BasicBlock::Create(TheContext, "else");
     Builder.CreateCondBr(expr,caseBB,elseBB);
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     TheFunction->getBasicBlockList().push_back(caseBB);
     Builder.SetInsertPoint(caseBB);
-    //генерация кода послед-ти операторов
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРѕСЃР»РµРґ-С‚Рё РѕРїРµСЂР°С‚РѕСЂРѕРІ
     WriteLLVM(&cls->StatementSeq);
     Builder.CreateBr(exitBB);
-    //вставка блока следующей метки
+    //РІСЃС‚Р°РІРєР° Р±Р»РѕРєР° СЃР»РµРґСѓСЋС‰РµР№ РјРµС‚РєРё
     TheFunction->getBasicBlockList().push_back(elseBB);
     Builder.SetInsertPoint(elseBB);
     return nullptr;
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM метки оператора CASE
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РјРµС‚РєРё РѕРїРµСЂР°С‚РѕСЂР° CASE
 Value *LLVMDriver::WriteLLVM(CCaseLabels *cls, CExpr *e)
 {
     Value* expr = WriteLLVM(e);
-    //проверка наличия диапазона
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРёР°РїР°Р·РѕРЅР°
     if (cls->IsRange) {
         Value* uge = Builder.CreateICmpUGE(expr,ConstantInt::get(expr->getType(),cls->ConstValue));
         Value* ule = Builder.CreateICmpULE(expr,ConstantInt::get(expr->getType(),cls->ConstHighValue));
@@ -1077,19 +1077,19 @@ Value *LLVMDriver::WriteLLVM(CCaseLabels *cls, CExpr *e)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM оператора Return
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РѕРїРµСЂР°С‚РѕСЂР° Return
 Value *LLVMDriver::WriteLLVM(CReturnStatement *s)
 {
-    //получаем тип возвращаемого значения
+    //РїРѕР»СѓС‡Р°РµРј С‚РёРї РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
     Type* funRetType=Builder.getCurrentFunctionReturnType();
-    //генерация возвращаемого значения
+    //РіРµРЅРµСЂР°С†РёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
     Value* retVal;
     if (s->Expr) {
         retVal=WriteLLVM(s->Expr);
     } else retVal=Constant::getNullValue(funRetType);
     retVal=CastToType(retVal,funRetType);
     Builder.CreateRet(retVal);
-    //переход к недостижимому блоку, из-за особенностей LLVM
+    //РїРµСЂРµС…РѕРґ Рє РЅРµРґРѕСЃС‚РёР¶РёРјРѕРјСѓ Р±Р»РѕРєСѓ, РёР·-Р·Р° РѕСЃРѕР±РµРЅРЅРѕСЃС‚РµР№ LLVM
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
@@ -1098,17 +1098,17 @@ Value *LLVMDriver::WriteLLVM(CReturnStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM оператора присваивания
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РѕРїРµСЂР°С‚РѕСЂР° РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
 {
     ////////////////////////////////////////////////////
-    //генерация кода присвоения текстовой строки массиву
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
     if (s->str_to_array) {
         return WriteLLVM_array(s);
     }//if
 
     ////////////////////////////////////////////////////
-    //генерация кода присваивания процедуры
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРёСЃРІР°РёРІР°РЅРёСЏ РїСЂРѕС†РµРґСѓСЂС‹
     if(s->Designator->ResultId==id_CProcedureVar){
         Value* store=WriteLLVM(s->Designator);
         while (store->getType()->getContainedType(0)->getContainedType(0)->isPointerTy()) {
@@ -1122,7 +1122,7 @@ Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
     }//if
 
     ////////////////////////////////////////////////////
-    //генерация кода присваивания указателя
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРёСЃРІР°РёРІР°РЅРёСЏ СѓРєР°Р·Р°С‚РµР»СЏ
     if(s->Designator->ResultId==id_CPointerVar){
         Value* store=WriteLLVM(s->Designator);
         while (store->getType()->getContainedType(0)->getContainedType(0)->isPointerTy()) {
@@ -1140,7 +1140,7 @@ Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
     }//if
 
     //////////////////////////////////////
-    //генерация кода обычного присваивания
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РѕР±С‹С‡РЅРѕРіРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
     Value* store=WriteLLVM(s->Designator);
     while (store->getType()->getContainedType(0)->isPointerTy()) {
         store=Builder.CreateLoad(store,store->getName());
@@ -1153,10 +1153,10 @@ Value *LLVMDriver::WriteLLVM(CAssignStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM в случае присвоения текстовой строки массиву
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РІ СЃР»СѓС‡Р°Рµ РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 Value *LLVMDriver::WriteLLVM_array(CAssignStatement *s)
 {
-    //используется функция COPY из сгенерированного файла _O2M_sys.cpp
+    //РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„СѓРЅРєС†РёСЏ COPY РёР· СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° _O2M_sys.cpp
     std::string name="_Z4COPYPKciPci";
     Function *F=Functions[name];
     if(!F){
@@ -1169,33 +1169,33 @@ Value *LLVMDriver::WriteLLVM_array(CAssignStatement *s)
         F=createFunction(FunRetType,pars,emptyVector,name);
         Functions[name]=F;
     }//if
-    //получение значения источника
+    //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РёСЃС‚РѕС‡РЅРёРєР°
     Value* string1 = WriteLLVM(s->Expr);
     CBaseName* BN = s->Expr->FindLastName();
     Value* size1 = WriteLLVM_COPY_Par(BN);
-    //получение значения приемника
+    //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїСЂРёРµРјРЅРёРєР°
     Value* string2 = WriteLLVM(s->Designator);
     BN = s->Designator->FindLastName();
     Value* size2 = WriteLLVM_COPY_Par(BN);
-    //Если указатель на строку, получим саму строку
+    //Р•СЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂРѕРєСѓ, РїРѕР»СѓС‡РёРј СЃР°РјСѓ СЃС‚СЂРѕРєСѓ
     while(string2->getType()->getContainedType(0)->isArrayTy()){
         std::vector<Value*> values;
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
         string2=Builder.CreateGEP(string2,values);
     }//while
-    //Вызов функции COPY
+    //Р’С‹Р·РѕРІ С„СѓРЅРєС†РёРё COPY
     std::vector<Value *> values={string1,size1,string2,size2};
     return Builder.CreateCall(F,values);
 }//WriteLLVM_array
 
 //-----------------------------------------------------------------------------
-//получение размерности массива в качестве параметра при вызове COPY
-//предполагается, что BN является массивом символов или ук. на массив символов
+//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР° РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° РїСЂРё РІС‹Р·РѕРІРµ COPY
+//РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ BN СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј СЃРёРјРІРѕР»РѕРІ РёР»Рё СѓРє. РЅР° РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ
 Value *LLVMDriver::WriteLLVM_COPY_Par(CBaseName *bn)
 {
     if (id_CPointerVar == bn->name_id) bn = static_cast<CPointerVar*>(bn)->FindType();
-    //получение размера для переменной или типа
+    //РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РґР»СЏ РїРµСЂРµРјРµРЅРЅРѕР№ РёР»Рё С‚РёРїР°
     int arr_size;
     if (id_CArrayVar == bn->name_id)
         arr_size = static_cast<CArrayVar*>(bn)->ArrayType->size;
@@ -1205,12 +1205,12 @@ Value *LLVMDriver::WriteLLVM_COPY_Par(CBaseName *bn)
 }//WriteLLVM_COPY_Par
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM оператора EXIT
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РѕРїРµСЂР°С‚РѕСЂР° EXIT
 Value *LLVMDriver::WriteLLVM(CExitStatement *s)
 {
-    //генерация выхода из цикла LOOP
+    //РіРµРЅРµСЂР°С†РёСЏ РІС‹С…РѕРґР° РёР· С†РёРєР»Р° LOOP
     Builder.CreateBr(BasicBlocks[s->UID]);
-    //создание недостижимого блока и переход к нему
+    //СЃРѕР·РґР°РЅРёРµ РЅРµРґРѕСЃС‚РёР¶РёРјРѕРіРѕ Р±Р»РѕРєР° Рё РїРµСЂРµС…РѕРґ Рє РЅРµРјСѓ
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
@@ -1219,72 +1219,72 @@ Value *LLVMDriver::WriteLLVM(CExitStatement *s)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM оператора вызова процедуры
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РѕРїРµСЂР°С‚РѕСЂР° РІС‹Р·РѕРІР° РїСЂРѕС†РµРґСѓСЂС‹
 Value *LLVMDriver::WriteLLVM(CCallStatement *s)
 {
-    //получение ук. на CProcedure или CProcedureVar
+    //РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° CProcedure РёР»Рё CProcedureVar
     CBaseName *BN = s->Designator->FindLastName();
     CFormalPars* FP;
     if (CProcedure::IsProcId(BN->name_id)){
         CProcedure* BV = static_cast<CProcedure*>(BN);
         FP=BV->FormalPars;
-        //Получение указателяя на функцию
+        //РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏСЏ РЅР° С„СѓРЅРєС†РёСЋ
         Function* F=GetFunction(BV);
-        //Формирование списка параметров, если есть
+        //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ, РµСЃР»Рё РµСЃС‚СЊ
         std::vector<Value *> ArgsV;
         if (s->ExprList) {
             ArgsV = WriteLLVM(s->ExprList,FP);
         }//if
-        //Формирование списка обобщающих параметров, если есть
+        //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° РѕР±РѕР±С‰Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ, РµСЃР»Рё РµСЃС‚СЊ
         if (s->CommonList) {
             std::vector<Value *> ArgsVC = WriteLLVM(s->CommonList,static_cast<CCommonProc*>(BV)->CommonPars);
             ArgsV.insert(ArgsV.end(),ArgsVC.begin(),ArgsVC.end());
         }//if
-        //Если есть приемник, добавляем его в параметры
+        //Р•СЃР»Рё РµСЃС‚СЊ РїСЂРёРµРјРЅРёРє, РґРѕР±Р°РІР»СЏРµРј РµРіРѕ РІ РїР°СЂР°РјРµС‚СЂС‹
         if(BV->Receiver){
             ArgsV.push_back(WriteLLVM(s->Designator));
         }//if
-        //Вызов функции
+        //Р’С‹Р·РѕРІ С„СѓРЅРєС†РёРё
         return Builder.CreateCall(F,ArgsV,"calltmp");
     } else if (id_CProcedureVar == BN->name_id){
-        //случай переменной типа PROCEDURE
+        //СЃР»СѓС‡Р°Р№ РїРµСЂРµРјРµРЅРЅРѕР№ С‚РёРїР° PROCEDURE
         FP = &static_cast<CProcedureVar*>(BN)->FormalPars;
-        //Получаем указатель на переменную типа PRCEDURE
+        //РџРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРµСЂРµРјРµРЅРЅСѓСЋ С‚РёРїР° PRCEDURE
         Value* d = Builder.CreateLoad(WriteLLVM(s->Designator),BN->name);
-        //Получение типа функции
+        //РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° С„СѓРЅРєС†РёРё
         FunctionType* ft= static_cast<FunctionType*>(d->getType()->getContainedType(0));
-        //Формирование списка параметров, если есть
+        //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ, РµСЃР»Рё РµСЃС‚СЊ
         std::vector<Value *> ArgsV;
         if (s->ExprList) {
             ArgsV = WriteLLVM(s->ExprList,FP);
         }//if
-        ////!Добавить обработку CommonList и Receiver!
-        //Вызов функции
+        ////!Р”РѕР±Р°РІРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ CommonList Рё Receiver!
+        //Р’С‹Р·РѕРІ С„СѓРЅРєС†РёРё
         return Builder.CreateCall(ft,d,ArgsV,"calltmp");;
     } else{
-        ////!Добавить обработку CProcedureType!
+        ////!Р”РѕР±Р°РІРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ CProcedureType!
         return nullptr;
     }//if
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Формирование списка фактических параметров функции
+//Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° С„Р°РєС‚РёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ С„СѓРЅРєС†РёРё
 std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
 {
     std::vector<Value *> ArgsV;
     CBaseVarVector::const_iterator ci = fp->FPStore.begin();
     for(CExprVector::const_iterator i = e->ExprVector->begin(); i != e->ExprVector->end(); ++i, ++ci) {
         Value* value;
-        //Если параметр переменная, нужно передавать указатель на него
+        //Р•СЃР»Рё РїР°СЂР°РјРµС‚СЂ РїРµСЂРµРјРµРЅРЅР°СЏ, РЅСѓР¶РЅРѕ РїРµСЂРµРґР°РІР°С‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРµРіРѕ
         if((*ci)->is_var){
             value = WriteLLVM((*i)->SimpleExpr1->Term->Factor->Designator);
         }else value=WriteLLVM((*i));
-        //если это не переменная-указатель - нужно грузить до первого указателя
+        //РµСЃР»Рё СЌС‚Рѕ РЅРµ РїРµСЂРµРјРµРЅРЅР°СЏ-СѓРєР°Р·Р°С‚РµР»СЊ - РЅСѓР¶РЅРѕ РіСЂСѓР·РёС‚СЊ РґРѕ РїРµСЂРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
         while (value->getType()->getNumContainedTypes()>0&&value->getType()->getContainedType(0)->isPointerTy()
                &&((*ci)->name_id!=id_CPointerVar or value->getType()->getContainedType(0)->getContainedType(0)->isPointerTy())) {
             value=Builder.CreateLoad(value,value->getName());
         }//while
-        //если указатель на массив, получаем сам массив
+        //РµСЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ, РїРѕР»СѓС‡Р°РµРј СЃР°Рј РјР°СЃСЃРёРІ
         while(value->getType()->getNumContainedTypes()>0&&value->getType()->getContainedType(0)->isArrayTy()){
             std::vector<Value*> values;
             values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
@@ -1292,7 +1292,7 @@ std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
             value=Builder.CreateGEP(value,values);
         }//while
         ArgsV.push_back(CastToType(value,GetLLVMType((*ci)->name_id)));
-        //для массива нужно также добавить в список размеры массива
+        //РґР»СЏ РјР°СЃСЃРёРІР° РЅСѓР¶РЅРѕ С‚Р°РєР¶Рµ РґРѕР±Р°РІРёС‚СЊ РІ СЃРїРёСЃРѕРє СЂР°Р·РјРµСЂС‹ РјР°СЃСЃРёРІР°
         if(id_CArrayVar == (*ci)->name_id){
             CArrayVar* AV=static_cast<CArrayVar*>((*i)->FindLastName());
             CArrayType* AT=static_cast<CArrayVar*>(AV)->ArrayType;
@@ -1313,25 +1313,25 @@ std::vector<Value *> LLVMDriver::WriteLLVM(CExprList *e,CFormalPars* fp)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM выражения
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РІС‹СЂР°Р¶РµРЅРёСЏ
 Value *LLVMDriver::WriteLLVM(CExpr *e)
 {
-    //Генерация 1-го простого выражения
+    //Р“РµРЅРµСЂР°С†РёСЏ 1-РіРѕ РїСЂРѕСЃС‚РѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
     Value* simpleExpr1 = CastToType(WriteLLVM(e->SimpleExpr1),GetLLVMType(e->SimpleExpr1->GetResultId()));
-    //Генерация 2-го простого выражения (если есть)
+    //Р“РµРЅРµСЂР°С†РёСЏ 2-РіРѕ РїСЂРѕСЃС‚РѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ (РµСЃР»Рё РµСЃС‚СЊ)
     Value* simpleExpr2 =nullptr;
     if (e->SimpleExpr2) {
         simpleExpr2 = CastToType(WriteLLVM(e->SimpleExpr2),GetLLVMType(e->SimpleExpr2->GetResultId()));
-        /* разобраться, предварительно
-        Если expr2 - нулевой указатель, приводим его к типу expr1*/
+        /* СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ, РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ
+        Р•СЃР»Рё expr2 - РЅСѓР»РµРІРѕР№ СѓРєР°Р·Р°С‚РµР»СЊ, РїСЂРёРІРѕРґРёРј РµРіРѕ Рє С‚РёРїСѓ expr1*/
         if(!simpleExpr2)
             simpleExpr2 = ConstantPointerNull::get(simpleExpr1->getType()->getContainedType(0)->getPointerTo());
-        //приведение типов
+        //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
         if(IsId1IncloseId2(e->SimpleExpr1->GetResultId(),e->SimpleExpr2->GetResultId()))
             simpleExpr2 = CastToType(simpleExpr2,simpleExpr1->getType());
         else simpleExpr1 = CastToType(simpleExpr1,simpleExpr2->getType());
     }//if
-    //Выполнение операции (если есть)
+    //Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё (РµСЃР»Рё РµСЃС‚СЊ)
     switch (e->Relation) {
     case rel_EQ:
         if(simpleExpr1->getType()==Type::getDoubleTy(TheContext))
@@ -1362,28 +1362,28 @@ Value *LLVMDriver::WriteLLVM(CExpr *e)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM простого выражения
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕСЃС‚РѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
 {
-    //Генерация первого Term
+    //Р“РµРЅРµСЂР°С†РёСЏ РїРµСЂРІРѕРіРѕ Term
     Value* term = CastToType(WriteLLVM(e->Term),GetLLVMType(e->Term->GetResultId()));
-    //Генерация отрицания (если используется)
+    //Р“РµРЅРµСЂР°С†РёСЏ РѕС‚СЂРёС†Р°РЅРёСЏ (РµСЃР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ)
     if (e->negative) {
         if(term->getType()==Type::getDoubleTy(TheContext))
             term=Builder.CreateFNeg(term);
         else term=Builder.CreateNeg(term);
     }//if
-    //Генерация остальных Term'ов (если есть)
+    //Р“РµРЅРµСЂР°С†РёСЏ РѕСЃС‚Р°Р»СЊРЅС‹С… Term'РѕРІ (РµСЃР»Рё РµСЃС‚СЊ)
     if (e->SimpleExprPairStore) {
         CBaseVector::const_iterator ci;
         for (ci = e->SimpleExprPairStore->begin(); ci != e->SimpleExprPairStore->end(); ++ci){
             CSimpleExprPair* sep = static_cast<CSimpleExprPair*>(*ci);
             Value* simplePair=CastToType(WriteLLVM(sep->Term),GetLLVMType(sep->GetResultId()));
-            //приведение типов
+            //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
             if(IsId1IncloseId2(e->Term->GetResultId(),sep->GetResultId()))
                 simplePair = CastToType(simplePair,term->getType());
             else term = CastToType(term,simplePair->getType());
-            //выполнение операций
+            //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№
             switch (sep->AddOp) {
             case aop_ADD:
                 if(term->getType()==Type::getDoubleTy(TheContext))
@@ -1409,23 +1409,23 @@ Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для CTerm
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ CTerm
 Value *LLVMDriver::WriteLLVM(CTerm *t)
 {
-    //Генерация первого множителя
+    //Р“РµРЅРµСЂР°С†РёСЏ РїРµСЂРІРѕРіРѕ РјРЅРѕР¶РёС‚РµР»СЏ
     Value* factor = CastToType(WriteLLVM(t->Factor),GetLLVMType(t->Factor->GetResultId()));
     if (t->TermPairStore) {
-        //запись оставшихся множителей (если есть)
+        //Р·Р°РїРёСЃСЊ РѕСЃС‚Р°РІС€РёС…СЃСЏ РјРЅРѕР¶РёС‚РµР»РµР№ (РµСЃР»Рё РµСЃС‚СЊ)
         CBaseVector::const_iterator ci;
         for (ci = t->TermPairStore->begin(); ci != t->TermPairStore->end(); ++ci) {
             CTermPair* tp=static_cast<CTermPair*>(*ci);
-            //генерация второго операнда для текущей операци
+            //РіРµРЅРµСЂР°С†РёСЏ РІС‚РѕСЂРѕРіРѕ РѕРїРµСЂР°РЅРґР° РґР»СЏ С‚РµРєСѓС‰РµР№ РѕРїРµСЂР°С†Рё
             Value* termPair = CastToType(WriteLLVM(tp->Factor),GetLLVMType(tp->GetResultId()));
-            //приведение типов
+            //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
             if(IsId1IncloseId2(t->Factor->GetResultId(),tp->GetResultId()))
                 termPair = CastToType(termPair,factor->getType());
             else factor = CastToType(factor,termPair->getType());
-            //выполнение операции
+            //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё
             switch (tp->MulOp) {
             case mop_DIV:
                 factor=Builder.CreateSDiv(factor, termPair, "quotmp");
@@ -1457,7 +1457,7 @@ Value *LLVMDriver::WriteLLVM(CTerm *t)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для CFactor
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ CFactor
 Value *LLVMDriver::WriteLLVM(CFactor *f)
 {
     switch (f->FactorKind) {
@@ -1471,7 +1471,7 @@ Value *LLVMDriver::WriteLLVM(CFactor *f)
     case fk_ConstVar:
         return WriteLLVM_ConstValue(f->ConstVar);
     case fk_StdProcFunc:
-        //выбор и генерация кода конкретной стандартной процедуры
+        //РІС‹Р±РѕСЂ Рё РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РєРѕРЅРєСЂРµС‚РЅРѕР№ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
         if(typeid(*f->StdProcFunc) == typeid (CAbsStdProcFunc) )
             return WriteLLVM(static_cast<CAbsStdProcFunc*>(f->StdProcFunc));
         if(typeid(*f->StdProcFunc) == typeid (CAshStdProcFunc) )
@@ -1499,13 +1499,13 @@ Value *LLVMDriver::WriteLLVM(CFactor *f)
         if(typeid(*f->StdProcFunc) == typeid (CSizeStdProcFunc) )
             return WriteLLVM(static_cast<CSizeStdProcFunc*>(f->StdProcFunc));
     case fk_Designator:
-        //проверка наличия вызова процедуры функции (если нет - запись кода обозначения)
+        //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹Р·РѕРІР° РїСЂРѕС†РµРґСѓСЂС‹ С„СѓРЅРєС†РёРё (РµСЃР»Рё РЅРµС‚ - Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±РѕР·РЅР°С‡РµРЅРёСЏ)
         if (f->Call)
             return WriteLLVM(f->Call);
         else{
             Value* designator = WriteLLVM(f->Designator);
-            //для простых переменных, возвращаем ее значение, а не указатель на нее
-            //(нужно перенести на верхний уровень или в CastToType)
+            //РґР»СЏ РїСЂРѕСЃС‚С‹С… РїРµСЂРµРјРµРЅРЅС‹С…, РІРѕР·РІСЂР°С‰Р°РµРј РµРµ Р·РЅР°С‡РµРЅРёРµ, Р° РЅРµ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРµРµ
+            //(РЅСѓР¶РЅРѕ РїРµСЂРµРЅРµСЃС‚Рё РЅР° РІРµСЂС…РЅРёР№ СѓСЂРѕРІРµРЅСЊ РёР»Рё РІ CastToType)
             while (f->GetResultId()!=id_CArrayVar && f->GetResultId()!=id_CProcedureVar
                    && f->GetResultId()!=id_CProcedure && designator->getType()->isPointerTy()
                    && !designator->getType()->getContainedType(0)->isStructTy()) {
@@ -1517,19 +1517,19 @@ Value *LLVMDriver::WriteLLVM(CFactor *f)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM для CDesignator
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РґР»СЏ CDesignator
 Value *LLVMDriver::WriteLLVM(CDesignator *d)
 {
-    //вначале ищем обозначение в локальных переменных, затем в глобальных
+    //РІРЅР°С‡Р°Р»Рµ РёС‰РµРј РѕР±РѕР·РЅР°С‡РµРЅРёРµ РІ Р»РѕРєР°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…, Р·Р°С‚РµРј РІ РіР»РѕР±Р°Р»СЊРЅС‹С…
     Value* designator=NamedValues[d->Qualident->ident];
     if(!designator) designator=GlobalValues[d->Qualident->ident];
-    //если не нашли, возможно это процедура
+    //РµСЃР»Рё РЅРµ РЅР°С€Р»Рё, РІРѕР·РјРѕР¶РЅРѕ СЌС‚Рѕ РїСЂРѕС†РµРґСѓСЂР°
     if(!designator) {
         CBaseName* BN = d->FindLastName();
         if(BN->name_id==id_CProcedure)
             designator=GetFunction(static_cast<CProcedure*>(BN));
     }//if
-    //если нет, создаем глобальную переменную
+    //РµСЃР»Рё РЅРµС‚, СЃРѕР·РґР°РµРј РіР»РѕР±Р°Р»СЊРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
     if(!designator){
         const CBaseName* BN = d->parent_element;
         while(BN->name_id!=id_CModule){
@@ -1543,7 +1543,7 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
         GlobalValues[lastName]=gVar;
         designator=gVar;
     }//if
-    //получение значения по эл-там обозначения (индексам)
+    //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СЌР»-С‚Р°Рј РѕР±РѕР·РЅР°С‡РµРЅРёСЏ (РёРЅРґРµРєСЃР°Рј)
     for (CDesignator::SDesElemStore::const_iterator ci = d->DesElemStore.begin(); ci != d->DesElemStore.end(); ci++) {
         switch ((*ci)->DesKind) {
         case CDesignator::EDesKind::dk_Array:       
@@ -1562,23 +1562,23 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Получения значения массива по индексам
+//РџРѕР»СѓС‡РµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ РјР°СЃСЃРёРІР° РїРѕ РёРЅРґРµРєСЃР°Рј
 Value *LLVMDriver::WriteLLVM_index(CExprList *e, Value* array)
 {
     std::vector<Value*> values;
-    //Закрытый массив - это должен быть указатель на тип Массив
+    //Р—Р°РєСЂС‹С‚С‹Р№ РјР°СЃСЃРёРІ - СЌС‚Рѕ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РёРї РњР°СЃСЃРёРІ
     bool isCloseArray = array->getType()->isPointerTy() && array->getType()->getContainedType(0)->isArrayTy();
-    //Для закрытого массиванужен дополнительный параметр вначале
+    //Р”Р»СЏ Р·Р°РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР°РЅСѓР¶РµРЅ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РІРЅР°С‡Р°Р»Рµ
     if(isCloseArray){
         values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
     }//if
-    //запись индексов массива
+    //Р·Р°РїРёСЃСЊ РёРЅРґРµРєСЃРѕРІ РјР°СЃСЃРёРІР°
     for (CExprVector::const_iterator ci = e->ExprVector->begin(); ci != e->ExprVector->end(); ++ci) {
         Value* value=WriteLLVM((*ci));
         value=CastToType(value,Type::getInt32Ty(TheContext));
         values.push_back(value);
     }//for
-    //взятие значения у закрытого и открытого массива обрабатываются разными функциями
+    //РІР·СЏС‚РёРµ Р·РЅР°С‡РµРЅРёСЏ Сѓ Р·Р°РєСЂС‹С‚РѕРіРѕ Рё РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР° РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ СЂР°Р·РЅС‹РјРё С„СѓРЅРєС†РёСЏРјРё
     if(!isCloseArray){
         array=Builder.CreateLoad(array,array->getName());
         return Builder.CreateInBoundsGEP(array,values,"gep");
@@ -1587,7 +1587,7 @@ Value *LLVMDriver::WriteLLVM_index(CExprList *e, Value* array)
 }//WriteLLVM_index
 
 //-----------------------------------------------------------------------------
-//Получения значения элемента записи по индексам
+//РџРѕР»СѓС‡РµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° Р·Р°РїРёСЃРё РїРѕ РёРЅРґРµРєСЃР°Рј
 Value *LLVMDriver::WriteLLVM_record_index(Value *record, char *ident,CDesignator *d)
 {
     CBaseVar* BN = static_cast<CBaseVar*>(d->parent_element->GetGlobalName(d->Qualident->pref_ident, d->Qualident->ident));
@@ -1624,10 +1624,10 @@ Value *LLVMDriver::WriteLLVM_record_index(Value *record, char *ident,CDesignator
 }//WriteLLVM_record_index
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции ABS
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ABS
 Value *LLVMDriver::WriteLLVM(CAbsStdProcFunc *d)
 {
-    //Вызов стандартных функций С (в зависимости от типа аргумента)
+    //Р’С‹Р·РѕРІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… С„СѓРЅРєС†РёР№ РЎ (РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р°)
     std::string name;
     Type* type;
     if (id_CLongintVar == d->GetResultId()) {
@@ -1652,7 +1652,7 @@ Value *LLVMDriver::WriteLLVM(CAbsStdProcFunc *d)
 }
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции ASH
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ASH
 Value *LLVMDriver::WriteLLVM(CAshStdProcFunc *d)
 {
     Value* exprX = WriteLLVM(&d->ExprX);
@@ -1664,7 +1664,7 @@ Value *LLVMDriver::WriteLLVM(CAshStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции CAP
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё CAP
 Value *LLVMDriver::WriteLLVM(CCapStdProcFunc *d)
 {
     std::string name="toupper";
@@ -1682,24 +1682,24 @@ Value *LLVMDriver::WriteLLVM(CCapStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции CHR
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё CHR
 Value *LLVMDriver::WriteLLVM(CChrStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции ENTIER
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ENTIER
 Value *LLVMDriver::WriteLLVM(CEntierStdProcFunc *d)
 {
     return CastToType(WriteLLVM(&d->Expr),Type::getInt32Ty(TheContext));
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры LEN
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹ LEN
 Value *LLVMDriver::WriteLLVM(CLenStdProcFunc *d)
 {
-    //проверка типа массива (открытый / обычный)
+    //РїСЂРѕРІРµСЂРєР° С‚РёРїР° РјР°СЃСЃРёРІР° (РѕС‚РєСЂС‹С‚С‹Р№ / РѕР±С‹С‡РЅС‹Р№)
     if (!d->array_size){
         std::string name="O2M_ARR_"+std::to_string(d->dimension)+"_"+d->array_name;
         return Builder.CreateLoad(NamedValues[name],name);
@@ -1708,14 +1708,14 @@ Value *LLVMDriver::WriteLLVM(CLenStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции LONG
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё LONG
 Value *LLVMDriver::WriteLLVM(CLongStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции MAX
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MAX
 Value *LLVMDriver::WriteLLVM(CMaxStdProcFunc *d){
     switch (d->GetResultId()) {
     case id_CBooleanVar:
@@ -1725,7 +1725,7 @@ Value *LLVMDriver::WriteLLVM(CMaxStdProcFunc *d){
     case id_CShortintVar:
         return ConstantInt::get(GetLLVMType(d->GetResultId()),SHRT_MAX);
     case id_CIntegerVar:
-        //выбор между SET и INTEGER
+        //РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
         if (d->AppliedToSET)
             return ConstantInt::get(GetLLVMType(d->GetResultId()),SET_MAX);
         else
@@ -1734,7 +1734,7 @@ Value *LLVMDriver::WriteLLVM(CMaxStdProcFunc *d){
         return ConstantInt::get(GetLLVMType(d->GetResultId()),LONG_MAX);
     case id_CRealVar:
     case id_CLongrealVar:
-        //double по размеру совпадает с long double
+        //double РїРѕ СЂР°Р·РјРµСЂСѓ СЃРѕРІРїР°РґР°РµС‚ СЃ long double
         return ConstantFP::get(GetLLVMType(d->GetResultId()),DBL_MAX);
     default:
         return nullptr;
@@ -1742,7 +1742,7 @@ Value *LLVMDriver::WriteLLVM(CMaxStdProcFunc *d){
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции MIN
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё MIN
 Value *LLVMDriver::WriteLLVM(CMinStdProcFunc *d){
     switch (d->GetResultId()) {
     case id_CBooleanVar:
@@ -1751,7 +1751,7 @@ Value *LLVMDriver::WriteLLVM(CMinStdProcFunc *d){
     case id_CShortintVar:
         return ConstantInt::get(GetLLVMType(d->GetResultId()),SHRT_MIN);
     case id_CIntegerVar:
-        //выбор между SET и INTEGER
+        //РІС‹Р±РѕСЂ РјРµР¶РґСѓ SET Рё INTEGER
         if (d->AppliedToSET)
             return Constant::getNullValue(GetLLVMType(d->GetResultId()));
         else
@@ -1760,7 +1760,7 @@ Value *LLVMDriver::WriteLLVM(CMinStdProcFunc *d){
         return ConstantInt::get(GetLLVMType(d->GetResultId()),LONG_MIN);
     case id_CRealVar:
     case id_CLongrealVar:
-        //double по размеру совпадает с long double
+        //double РїРѕ СЂР°Р·РјРµСЂСѓ СЃРѕРІРїР°РґР°РµС‚ СЃ long double
         return ConstantFP::get(GetLLVMType(d->GetResultId()),DBL_MIN);
     default:
         return nullptr;
@@ -1768,7 +1768,7 @@ Value *LLVMDriver::WriteLLVM(CMinStdProcFunc *d){
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции ODD
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ODD
 Value *LLVMDriver::WriteLLVM(COddStdProcFunc *d)
 {
     Value* expr = WriteLLVM(&d->Expr);
@@ -1777,10 +1777,10 @@ Value *LLVMDriver::WriteLLVM(COddStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции ORD
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё ORD
 Value *LLVMDriver::WriteLLVM(COrdStdProcFunc *d)
 {
-    //вызов стандартной функции из сгенерированного файла _O2M_sys.cpp
+    //РІС‹Р·РѕРІ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ С„СѓРЅРєС†РёРё РёР· СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° _O2M_sys.cpp
     std::string name="_Z3ORDc";
     Function *F=Functions[name];
     if(!F){
@@ -1796,75 +1796,75 @@ Value *LLVMDriver::WriteLLVM(COrdStdProcFunc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции SHORT
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SHORT
 Value *LLVMDriver::WriteLLVM(CShortStdProcFunc *d)
 {
     return WriteLLVM(&d->Expr);
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры-функции SIZE
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё SIZE
 Value *LLVMDriver::WriteLLVM(CSizeStdProcFunc *d)
 {
     return llvm::ConstantInt::get(llvm::Type::getInt64Ty(TheContext), TheModule->getDataLayout().getTypeAllocSize(GetLLVMType(d->Qualident.TypeResultId)));
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры DEC
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹ DEC
 Value *LLVMDriver::WriteLLVM(CDecStdProc *d)
 {
-    //получение переменной (первого выражения)
+    //РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ (РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
     Value* store=WriteLLVM(d->Expr1.SimpleExpr1->Term->Factor->Designator);
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
     }//while
     Value* expr=Builder.CreateLoad(store,store->getName());
     Value* dec=nullptr;
-    //получение второго выражения или создание единичной константы
+    //РїРѕР»СѓС‡РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ РёР»Рё СЃРѕР·РґР°РЅРёРµ РµРґРёРЅРёС‡РЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
     if (d->Expr2) dec=CastToType(WriteLLVM(d->Expr2),expr->getType());
     else dec=ConstantInt::get(expr->getType(),1);
-    //выполнение операции и сохранение
+    //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё Рё СЃРѕС…СЂР°РЅРµРЅРёРµ
     expr=Builder.CreateSub(expr,dec,"dec");
     return Builder.CreateStore(expr,store);
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры INC
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹ INC
 Value *LLVMDriver::WriteLLVM(CIncStdProc *d)
 {
-    //получение переменной (первого выражения)
+    //РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ (РїРµСЂРІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ)
     Value* store=WriteLLVM(d->Expr1.SimpleExpr1->Term->Factor->Designator);
     while(store->getType()->getContainedType(0)->isPointerTy()){
         store=Builder.CreateLoad(store,store->getName());
     }//while
     Value* expr=Builder.CreateLoad(store,store->getName());
     Value* inc=nullptr;
-    //получение второго выражения или создание единичной константы
+    //РїРѕР»СѓС‡РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ РёР»Рё СЃРѕР·РґР°РЅРёРµ РµРґРёРЅРёС‡РЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
     if (d->Expr2) inc=CastToType(WriteLLVM(d->Expr2),expr->getType());
     else inc=ConstantInt::get(expr->getType(),1);
-    //выполнение операции и сохранение
+    //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё Рё СЃРѕС…СЂР°РЅРµРЅРёРµ
     expr=Builder.CreateAdd(expr,inc,"inc");
     return Builder.CreateStore(expr,store);
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры NEW
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹ NEW
 Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
 {
-    //получение переменной по обозначению
+    //РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РїРѕ РѕР±РѕР·РЅР°С‡РµРЅРёСЋ
     CPointerVar* pVar = static_cast<CPointerVar*>(d->Des.FindLastName());
-    //получения типа по переменной
+    //РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° РїРѕ РїРµСЂРµРјРµРЅРЅРѕР№
     CBaseType* BT = pVar->FindType();
-    //получения переменной
+    //РїРѕР»СѓС‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
     Value* des = WriteLLVM(&(d->Des));
     Type* type = des->getType();
-    //получение указателя на базовый тип
+    //РїРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° Р±Р°Р·РѕРІС‹Р№ С‚РёРї
     while(type->isPointerTy()&&type->getContainedType(0)->isPointerTy()&&type->getContainedType(0)->getContainedType(0)->isPointerTy()){
         des = Builder.CreateLoad(des,des->getName());
         type = des->getType();
     }//while
     type = type->getContainedType(0);
-    //Создание стандартной функции new
+    //РЎРѕР·РґР°РЅРёРµ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ С„СѓРЅРєС†РёРё new
     std::string name="_Znwy";
     Function *F=Functions[name];
     if(!F){
@@ -1874,19 +1874,19 @@ Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
         F = createFunction(reType,pars,emptyVector,name);
         Functions[name]=F;
     }
-    //вызов функции new
+    //РІС‹Р·РѕРІ С„СѓРЅРєС†РёРё new
     Value* call = Builder.CreateCall(F, ConstantInt::get(Type::getInt64Ty(TheContext),32), "new");
-    //приведение результата к базовому типу
+    //РїСЂРёРІРµРґРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° Рє Р±Р°Р·РѕРІРѕРјСѓ С‚РёРїСѓ
     call=Builder.CreateBitCast(call,type,"bitcast");
-    //для специализаций также нужно выделить память под саму специализацию
+    //РґР»СЏ СЃРїРµС†РёР°Р»РёР·Р°С†РёР№ С‚Р°РєР¶Рµ РЅСѓР¶РЅРѕ РІС‹РґРµР»РёС‚СЊ РїР°РјСЏС‚СЊ РїРѕРґ СЃР°РјСѓ СЃРїРµС†РёР°Р»РёР·Р°С†РёСЋ
     if (id_CSpecType == BT->name_id){
-        //выделение памяти под тип специализации
+        //РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ С‚РёРї СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
         Value* val=Builder.CreateStructGEP(call,0,"val");
         type=val->getType()->getContainedType(0);
         Value* call2 = Builder.CreateCall(F, ConstantInt::get(Type::getInt64Ty(TheContext),32), "new");
         call2=Builder.CreateBitCast(call2,type,"bitcast2");
         Builder.CreateStore(call2,val);
-        //во втором параметре сохраняем идентификатор специализации
+        //РІРѕ РІС‚РѕСЂРѕРј РїР°СЂР°РјРµС‚СЂРµ СЃРѕС…СЂР°РЅСЏРµРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
         Value* spec=Builder.CreateStructGEP(call,1,"val");
         CSpecType* ST=static_cast<CSpecType*>(BT);
         std::string specname=std::string(ST->GetSpecName());
@@ -1901,7 +1901,7 @@ Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
 }//WriteLLVM
 
 //-----------------------------------------------------------------------------
-//Генерация кода LLVM процедуры ASSERT
+//Р“РµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹ ASSERT
 Value *LLVMDriver::WriteLLVM(CAssertStdProc *d)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();

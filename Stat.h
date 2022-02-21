@@ -1,5 +1,5 @@
 //===============================================================
-// Объявление классов инструкций (Statements)
+// РћР±СЉСЏРІР»РµРЅРёРµ РєР»Р°СЃСЃРѕРІ РёРЅСЃС‚СЂСѓРєС†РёР№ (Statements)
 //===============================================================
 
 #ifndef O2M_Stat_h
@@ -11,7 +11,7 @@
 
 
 //---------------------------------------------------------------
-//последовательность операторов
+//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ
 class CStatementSeq : public CBase
 {
 public:
@@ -29,7 +29,7 @@ private:
 
 
 //---------------------------------------------------------------
-//контейнер Expr THEN StatementSeq ("ELSIF") для оператора IF
+//РєРѕРЅС‚РµР№РЅРµСЂ Expr THEN StatementSeq ("ELSIF") РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° IF
 class CElsifPair
 {
 public:
@@ -49,7 +49,7 @@ public:
 
 
 //---------------------------------------------------------------
-//оператор IF
+//РѕРїРµСЂР°С‚РѕСЂ IF
 class CIfStatement : public CBase
 {
 public:
@@ -66,17 +66,17 @@ public:
 };//CIfStatement
 
 
-//для передачи указателей на объекты в параметрах процедуры CCaseLabels::Init
+//РґР»СЏ РїРµСЂРµРґР°С‡Рё СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РѕР±СЉРµРєС‚С‹ РІ РїР°СЂР°РјРµС‚СЂР°С… РїСЂРѕС†РµРґСѓСЂС‹ CCaseLabels::Init
 class CCaseLabelsSeq;
 class CCaseStatement;
 
 
 //---------------------------------------------------------------
-//CASE метки ConstExpr [".." ConstExpr]
+//CASE РјРµС‚РєРё ConstExpr [".." ConstExpr]
 class CCaseLabels
 {
 public:
-	bool ValueExists(const long Value, const bool IsRng, const long HighValue);	//проверка наличия указанного значения в текущей метке
+	bool ValueExists(const long Value, const bool IsRng, const long HighValue);	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ С‚РµРєСѓС‰РµР№ РјРµС‚РєРµ
 	CCaseLabels(const CBaseName* parent) : ConstValue(0),
 		IsRange(false),
 		ConstHighValue(0),
@@ -84,15 +84,15 @@ public:
 	int Init(CLexBuf *lb, CCaseStatement* const CaseStatement, CCaseLabelsSeq* const CaseLabelsSeq);
 	void WriteCPP(CPP_files& f, CExpr* Expr);
 //private:
-	long ConstValue;			//значение 1-го выражения
-	bool IsRange;				//признак наличия второго выражения
-	long ConstHighValue;		//значение 2-го выражения, действительно при IsRange
+	long ConstValue;			//Р·РЅР°С‡РµРЅРёРµ 1-РіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
+	bool IsRange;				//РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РІС‚РѕСЂРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
+	long ConstHighValue;		//Р·РЅР°С‡РµРЅРёРµ 2-РіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїСЂРё IsRange
 	const CBaseName* parent_element;
 };//CCaseLabels
 
 
 //---------------------------------------------------------------
-//последовательность меток одного варианта Case
+//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РјРµС‚РѕРє РѕРґРЅРѕРіРѕ РІР°СЂРёР°РЅС‚Р° Case
 class CCaseLabelsSeq
 {
 public:
@@ -100,20 +100,20 @@ public:
 	CCaseLabelsSeq(const CBaseName* parent) : parent_element(parent),
 		StatementSeq(parent) {};
 	~CCaseLabelsSeq();
-	//в случае отсутствия меток можно считать, что RETURN имеется
+	//РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РјРµС‚РѕРє РјРѕР¶РЅРѕ СЃС‡РёС‚Р°С‚СЊ, С‡С‚Рѕ RETURN РёРјРµРµС‚СЃСЏ
 	EHaveRet HaveRet() const {return CaseLabelsList.empty() ? hr_Yes : StatementSeq.HaveRet();};
 	int Init(CLexBuf *lb, CCaseStatement* const CaseStatement);
 	void WriteCPP(CPP_files& f, CExpr* Expr);
 //private:
 	const CBaseName* parent_element;
-	CStatementSeq StatementSeq;		//последовательность операторов
-	typedef std::vector <CCaseLabels*> CaseLabelsList_type;	//тип списка меток
-	CaseLabelsList_type CaseLabelsList;						//список меток
+	CStatementSeq StatementSeq;		//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ
+	typedef std::vector <CCaseLabels*> CaseLabelsList_type;	//С‚РёРї СЃРїРёСЃРєР° РјРµС‚РѕРє
+	CaseLabelsList_type CaseLabelsList;						//СЃРїРёСЃРѕРє РјРµС‚РѕРє
 };//CCaseLabelsSeq
 
 
 //---------------------------------------------------------------
-//оператор CASE
+//РѕРїРµСЂР°С‚РѕСЂ CASE
 class CCaseStatement : public CBase
 {
 public:
@@ -127,15 +127,15 @@ public:
 	bool ValueExists(const long Value, const bool IsRng, const long HighValue);
 	void WriteCPP(CPP_files& f);
 //private:
-	CExpr *Expr;						//выражение
-	CStatementSeq* ElseStatementSeq;	//последовательность операторов в блоке ELSE
+	CExpr *Expr;						//РІС‹СЂР°Р¶РµРЅРёРµ
+	CStatementSeq* ElseStatementSeq;	//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ РІ Р±Р»РѕРєРµ ELSE
 	typedef std::vector <CCaseLabelsSeq*> CaseLabelsSeqList_type;
 	CaseLabelsSeqList_type CaseLabelsSeqList;
 };//CCaseStatement
 
 
 //---------------------------------------------------------------
-//оператор цикла WHILE
+//РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р° WHILE
 class CWhileStatement : public CBase
 {
 public:
@@ -154,7 +154,7 @@ public:
 
 
 //---------------------------------------------------------------
-//оператор цикла REPEAT
+//РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р° REPEAT
 class CRepeatStatement : public CBase
 {
 public:
@@ -173,7 +173,7 @@ public:
 
 
 //---------------------------------------------------------------
-//оператор цикла FOR
+//РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р° FOR
 class CForStatement : public CBase
 {
 public:
@@ -187,16 +187,16 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	char* var_name;					//название переменной цикла
-	CStatementSeq *StatementSeq;	//последовательность операторов
-	CExpr *ForExpr;					//выражение For
-	CExpr *ToExpr;					//выражение To
-	long step;						//шаг цикла
+	char* var_name;					//РЅР°Р·РІР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ С†РёРєР»Р°
+	CStatementSeq *StatementSeq;	//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂРѕРІ
+	CExpr *ForExpr;					//РІС‹СЂР°Р¶РµРЅРёРµ For
+	CExpr *ToExpr;					//РІС‹СЂР°Р¶РµРЅРёРµ To
+	long step;						//С€Р°Рі С†РёРєР»Р°
 };//CForStatement
 
 
 //---------------------------------------------------------------
-//оператор цикла LOOP
+//РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р° LOOP
 class CLoopStatement : public CBase
 {
 public:
@@ -214,7 +214,7 @@ public:
 
 
 //---------------------------------------------------------------
-//объект Guard для оператора WITH
+//РѕР±СЉРµРєС‚ Guard РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° WITH
 class CGuard
 {
 public:
@@ -226,19 +226,19 @@ public:
 	void WriteCPP(CPP_files& f);
 private:
 	const CBaseName* parent_element;
-	//название признака специализации (может отсутствовать)
+	//РЅР°Р·РІР°РЅРёРµ РїСЂРёР·РЅР°РєР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё (РјРѕР¶РµС‚ РѕС‚СЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ)
 	CQualident spec_name;
-	//имя тестируемой переменной
+	//РёРјСЏ С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CQualident VarName;
-	//требуемое имя динамического типа переменной (охрана)
+	//С‚СЂРµР±СѓРµРјРѕРµ РёРјСЏ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№ (РѕС…СЂР°РЅР°)
 	CQualident TypeName;
-	//id типа-охраны (запоминается в Init, чтобы не извлекать повторно)
+	//id С‚РёРїР°-РѕС…СЂР°РЅС‹ (Р·Р°РїРѕРјРёРЅР°РµС‚СЃСЏ РІ Init, С‡С‚РѕР±С‹ РЅРµ РёР·РІР»РµРєР°С‚СЊ РїРѕРІС‚РѕСЂРЅРѕ)
 	EName_id type_id;
 };//CGuard
 
 
 //---------------------------------------------------------------
-//контейнер Guard DO StatementSeq ("|") для оператора WITH
+//РєРѕРЅС‚РµР№РЅРµСЂ Guard DO StatementSeq ("|") РґР»СЏ РѕРїРµСЂР°С‚РѕСЂР° WITH
 class CGuardPair : public CBase
 {
 public:
@@ -251,13 +251,13 @@ public:
 private:
 	CGuard *Guard;
 	CStatementSeq *StatementSeq;	//DO StatementSeq
-	//для организации таблицы имен для StatementSeq
+	//РґР»СЏ РѕСЂРіР°РЅРёР·Р°С†РёРё С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РґР»СЏ StatementSeq
 	CWithLoopLink WithLoopLink;
 };//CGuardPair
 
 
 //---------------------------------------------------------------
-//оператор WITH
+//РѕРїРµСЂР°С‚РѕСЂ WITH
 class CWithStatement : public CBase
 {
 public:
@@ -282,7 +282,7 @@ public:
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 //private:
-	int UID;		//содержит UID оператора LOOP, к которому относится данный EXIT
+	int UID;		//СЃРѕРґРµСЂР¶РёС‚ UID РѕРїРµСЂР°С‚РѕСЂР° LOOP, Рє РєРѕС‚РѕСЂРѕРјСѓ РѕС‚РЅРѕСЃРёС‚СЃСЏ РґР°РЅРЅС‹Р№ EXIT
 };//CExitStatement
 
 
@@ -292,7 +292,7 @@ class CReturnStatement : public CBase
 {
 public:
 	CReturnStatement(const CBaseName *parent) : CBase(parent),
-		Expr(NULL)//может не быть
+		Expr(NULL)//РјРѕР¶РµС‚ РЅРµ Р±С‹С‚СЊ
 		{};
 	~CReturnStatement();
 	EHaveRet HaveRet() const {return hr_Yes;};
@@ -304,7 +304,7 @@ public:
 
 
 //---------------------------------------------------------------
-//оператор присваивания
+//РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 class CAssignStatement : public CBase
 {
 public:
@@ -321,11 +321,11 @@ public:
 	void WriteCPP(CPP_files& f);
 //private:
 	void WriteCPP_array(CPP_files& f);
-	//для генерации кода в случае ук. на обобщенную переменную
+	//РґР»СЏ РіРµРЅРµСЂР°С†РёРё РєРѕРґР° РІ СЃР»СѓС‡Р°Рµ СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	const char* cv_compound_name;
 	CDesignator *Designator;
 	CExpr *Expr;
-	//признак присвоения текстовой строки массиву
+	//РїСЂРёР·РЅР°Рє РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 	bool str_to_array;
 };//CAssignStatement
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// Объявление классов переменных (Var)
+// РћР±СЉСЏРІР»РµРЅРёРµ РєР»Р°СЃСЃРѕРІ РїРµСЂРµРјРµРЅРЅС‹С… (Var)
 //=============================================================================
 
 #ifndef O2M_Var_h
@@ -14,13 +14,13 @@
 #include "StdProc.h"
 
 
-//классы, на которые имеются ссылки в данном файле
+//РєР»Р°СЃСЃС‹, РЅР° РєРѕС‚РѕСЂС‹Рµ РёРјРµСЋС‚СЃСЏ СЃСЃС‹Р»РєРё РІ РґР°РЅРЅРѕРј С„Р°Р№Р»Рµ
 class CCaseLabels;
 class CGuard;
 
 
 //-----------------------------------------------------------------------------
-//переменная типа ARRAY
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° ARRAY
 class CArrayVar : public CBaseVar
 {
 public:
@@ -30,19 +30,19 @@ public:
 	int CheckComplete(CLexBuf *lb);
 	CBaseVar* CreateConst(const CBaseName* parent) const;
 	CBaseVar* CreateVar(const CBaseName* parent) const;
-	//инициализация массива строкой символов
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР° СЃС‚СЂРѕРєРѕР№ СЃРёРјРІРѕР»РѕРІ
 	int SetConstValue(const char* st);
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
-	//запись объявления поля-массива в записи (в отличие от остальных переменных здесь нельзя использовать WriteCPP_fp)
+	//Р·Р°РїРёСЃСЊ РѕР±СЉСЏРІР»РµРЅРёСЏ РїРѕР»СЏ-РјР°СЃСЃРёРІР° РІ Р·Р°РїРёСЃРё (РІ РѕС‚Р»РёС‡РёРµ РѕС‚ РѕСЃС‚Р°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С… Р·РґРµСЃСЊ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ WriteCPP_fp)
 	void WriteCPP_rec(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//для хранения типа данной переменной
+	//РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚РёРїР° РґР°РЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CArrayType* ArrayType;
-	//для хранения строки символов (ARRAY OF CHAR)
+	//РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ (ARRAY OF CHAR)
 	char* ConstString;
-	//признак того, что массив соответствует 1 символу
+	//РїСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ РјР°СЃСЃРёРІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ 1 СЃРёРјРІРѕР»Сѓ
 	bool ConstStringIsChar;
 protected:
 	typedef CBaseVarVector VarList_type;
@@ -50,10 +50,10 @@ protected:
 
 
 //-----------------------------------------------------------------------------
-//переменная типа BOOLEAN
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° BOOLEAN
 class CBooleanVar : public CBaseVar
 {
-	//необходимо для расчета констант
+	//РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ СЂР°СЃС‡РµС‚Р° РєРѕРЅСЃС‚Р°РЅС‚
 	friend class CMaxStdProcFunc;
 	friend class CMinStdProcFunc;
 	friend class COddStdProcFunc;
@@ -74,16 +74,16 @@ public:
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
 //private:
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	bool ConstValue;
 };//CBooleanVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа CHAR
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° CHAR
 class CCharVar : public CBaseVar
 {
-	//необходимо для расчета констант
+	//РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ СЂР°СЃС‡РµС‚Р° РєРѕРЅСЃС‚Р°РЅС‚
 	friend class CExprList;
 	friend class CCaseLabels;
 	friend class CCapStdProcFunc;
@@ -101,13 +101,13 @@ public:
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
 //private:
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	char ConstValue;
 };//CCharVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа CommonVar
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° CommonVar
 class CCommonVar : public CBaseVar
 {
 public:
@@ -125,30 +125,30 @@ public:
 	};
 	CBaseVar* CreateVar(const CBaseName* parent) const;
 	CBaseName* FindName(const char *search_name) const;
-	//поиск типа специализации (если есть)
+	//РїРѕРёСЃРє С‚РёРїР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё (РµСЃР»Рё РµСЃС‚СЊ)
 	CBaseType* FindType() const;
 	const char* GetCPPCompoundName() const {return CPPCompoundName;};
 	void GetTagName(const char* &QualName, const char* &Name, const char* &TagName);
 	bool IsPureCommon();
-	//установка названия признака и названия типа признака
+	//СѓСЃС‚Р°РЅРѕРІРєР° РЅР°Р·РІР°РЅРёСЏ РїСЂРёР·РЅР°РєР° Рё РЅР°Р·РІР°РЅРёСЏ С‚РёРїР° РїСЂРёР·РЅР°РєР°
 	int SetTagName(const char* QualName, const char* Name);
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
 //private:
-	//название C++ параметра (члена union), соответствующего специализации переменной
+	//РЅР°Р·РІР°РЅРёРµ C++ РїР°СЂР°РјРµС‚СЂР° (С‡Р»РµРЅР° union), СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	char* CPPCompoundName;
-	//название модуля, экспортирующего тип признака
+	//РЅР°Р·РІР°РЅРёРµ РјРѕРґСѓР»СЏ, СЌРєСЃРїРѕСЂС‚РёСЂСѓСЋС‰РµРіРѕ С‚РёРї РїСЂРёР·РЅР°РєР°
 	char* QualSpecName;
-	//название типа признака
+	//РЅР°Р·РІР°РЅРёРµ С‚РёРїР° РїСЂРёР·РЅР°РєР°
 	char* SpecName;
-	//название признака (может отсутствовать)
+	//РЅР°Р·РІР°РЅРёРµ РїСЂРёР·РЅР°РєР° (РјРѕР¶РµС‚ РѕС‚СЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ)
 	char* Tag;
 };//CCommonVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа INTEGER
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° INTEGER
 class CIntegerVar : public CBaseVar
 {
 public:
@@ -161,13 +161,13 @@ public:
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	int ConstValue;
 };//CIntegerVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа LONGINT
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° LONGINT
 class CLongintVar : public CBaseVar
 {
 public:
@@ -179,13 +179,13 @@ public:
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	long ConstValue;
 };//CLongintVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа LONGREAL
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° LONGREAL
 class CLongrealVar : public CBaseVar
 {
 public:
@@ -197,13 +197,13 @@ public:
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	long double ConstValue;
 };//CLongrealVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа POINTER
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° POINTER
 class CPointerVar : public CBaseVar
 {
 	friend class CPointerType;
@@ -225,38 +225,38 @@ public:
 	~CPointerVar() {delete Type;};
 	CBaseVar* CreateConst(const CBaseName *parent) const;
 	CBaseVar* CreateVar(const CBaseName* parent) const;
-	//поиск типа (не QualidentType), на кот. указывает указатель
+	//РїРѕРёСЃРє С‚РёРїР° (РЅРµ QualidentType), РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ
 	CBaseType* FindType() const;
-	//возврат true, если указатель указывает на ARRAY
+	//РІРѕР·РІСЂР°С‚ true, РµСЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ СѓРєР°Р·С‹РІР°РµС‚ РЅР° ARRAY
 	bool IsArrayPointer() const {return IsArray;};
-	//возврат true, если указатель указывает на RECORD или SpecType
+	//РІРѕР·РІСЂР°С‚ true, РµСЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ СѓРєР°Р·С‹РІР°РµС‚ РЅР° RECORD РёР»Рё SpecType
 	bool IsRecordPointer() const {return IsRecord;};
-	//принудительная установка признака ук. на запись - вызывается в объектах, самостоятельно
-	//проверяющих принадлежность указателя (CReceiver, CGuard)
+	//РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅР°СЏ СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° СѓРє. РЅР° Р·Р°РїРёСЃСЊ - РІС‹Р·С‹РІР°РµС‚СЃСЏ РІ РѕР±СЉРµРєС‚Р°С…, СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ
+	//РїСЂРѕРІРµСЂСЏСЋС‰РёС… РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚СЊ СѓРєР°Р·Р°С‚РµР»СЏ (CReceiver, CGuard)
 	void SetIsRecord() {IsRecord = true; IsArray = false;};
-	//генерация кода
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР°
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteDFN(DFN_file& f);
 //private:
-	//запись кода доп. переменных, содержащих размерности в случае открытого массива
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РґРѕРї. РїРµСЂРµРјРµРЅРЅС‹С…, СЃРѕРґРµСЂР¶Р°С‰РёС… СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РјР°СЃСЃРёРІР°
 	void WriteCPP_array(CPP_files& f);
-	//признак того, что указываемый тип - массив
+	//РїСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ СѓРєР°Р·С‹РІР°РµРјС‹Р№ С‚РёРї - РјР°СЃСЃРёРІ
 	bool IsArray;
-	//признак того, что указываемый тип - запись или специализация
+	//РїСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ СѓРєР°Р·С‹РІР°РµРјС‹Р№ С‚РёРї - Р·Р°РїРёСЃСЊ РёР»Рё СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ
 	bool IsRecord;
-	//признак переменной типа QualidentType (т.к. type_name может быть инициализирован в CPointerType::CreateVar)
+	//РїСЂРёР·РЅР°Рє РїРµСЂРµРјРµРЅРЅРѕР№ С‚РёРїР° QualidentType (С‚.Рє. type_name РјРѕР¶РµС‚ Р±С‹С‚СЊ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅ РІ CPointerType::CreateVar)
 	bool qualident_type;
-	//неименованный тип, на кот. указывает переменная (CRecordType, CArrayType, ...) или NULL (для именованного типа или ук. на именованный тип)
+	//РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ РїРµСЂРµРјРµРЅРЅР°СЏ (CRecordType, CArrayType, ...) РёР»Рё NULL (РґР»СЏ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° РёР»Рё СѓРє. РЅР° РёРјРµРЅРѕРІР°РЅРЅС‹Р№ С‚РёРї)
 	CBaseType* Type;
-	//позиция описания типа переменной в буфере лексем (устанавливается в CPointerType::CreateVar)
+	//РїРѕР·РёС†РёСЏ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№ РІ Р±СѓС„РµСЂРµ Р»РµРєСЃРµРј (СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РІ CPointerType::CreateVar)
 	CLexBufPos TypePos;
 };//CPointerVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа PROCEDURE
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° PROCEDURE
 class CProcedureVar : public CBaseVar
 {
 public:
@@ -266,13 +266,13 @@ public:
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//список формальных параметров
+	//СЃРїРёСЃРѕРє С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	CFormalPars FormalPars;
 };//CProcedureVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа PTR
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° PTR
 class CPtrVar : public CBaseVar
 {
 public:
@@ -285,7 +285,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-//переменная типа REAL
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° REAL
 class CRealVar : public CBaseVar
 {
 public:
@@ -297,45 +297,45 @@ public:
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	double ConstValue;
 };//CRealVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа RECORD
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° RECORD
 class CRecordVar : public CBaseVar
 {
 public:
-	//добавление указанного эл-та в список полей
+	//РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»-С‚Р° РІ СЃРїРёСЃРѕРє РїРѕР»РµР№
 	void AddName(CBaseName* BN) const;
 	int CheckComplete(CLexBuf *lb);
 	CBaseVar* CreateVar(const CBaseName* parent) const;
 	CRecordVar(const CBaseName* parent) : CBaseVar(id_CRecordVar, parent), Qualident(NULL) {};
 	~CRecordVar();
-	//поиск имени в списке полей
+	//РїРѕРёСЃРє РёРјРµРЅРё РІ СЃРїРёСЃРєРµ РїРѕР»РµР№
 	CBaseName* FindName(const char* search_name) const;
-	//генерация кода при объявлении переменной
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРё РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
-	//запись кода при использования CRecordVar для описания типа указателя
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ CRecordVar РґР»СЏ РѕРїРёСЃР°РЅРёСЏ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЏ
 	void WriteCPP_pointer(CPP_files& f);
 	void WriteDFN(DFN_file& f);
-	//название базового типа
+	//РЅР°Р·РІР°РЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ С‚РёРїР°
 	CQualident* Qualident;
 //private:
-	//тип контейнера для хранения списка полей записи
+	//С‚РёРї РєРѕРЅС‚РµР№РЅРµСЂР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїРёСЃРєР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	typedef CBaseVarVector TFieldStore;
-	//контейнер для хранения списка полей записи
+	//РєРѕРЅС‚РµР№РЅРµСЂ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїРёСЃРєР° РїРѕР»РµР№ Р·Р°РїРёСЃРё
 	mutable TFieldStore FieldStore;
 };//CRecordVar
 
 
 //-----------------------------------------------------------------------------
-//переменная типа SET
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° SET
 class CSetVar : public CBaseVar
 {
-	//необходимо для расчета констант
+	//РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ СЂР°СЃС‡РµС‚Р° РєРѕРЅСЃС‚Р°РЅС‚
 	friend class CExpr;
 	friend class CSimpleExpr;
 	friend class CTermPair;
@@ -345,55 +345,55 @@ public:
 	CBaseVar* CreateVar(const CBaseName* parent) const;
 	CSetVar(const CBaseName* parent) : CBaseVar(id_CSetVar, parent), ConstValue(0) {};
 	~CSetVar();
-	//обработка конструктора множества, если есть (может не быть), при возникновении ошибок
-	//должно обеспечиваться уничтожение всех временных объектов
+	//РѕР±СЂР°Р±РѕС‚РєР° РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° РјРЅРѕР¶РµСЃС‚РІР°, РµСЃР»Рё РµСЃС‚СЊ (РјРѕР¶РµС‚ РЅРµ Р±С‹С‚СЊ), РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РѕС€РёР±РѕРє
+	//РґРѕР»Р¶РЅРѕ РѕР±РµСЃРїРµС‡РёРІР°С‚СЊСЃСЏ СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РІСЃРµС… РІСЂРµРјРµРЅРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 	int SetInit(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
 private:
-	//рассчитанное константное значение, действительно только при is_const == true
-	//тип ConstValue должен соответствовать типу, название которого возвращает CSetType::GetCPPTypeName,
-	//это же относится ко всем типам, имеющим отношение к SET (например, в CSetVarElem)
+	//СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С‚РѕР»СЊРєРѕ РїСЂРё is_const == true
+	//С‚РёРї ConstValue РґРѕР»Р¶РµРЅ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ С‚РёРїСѓ, РЅР°Р·РІР°РЅРёРµ РєРѕС‚РѕСЂРѕРіРѕ РІРѕР·РІСЂР°С‰Р°РµС‚ CSetType::GetCPPTypeName,
+	//СЌС‚Рѕ Р¶Рµ РѕС‚РЅРѕСЃРёС‚СЃСЏ РєРѕ РІСЃРµРј С‚РёРїР°Рј, РёРјРµСЋС‰РёРј РѕС‚РЅРѕС€РµРЅРёРµ Рє SET (РЅР°РїСЂРёРјРµСЂ, РІ CSetVarElem)
 	int ConstValue;
-	//список эл-тов множества, может содержать выражения, действителен только при is_const == false
+	//СЃРїРёСЃРѕРє СЌР»-С‚РѕРІ РјРЅРѕР¶РµСЃС‚РІР°, РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РІС‹СЂР°Р¶РµРЅРёСЏ, РґРµР№СЃС‚РІРёС‚РµР»РµРЅ С‚РѕР»СЊРєРѕ РїСЂРё is_const == false
 	CBaseVector SetElems;
 };//CSetVar
 
 
 //-----------------------------------------------------------------------------
-//эл-т множества SET
+//СЌР»-С‚ РјРЅРѕР¶РµСЃС‚РІР° SET
 class CSetVarElem : public CBase
 {
 public:
 	CSetVarElem(const CBaseName *parent) : CBase(parent),
 		HighBoundValue(0), HighExpr(NULL), IsRange(false), LowBoundValue(0), LowExpr(NULL), SetValue(0) {};
 	~CSetVarElem();
-	//получение константного значения SET (действительно только при IsConst() == true)
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ SET (РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С‚РѕР»СЊРєРѕ РїСЂРё IsConst() == true)
 	int GetConstValue() const {return SetValue;};
 	int Init(CLexBuf *lb);
-	//проверка контантности данного объекта
+	//РїСЂРѕРІРµСЂРєР° РєРѕРЅС‚Р°РЅС‚РЅРѕСЃС‚Рё РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	bool IsConst() const {return !(HighExpr || LowExpr);};
 	void WriteCPP(CPP_files& f);
 private:
-	//рассчитанное значение верхней границы диапазона, действительно при !HighExpr
+	//СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР°, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїСЂРё !HighExpr
 	int HighBoundValue;
-	//выражение для верхней границы диапазона, действительно при IsRange
+	//РІС‹СЂР°Р¶РµРЅРёРµ РґР»СЏ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР°, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїСЂРё IsRange
 	CExpr *HighExpr;
-	//признак диапазона (LowBoundValue..HighBoundValue)
+	//РїСЂРёР·РЅР°Рє РґРёР°РїР°Р·РѕРЅР° (LowBoundValue..HighBoundValue)
 	bool IsRange;
-	//рассчитанное значение нижней границы диапазона, действительно при !LowExpr
+	//СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР°, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїСЂРё !LowExpr
 	int LowBoundValue;
-	//выражение для нижней границы диапазона
+	//РІС‹СЂР°Р¶РµРЅРёРµ РґР»СЏ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР°
 	CExpr *LowExpr;
-	//рассчитанное константное значение множества, действительно только при IsConst() == true
+	//СЂР°СЃСЃС‡РёС‚Р°РЅРЅРѕРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјРЅРѕР¶РµСЃС‚РІР°, РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С‚РѕР»СЊРєРѕ РїСЂРё IsConst() == true
 	int SetValue;
 };//CSetVarElem
 
 
 //-----------------------------------------------------------------------------
-//переменная типа SHORTINT
+//РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° SHORTINT
 class CShortintVar : public CBaseVar
 {
 public:
@@ -405,7 +405,7 @@ public:
 	void WriteCPP_ConstValue(CPP_files& f);
 	void WriteCPP_fp(CPP_files &f, const bool to_h);
 	void WriteDFN(DFN_file& f);
-	//значение константы (в случае константы)
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РІ СЃР»СѓС‡Р°Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹)
 	short ConstValue;
 };//CShortintVar
 

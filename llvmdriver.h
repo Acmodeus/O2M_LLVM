@@ -1,5 +1,5 @@
 //===============================================================
-// Объявление процедур, для компиляции с помощью LLVM
+// РћР±СЉСЏРІР»РµРЅРёРµ РїСЂРѕС†РµРґСѓСЂ, РґР»СЏ РєРѕРјРїРёР»СЏС†РёРё СЃ РїРѕРјРѕС‰СЊСЋ LLVM
 //===============================================================
 
 #ifndef LLVMDRIVER_H
@@ -40,55 +40,55 @@ public:
     LLVMContext TheContext;
     IRBuilder<> Builder;
     std::unique_ptr<Module> TheModule;
-    //Карта внутренних констант, переменных и аргументов функции
+    //РљР°СЂС‚Р° РІРЅСѓС‚СЂРµРЅРЅРёС… РєРѕРЅСЃС‚Р°РЅС‚, РїРµСЂРµРјРµРЅРЅС‹С… Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё
     std::map<std::string, AllocaInst *> NamedValues;
-    //Карта глобальных констант и переменных
+    //РљР°СЂС‚Р° РіР»РѕР±Р°Р»СЊРЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚ Рё РїРµСЂРµРјРµРЅРЅС‹С…
     std::map<std::string, GlobalVariable *> GlobalValues;
-    //Карта функций
+    //РљР°СЂС‚Р° С„СѓРЅРєС†РёР№
     std::map<std::string, Function *> Functions;
-    //Карта связи имени элемента структуры с его порядковым номером
-    //для обращения к нему в IR LLVM
+    //РљР°СЂС‚Р° СЃРІСЏР·Рё РёРјРµРЅРё СЌР»РµРјРµРЅС‚Р° СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РµРіРѕ РїРѕСЂСЏРґРєРѕРІС‹Рј РЅРѕРјРµСЂРѕРј
+    //РґР»СЏ РѕР±СЂР°С‰РµРЅРёСЏ Рє РЅРµРјСѓ РІ IR LLVM
     std::map<std::string, std::map<std::string,int>> Structures;
-    //Карта номеров специализаций, для формирования функций выбора
+    //РљР°СЂС‚Р° РЅРѕРјРµСЂРѕРІ СЃРїРµС†РёР°Р»РёР·Р°С†РёР№, РґР»СЏ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ С„СѓРЅРєС†РёР№ РІС‹Р±РѕСЂР°
     std::map<std::string, int> SpecTypes;
-    //Карта блоков, используется для выхода из бесконечного цикла
+    //РљР°СЂС‚Р° Р±Р»РѕРєРѕРІ, РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІС‹С…РѕРґР° РёР· Р±РµСЃРєРѕРЅРµС‡РЅРѕРіРѕ С†РёРєР»Р°
     std::map<int, BasicBlock *> BasicBlocks;
     LLVMDriver(): Builder(TheContext){};
     ~LLVMDriver();
-    //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
+    //РЎРѕР·РґР°РЅРёРµ РёРЅСЃС‚СЂСѓРєС†РёРё РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РІ РЅР°С‡Р°Р»СЊРЅРѕРј Р±Р»РѕРєРµ С„СѓРЅРєС†РёРё. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРµСЂРµРјРµРЅРЅС‹С… Рё С‚Рґ
     AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, std::string name,Type* type);
-    //Функция приведения типов
+    //Р¤СѓРЅРєС†РёСЏ РїСЂРёРІРµРґРµРЅРёСЏ С‚РёРїРѕРІ
     Value *CastToType(Value* v, Type* destType);
-    //Создание функции без аргументов
+    //РЎРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
     Function* createFunction(Type* retType,std::string name);
-    //Создание функции с аргументами
+    //РЎРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
     Function* createFunction(Type* retType,std::vector<Type*> typePars,StringVector namePars,std::string name);
-    //Функции получения типа LLVM
+    //Р¤СѓРЅРєС†РёРё РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° LLVM
     Type* GetLLVMType(EName_id name_id);
     Type* GetLLVMType(CBaseVar* v);
     Type* GetLLVMType(CBaseType* v);
-    //Поиск (если нет, создание) функции
+    //РџРѕРёСЃРє (РµСЃР»Рё РЅРµС‚, СЃРѕР·РґР°РЅРёРµ) С„СѓРЅРєС†РёРё
     Function* GetFunction(CProcedure* p);
-    //создание функции выбора специализированных функций
+    //СЃРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё РІС‹Р±РѕСЂР° СЃРїРµС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅС‹С… С„СѓРЅРєС†РёР№
     void CreateCommonFun(CCommonProc* p,Function* F);
     void CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector::const_iterator i,std::string funName,std::vector<Value*> values,std::vector<Type *> pars);
-    //генерация кода LLVM и запись в файл
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM Рё Р·Р°РїРёСЃСЊ РІ С„Р°Р№Р»
     int Init(CModule *m);
-    //генерация кода LLVM модуля
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РјРѕРґСѓР»СЏ
     Value* WriteLLVM(CModule *m);
     Value* WriteLLVM_var(CDeclSeq* ds);
     Value* WriteLLVM_proc(CDeclSeq* ds);
     Value* WriteLLVM(CStatementSeq* ss);
-    //генерация кода LLVM переменных
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїРµСЂРµРјРµРЅРЅС‹С…
     Value* WriteLLVM(CBaseVar* v);
     Value* WriteLLVM_ConstValue(CBaseVar* v);
 
-    //генерация кода LLVM процедуры
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РїСЂРѕС†РµРґСѓСЂС‹
     Function* WriteLLVM(CProcedure* p);
-    //получение списка типов формальных параметров
+    //РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° С‚РёРїРѕРІ С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
     std::vector<Type *> WriteLLVM_pars(CFormalPars *fp);
     void WriteLLVM_pars_array(CArrayVar* v,std::vector<Type*>& values);
-    //генерация кода LLVM операторов
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РѕРїРµСЂР°С‚РѕСЂРѕРІ
     Value* WriteLLVM(CIfStatement* s);
     BasicBlock* WriteLLVM(CElsifPair* s,BasicBlock* bb);
     Value* WriteLLVM(CCaseStatement* s);
@@ -98,17 +98,17 @@ public:
     Value* WriteLLVM(CRepeatStatement* s);
     Value* WriteLLVM(CForStatement* s);
     Value* WriteLLVM(CLoopStatement* s);
-    Value* WriteLLVM(CWithStatement* s){}; //не реализовано
+    Value* WriteLLVM(CWithStatement* s){}; //РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅРѕ
     Value* WriteLLVM(CExitStatement* s);
     Value* WriteLLVM(CReturnStatement* s);
     Value* WriteLLVM(CAssignStatement* s);
     Value* WriteLLVM_array(CAssignStatement* s);
     Value* WriteLLVM_COPY_Par(CBaseName* bn);
-    Value* WriteLLVM(CCallStatement* s); //частично реализовано
-    //получение списка фактических параметров
+    Value* WriteLLVM(CCallStatement* s); //С‡Р°СЃС‚РёС‡РЅРѕ СЂРµР°Р»РёР·РѕРІР°РЅРѕ
+    //РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° С„Р°РєС‚РёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     std::vector<Value *> WriteLLVM(CExprList* e,CFormalPars* fp);
-    //генерация кода LLVM выражений
-    Value* WriteLLVM(CExpr* e); //не реализовано rel_is,rel_IN
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM РІС‹СЂР°Р¶РµРЅРёР№
+    Value* WriteLLVM(CExpr* e); //РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅРѕ rel_is,rel_IN
     Value* WriteLLVM(CSimpleExpr* e);
     Value* WriteLLVM(CTerm* t);
     Value* WriteLLVM(CTermPair* t);
@@ -116,7 +116,7 @@ public:
     Value* WriteLLVM(CDesignator* d);
     Value* WriteLLVM_index(CExprList* e, Value* array);
     Value* WriteLLVM_record_index(Value* record,char *ident,CDesignator *d);
-    //генерация кода LLVM стандартных процедур
+    //РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° LLVM СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РїСЂРѕС†РµРґСѓСЂ
     Value* WriteLLVM(CAbsStdProcFunc* d);
     Value* WriteLLVM(CAshStdProcFunc* d);
     Value* WriteLLVM(CCapStdProcFunc* d);

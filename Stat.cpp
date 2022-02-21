@@ -1,5 +1,5 @@
 //=============================================================================
-// Описание классов инструкций (Statements)
+// РћРїРёСЃР°РЅРёРµ РєР»Р°СЃСЃРѕРІ РёРЅСЃС‚СЂСѓРєС†РёР№ (Statements)
 //=============================================================================
 
 #include "Stat.h"
@@ -9,7 +9,7 @@
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта ELSIF
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° ELSIF
 CElsifPair::~CElsifPair()
 {
 	delete StatementSeq;
@@ -18,24 +18,24 @@ CElsifPair::~CElsifPair()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта ELSIF из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° ELSIF РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CElsifPair::Init(CLexBuf *lb)
 {
-	//проверка наличия выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr = new CExpr(parent_element);
 	int err_num = Expr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (Expr->GetResultId() != id_CBooleanVar) return s_e_IF_ExprType;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова THEN
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° THEN
 	if (!lb->ReadLex(li) || lex_k_THEN != li.lex) return s_e_THEN;
 
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(parent_element);
 	err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
@@ -45,7 +45,7 @@ int CElsifPair::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CElsifPair
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CElsifPair
 void CElsifPair::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -61,7 +61,7 @@ void CElsifPair::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта IF
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° IF
 CIfStatement::~CIfStatement()
 {
 	ElsifPairList_type::const_iterator ci;
@@ -72,13 +72,13 @@ CIfStatement::~CIfStatement()
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия оператора RETURN
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° RETURN
 EHaveRet CIfStatement::HaveRet() const
 {
-	//признаки наличия веток операторов без и с RETURN
+	//РїСЂРёР·РЅР°РєРё РЅР°Р»РёС‡РёСЏ РІРµС‚РѕРє РѕРїРµСЂР°С‚РѕСЂРѕРІ Р±РµР· Рё СЃ RETURN
 	bool HaveNo = false;
 	bool HaveYes = false;
-	//проверка наличия RETURN среди содержимого секций ELSIF
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN СЃСЂРµРґРё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС†РёР№ ELSIF
 	ElsifPairList_type::const_iterator ci;
 	for (ci = ElsifPairList.begin(); ci != ElsifPairList.end(); ++ci)
 		switch ((*ci)->HaveRet()) {
@@ -90,7 +90,7 @@ EHaveRet CIfStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//проверка наличия RETURN в секции ELSE (если есть)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN РІ СЃРµРєС†РёРё ELSE (РµСЃР»Рё РµСЃС‚СЊ)
 	if (ElseStatementSeq)
 		switch (ElseStatementSeq->HaveRet()) {
 		case hr_NotAll:
@@ -101,16 +101,16 @@ EHaveRet CIfStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//т.к. все случаи NotAll проверены выше, проверяем наличие No и Yes
+	//С‚.Рє. РІСЃРµ СЃР»СѓС‡Р°Рё NotAll РїСЂРѕРІРµСЂРµРЅС‹ РІС‹С€Рµ, РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ No Рё Yes
 	return HaveYes ? HaveNo ? hr_NotAll : hr_Yes : hr_No;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта IF из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° IF РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CIfStatement::Init(CLexBuf *lb)
 {
-	//создание списка ELSIF с первым элементом (для IF ... THEN)
+	//СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° ELSIF СЃ РїРµСЂРІС‹Рј СЌР»РµРјРµРЅС‚РѕРј (РґР»СЏ IF ... THEN)
 	CElsifPair* EPair = new CElsifPair(parent_element);
 	int err_num = EPair->Init(lb);
 	if (err_num) {
@@ -119,15 +119,15 @@ int CIfStatement::Init(CLexBuf *lb)
 	}
 	ElsifPairList.push_back(EPair);
 	
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//чтение очередной лексемы (ключевого слова)
+	//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 
-	//проверка наличия ELSIF (список уже создан)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ELSIF (СЃРїРёСЃРѕРє СѓР¶Рµ СЃРѕР·РґР°РЅ)
 	while (lex_k_ELSIF == li.lex) {
-		//проверка очередной пары Expr THEN StatementSeq
+		//РїСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРЅРѕР№ РїР°СЂС‹ Expr THEN StatementSeq
 		EPair = new CElsifPair(parent_element);
 		err_num = EPair->Init(lb);
 		if (err_num) {
@@ -136,20 +136,20 @@ int CIfStatement::Init(CLexBuf *lb)
 		}
 		ElsifPairList.push_back(EPair);
 
-		//чтение очередной лексемы (ключевого слова)
+		//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 	};
 
-	//проверка наличия ELSE
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ELSE
 	if (lex_k_ELSE == li.lex) {
 		ElseStatementSeq = new CStatementSeq(parent_element);
 		err_num = ElseStatementSeq->Init(lb);
 		if (err_num) return err_num;
-		//чтение очередной лексемы (ключевого слова)
+		//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 	};
 
-	//проверка наличия конца (остальные варианты проверены)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєРѕРЅС†Р° (РѕСЃС‚Р°Р»СЊРЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РїСЂРѕРІРµСЂРµРЅС‹)
 	if (lex_k_END != li.lex) return s_e_END;
 
 	return 0;
@@ -157,18 +157,18 @@ int CIfStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CIfStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CIfStatement
 void CIfStatement::WriteCPP(CPP_files& f)
 {
 	ElsifPairList_type::iterator i = ElsifPairList.begin();
-	//запись первого условия (должно быть всегда)
+	//Р·Р°РїРёСЃСЊ РїРµСЂРІРѕРіРѕ СѓСЃР»РѕРІРёСЏ (РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІСЃРµРіРґР°)
 	if (!ElsifPairList.empty()) (*i)->WriteCPP(f);
-	//запись последующих условий ELSIF (могут отсутствовать)
+	//Р·Р°РїРёСЃСЊ РїРѕСЃР»РµРґСѓСЋС‰РёС… СѓСЃР»РѕРІРёР№ ELSIF (РјРѕРіСѓС‚ РѕС‚СЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ)
 	for(++i; i != ElsifPairList.end(); ++i) {
 		fprintf(f.fc, " else\n");
 		(*i)->WriteCPP(f);
 	}
-	//запись последнего чсловия ELSE
+	//Р·Р°РїРёСЃСЊ РїРѕСЃР»РµРґРЅРµРіРѕ С‡СЃР»РѕРІРёСЏ ELSE
 	if (ElseStatementSeq) {
 		fprintf(f.fc, " else {\n");
 		ElseStatementSeq->WriteCPP(f);
@@ -179,7 +179,7 @@ void CIfStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 CCaseLabelsSeq::~CCaseLabelsSeq()
 {
 	CCaseLabelsSeq::CaseLabelsList_type::iterator i;
@@ -189,14 +189,14 @@ CCaseLabelsSeq::~CCaseLabelsSeq()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта CaseLabelsSeq из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° CaseLabelsSeq РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CCaseLabelsSeq::Init(CLexBuf *lb, CCaseStatement* const CaseStatement)
 {
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия первой метки (может не быть, тогда есть "|", "ELSE", или "END")
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРµСЂРІРѕР№ РјРµС‚РєРё (РјРѕР¶РµС‚ РЅРµ Р±С‹С‚СЊ, С‚РѕРіРґР° РµСЃС‚СЊ "|", "ELSE", РёР»Рё "END")
 	if (!lb->ReadLex(li) || lex_k_vertical == li.lex || lex_k_ELSE == li.lex || lex_k_END == li.lex) {
 		RESTORE_POS
 		return s_m_CaseAbsent;
@@ -204,20 +204,20 @@ int CCaseLabelsSeq::Init(CLexBuf *lb, CCaseStatement* const CaseStatement)
 
 	RESTORE_POS
 
-	//первая метка присутствует => есть весь Case, инициализируем его
+	//РїРµСЂРІР°СЏ РјРµС‚РєР° РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ => РµСЃС‚СЊ РІРµСЃСЊ Case, РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РµРіРѕ
 	while (true) {
-		//получение очередной метки (интервала)
+		//РїРѕР»СѓС‡РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ РјРµС‚РєРё (РёРЅС‚РµСЂРІР°Р»Р°)
 		CCaseLabels* CaseLabels = new CCaseLabels(parent_element);
 		int err_num = CaseLabels->Init(lb, CaseStatement, this);
 		if (err_num) {
-			delete CaseLabels;	//очистка временной переменной
+			delete CaseLabels;	//РѕС‡РёСЃС‚РєР° РІСЂРµРјРµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 			return err_num;
 		}
-		//занесение очередной метки в список
+		//Р·Р°РЅРµСЃРµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ РјРµС‚РєРё РІ СЃРїРёСЃРѕРє
 		CaseLabelsList.push_back(CaseLabels);
-		//получение след. лексемы (должно быть "," или ":")
+		//РїРѕР»СѓС‡РµРЅРёРµ СЃР»РµРґ. Р»РµРєСЃРµРјС‹ (РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ "," РёР»Рё ":")
 		if (!lb->ReadLex(li)) return s_e_ColonMissing;
-		//проверка полученной лексемы
+		//РїСЂРѕРІРµСЂРєР° РїРѕР»СѓС‡РµРЅРЅРѕР№ Р»РµРєСЃРµРјС‹
 		switch (li.lex) {
 		case lex_k_comma:
 			continue;
@@ -226,7 +226,7 @@ int CCaseLabelsSeq::Init(CLexBuf *lb, CCaseStatement* const CaseStatement)
 		default:
 			return s_e_ColonMissing;
 		}
-		//получен ":", конец обработки
+		//РїРѕР»СѓС‡РµРЅ ":", РєРѕРЅРµС† РѕР±СЂР°Р±РѕС‚РєРё
 		break;
 	}
 
@@ -235,24 +235,24 @@ int CCaseLabelsSeq::Init(CLexBuf *lb, CCaseStatement* const CaseStatement)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCaseLabelsSeq
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCaseLabelsSeq
 void CCaseLabelsSeq::WriteCPP(CPP_files& f, CExpr* Expr)
 {
 	CCaseLabelsSeq::CaseLabelsList_type::const_iterator i;
 
-	//проверка первой метки
+	//РїСЂРѕРІРµСЂРєР° РїРµСЂРІРѕР№ РјРµС‚РєРё
 	if (CaseLabelsList.empty()) throw error_Internal("CCaseLabelsSeq::WriteCPP");
 	i = CaseLabelsList.begin();
 	(*i)->WriteCPP(f, Expr);
 	
-	//цикл перебора оставшихся меток
+	//С†РёРєР» РїРµСЂРµР±РѕСЂР° РѕСЃС‚Р°РІС€РёС…СЃСЏ РјРµС‚РѕРє
 	for (++i; i != CaseLabelsList.end(); ++i)
 	{
 		fprintf(f.fc, ")||(");
 		(*i)->WriteCPP(f, Expr);
 	}
 
-	//генерация кода послед-ти операторов
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїРѕСЃР»РµРґ-С‚Рё РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	fprintf(f.fc, ")) {\n");
 	StatementSeq.WriteCPP(f);
 	f.tab_fc();
@@ -261,7 +261,7 @@ void CCaseLabelsSeq::WriteCPP(CPP_files& f, CExpr* Expr)
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия указанного значения в уже созданных метках
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С… РјРµС‚РєР°С…
 bool CCaseLabelsSeq::ValueExists(const long Value, const bool IsRng, const long HighValue)
 {
 	CCaseLabelsSeq::CaseLabelsList_type::const_iterator ci;
@@ -272,20 +272,20 @@ bool CCaseLabelsSeq::ValueExists(const long Value, const bool IsRng, const long 
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта CaseLabels из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° CaseLabels РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CCaseLabels::Init(CLexBuf *lb, CCaseStatement* const CaseStatement, CCaseLabelsSeq* const CaseLabelsSeq)
 {
-	//создание константы
+	//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	CBaseVar* BV;
 	int err_num = ConstSelector(lb, BV, parent_element);
 	if (err_num) return err_num;
 
-	//запоминаем тип полученной константы
+	//Р·Р°РїРѕРјРёРЅР°РµРј С‚РёРї РїРѕР»СѓС‡РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	EName_id ExprResultId = BV->GetResultId();
-	//получаем тип выражения в CASE
+	//РїРѕР»СѓС‡Р°РµРј С‚РёРї РІС‹СЂР°Р¶РµРЅРёСЏ РІ CASE
 	EName_id CaseExprResultId = CaseStatement->GetExprResultId();
 
-	//запоминаем значение константы (одновременно проверяя тип)
+	//Р·Р°РїРѕРјРёРЅР°РµРј Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РїСЂРѕРІРµСЂСЏСЏ С‚РёРї)
 	if (id_CCharVar == ExprResultId) ConstValue = static_cast<CCharVar*>(BV)->ConstValue; else
 		if (id_CArrayVar == ExprResultId) {
 			if (strlen(static_cast<CArrayVar*>(BV)->ConstString) != 1) {
@@ -299,41 +299,41 @@ int CCaseLabels::Init(CLexBuf *lb, CCaseStatement* const CaseStatement, CCaseLab
 				return s_e_CASE_LabelType;
 			}
 
-	//уничтожение константы (значение уже сохранено)
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (Р·РЅР°С‡РµРЅРёРµ СѓР¶Рµ СЃРѕС…СЂР°РЅРµРЅРѕ)
 	delete BV;
 
-	//проверка допустимости сочетания выражений в CASE и метке
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё СЃРѕС‡РµС‚Р°РЅРёСЏ РІС‹СЂР°Р¶РµРЅРёР№ РІ CASE Рё РјРµС‚РєРµ
 	if (CBaseVar::IsIntId(CaseExprResultId)) {
-		//проверка поглощения полученной константы типом выражения в CASE
+		//РїСЂРѕРІРµСЂРєР° РїРѕРіР»РѕС‰РµРЅРёСЏ РїРѕР»СѓС‡РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ С‚РёРїРѕРј РІС‹СЂР°Р¶РµРЅРёСЏ РІ CASE
 		if (!CBaseVar::IsIntId(ExprResultId) || !IsId1IncloseId2(CaseExprResultId, ExprResultId))
 			return s_e_CASE_WrongLabelType;
 	} else
 		if (id_CCharVar != ExprResultId && id_CArrayVar != ExprResultId) return s_e_CASE_WrongLabelType;
 
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова ".."
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° ".."
 	if (!lb->ReadLex(li) || lex_k_dots != li.lex) {
 		RESTORE_POS
-		//проверка отсутствия уже загруженной метки с аналогичными параметрами
+		//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅРѕР№ РјРµС‚РєРё СЃ Р°РЅР°Р»РѕРіРёС‡РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё
 		if (CaseLabelsSeq->ValueExists(ConstValue, false, 0) || CaseStatement->ValueExists(ConstValue, false, 0)) return s_e_CASE_LabelExists;
-		//метка не содержит диапазона, конец обработки
+		//РјРµС‚РєР° РЅРµ СЃРѕРґРµСЂР¶РёС‚ РґРёР°РїР°Р·РѕРЅР°, РєРѕРЅРµС† РѕР±СЂР°Р±РѕС‚РєРё
 		return 0;
 	}
 
-	//есть второе выражение
+	//РµСЃС‚СЊ РІС‚РѕСЂРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ
 	IsRange = true;
 
-	//создание второй константы
+	//СЃРѕР·РґР°РЅРёРµ РІС‚РѕСЂРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	err_num = ConstSelector(lb, BV, parent_element);
 	if (err_num) return err_num;
 
-	//запоминаем тип полученной константы
+	//Р·Р°РїРѕРјРёРЅР°РµРј С‚РёРї РїРѕР»СѓС‡РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	ExprResultId = BV->GetResultId();
 
-	//запоминаем значение константы (одновременно проверяя тип)
+	//Р·Р°РїРѕРјРёРЅР°РµРј Р·РЅР°С‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РїСЂРѕРІРµСЂСЏСЏ С‚РёРї)
 	if (id_CCharVar == ExprResultId) ConstHighValue = static_cast<CCharVar*>(BV)->ConstValue; else
 		if (id_CArrayVar == ExprResultId) {
 			if (strlen(static_cast<CArrayVar*>(BV)->ConstString) != 1) {
@@ -347,21 +347,21 @@ int CCaseLabels::Init(CLexBuf *lb, CCaseStatement* const CaseStatement, CCaseLab
 				return s_e_CASE_LabelType;
 			}
 
-	//уничтожение константы (значение уже сохранено)
+	//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ (Р·РЅР°С‡РµРЅРёРµ СѓР¶Рµ СЃРѕС…СЂР°РЅРµРЅРѕ)
 	delete BV;
 
-	//проверка допустимости сочетания выражений в CASE и метке
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё СЃРѕС‡РµС‚Р°РЅРёСЏ РІС‹СЂР°Р¶РµРЅРёР№ РІ CASE Рё РјРµС‚РєРµ
 	if (CBaseVar::IsIntId(CaseExprResultId)) {
-		//проверка поглощения полученной константы типом выражения в CASE
+		//РїСЂРѕРІРµСЂРєР° РїРѕРіР»РѕС‰РµРЅРёСЏ РїРѕР»СѓС‡РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹ С‚РёРїРѕРј РІС‹СЂР°Р¶РµРЅРёСЏ РІ CASE
 		if (!CBaseVar::IsIntId(ExprResultId) || !IsId1IncloseId2(CaseExprResultId, ExprResultId))
 			return s_e_CASE_WrongLabelType;
 	} else
 		if (id_CCharVar != ExprResultId && id_CArrayVar != ExprResultId) return s_e_CASE_WrongLabelType;
 
-	//проверка допустимости интервала
+	//РїСЂРѕРІРµСЂРєР° РґРѕРїСѓСЃС‚РёРјРѕСЃС‚Рё РёРЅС‚РµСЂРІР°Р»Р°
 	if (ConstValue > ConstHighValue) return s_e_CASE_LabelType;
 
-	//проверка отсутствия уже загруженной метки с аналогичными параметрами
+	//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅРѕР№ РјРµС‚РєРё СЃ Р°РЅР°Р»РѕРіРёС‡РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё
 	if (CaseLabelsSeq->ValueExists(ConstValue, true, ConstHighValue) || CaseStatement->ValueExists(ConstValue, true, ConstHighValue)) return s_e_CASE_LabelExists;
 
 	return 0;
@@ -369,11 +369,11 @@ int CCaseLabels::Init(CLexBuf *lb, CCaseStatement* const CaseStatement, CCaseLab
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCaseLabels
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCaseLabels
 void CCaseLabels::WriteCPP(CPP_files& f, CExpr* Expr)
 {
 	Expr->WriteCPP(f);
-	//проверка наличия диапазона
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРёР°РїР°Р·РѕРЅР°
 	if (IsRange) {
 		fprintf(f.fc, " >= %li && ", ConstValue);
 		Expr->WriteCPP(f);
@@ -384,7 +384,7 @@ void CCaseLabels::WriteCPP(CPP_files& f, CExpr* Expr)
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия указанного значения в текущей метке
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ С‚РµРєСѓС‰РµР№ РјРµС‚РєРµ
 bool CCaseLabels::ValueExists(const long Value, const bool IsRng, const long HighValue)
 {
 	long HVal = IsRng ? HighValue : Value;
@@ -397,12 +397,12 @@ bool CCaseLabels::ValueExists(const long Value, const bool IsRng, const long Hig
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта CASE
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° CASE
 CCaseStatement::~CCaseStatement()
 {
 	delete ElseStatementSeq;
 	delete Expr;
-	//очистка списка наборов меток
+	//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° РЅР°Р±РѕСЂРѕРІ РјРµС‚РѕРє
 	CaseLabelsSeqList_type::const_iterator ci;
 	for (ci = CaseLabelsSeqList.begin(); ci != CaseLabelsSeqList.end(); ++ci)
 		delete *ci;
@@ -410,13 +410,13 @@ CCaseStatement::~CCaseStatement()
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия оператора RETURN
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° RETURN
 EHaveRet CCaseStatement::HaveRet() const
 {
-	//признаки наличия веток операторов без и с RETURN
+	//РїСЂРёР·РЅР°РєРё РЅР°Р»РёС‡РёСЏ РІРµС‚РѕРє РѕРїРµСЂР°С‚РѕСЂРѕРІ Р±РµР· Рё СЃ RETURN
 	bool HaveNo = false;
 	bool HaveYes = false;
-	//проверка наличия RETURN среди содержимого секций ELSIF
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN СЃСЂРµРґРё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС†РёР№ ELSIF
 	CaseLabelsSeqList_type::const_iterator ci;
 	for (ci = CaseLabelsSeqList.begin(); ci != CaseLabelsSeqList.end(); ++ci)
 		switch ((*ci)->HaveRet()) {
@@ -428,7 +428,7 @@ EHaveRet CCaseStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//проверка наличия RETURN в секции ELSE (если есть)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN РІ СЃРµРєС†РёРё ELSE (РµСЃР»Рё РµСЃС‚СЊ)
 	if (ElseStatementSeq)
 		switch (ElseStatementSeq->HaveRet()) {
 		case hr_NotAll:
@@ -439,55 +439,55 @@ EHaveRet CCaseStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//т.к. все случаи NotAll проверены выше, проверяем наличие No и Yes
+	//С‚.Рє. РІСЃРµ СЃР»СѓС‡Р°Рё NotAll РїСЂРѕРІРµСЂРµРЅС‹ РІС‹С€Рµ, РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ No Рё Yes
 	return HaveYes ? HaveNo ? hr_NotAll : hr_Yes : hr_No;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта CASE из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° CASE РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CCaseStatement::Init(CLexBuf *lb)
 {
-	//проверка наличия выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr = new CExpr(parent_element);
 	int err_num = Expr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	EName_id ExprResultId = Expr->GetResultId();
 	if (!CBaseVar::IsIntId(ExprResultId) && (id_CCharVar != ExprResultId)) return s_e_CASE_Expr;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова OF
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° OF
 	if (!lb->ReadLex(li) || lex_k_OF != li.lex) return s_e_OF;
 
-	//цикл инициализации эл-тов Case
+	//С†РёРєР» РёРЅРёС†РёР°Р»РёР·Р°С†РёРё СЌР»-С‚РѕРІ Case
 	while (true) {
 		CCaseLabelsSeq* CLSeq = new CCaseLabelsSeq(parent_element);
 		err_num = CLSeq->Init(lb, this);
 
-		//при наличии Case заносим его в список
+		//РїСЂРё РЅР°Р»РёС‡РёРё Case Р·Р°РЅРѕСЃРёРј РµРіРѕ РІ СЃРїРёСЃРѕРє
 		switch (err_num) {
 		case 0:
-			//ошибок не обнаружено - заносим Case в список
+			//РѕС€РёР±РѕРє РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅРѕ - Р·Р°РЅРѕСЃРёРј Case РІ СЃРїРёСЃРѕРє
 			CaseLabelsSeqList.push_back(CLSeq);
 			break;
 		case s_m_CaseAbsent:
-			//признак отсутствия Case - ничего не заносим в список
+			//РїСЂРёР·РЅР°Рє РѕС‚СЃСѓС‚СЃС‚РІРёСЏ Case - РЅРёС‡РµРіРѕ РЅРµ Р·Р°РЅРѕСЃРёРј РІ СЃРїРёСЃРѕРє
 			delete CLSeq;
 			break;
 		default:
-			//ошибка при инициализации Case
+			//РѕС€РёР±РєР° РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Case
 			delete CLSeq;
 			return err_num;
 		}
 
-		//получение след. лексемы (должно быть ключевое слово)
+		//РїРѕР»СѓС‡РµРЅРёРµ СЃР»РµРґ. Р»РµРєСЃРµРјС‹ (РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РєР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ)
 		if (!lb->ReadLex(li)) return s_e_END;
 
-		//проверка полученного ключевого слова
+		//РїСЂРѕРІРµСЂРєР° РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°
 		switch (li.lex) {
 		case lex_k_vertical:
 			continue;
@@ -498,16 +498,16 @@ int CCaseStatement::Init(CLexBuf *lb)
 			return s_e_END;
 		}
 
-		//получен ELSE или END - конец поиска Caseов
+		//РїРѕР»СѓС‡РµРЅ ELSE РёР»Рё END - РєРѕРЅРµС† РїРѕРёСЃРєР° CaseРѕРІ
 		break;
 	}//while
 
-	//проверка наличия секции ELSE
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРµРєС†РёРё ELSE
 	if (lex_k_ELSE == li.lex) {
 		ElseStatementSeq = new CStatementSeq(parent_element);
 		err_num = ElseStatementSeq->Init(lb);
 		if (err_num) return err_num;
-		//проверяем след. лексему
+		//РїСЂРѕРІРµСЂСЏРµРј СЃР»РµРґ. Р»РµРєСЃРµРјСѓ
 		if (!lb->ReadLex(li) || lex_k_END != li.lex) return s_e_END;
 	}
 
@@ -516,10 +516,10 @@ int CCaseStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CCaseStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CCaseStatement
 void CCaseStatement::WriteCPP(CPP_files& f)
 {
-	//цикл перебора последовательностей меток
+	//С†РёРєР» РїРµСЂРµР±РѕСЂР° РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№ РјРµС‚РѕРє
 	CCaseStatement::CaseLabelsSeqList_type::const_iterator i;
 	for (i = CaseLabelsSeqList.begin(); i != CaseLabelsSeqList.end(); ++i)
 	{
@@ -531,7 +531,7 @@ void CCaseStatement::WriteCPP(CPP_files& f)
 
 	f.tab_fc();
 
-	//проверка наличия условия ELSE
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓСЃР»РѕРІРёСЏ ELSE
 	if (ElseStatementSeq) {
 		fprintf(f.fc, "{\n");
 		ElseStatementSeq->WriteCPP(f);
@@ -543,7 +543,7 @@ void CCaseStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия указанного значения в уже созданных наборах меток
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С… РЅР°Р±РѕСЂР°С… РјРµС‚РѕРє
 bool CCaseStatement::ValueExists(const long Value, const bool IsRng, const long HighValue)
 {
 	CaseLabelsSeqList_type::const_iterator ci;
@@ -554,36 +554,36 @@ bool CCaseStatement::ValueExists(const long Value, const bool IsRng, const long 
 
 
 //-----------------------------------------------------------------------------
-//создание охраняемой переменной нужного типа (для помещения в таблицу имен WithLoopLink)
+//СЃРѕР·РґР°РЅРёРµ РѕС…СЂР°РЅСЏРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РЅСѓР¶РЅРѕРіРѕ С‚РёРїР° (РґР»СЏ РїРѕРјРµС‰РµРЅРёСЏ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ WithLoopLink)
 CBaseVar* CGuard::CreateGuardVar()
 {
-	//поиск типа и создание переменной
+	//РїРѕРёСЃРє С‚РёРїР° Рё СЃРѕР·РґР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№
 	CBaseName* BN = parent_element->GetGlobalName(TypeName.pref_ident, TypeName.ident);
 	CBaseVar* BV = NULL;
 	static_cast<CBaseType*>(BN)->CreateVar(BV, parent_element);
-	//установка требуемых атрибутов переменной
+	//СѓСЃС‚Р°РЅРѕРІРєР° С‚СЂРµР±СѓРµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ РїРµСЂРµРјРµРЅРЅРѕР№
 	BV->SetName(VarName.ident);
 	BV->SetTypeName(TypeName.pref_ident, TypeName.ident);
-	//поскольку запись может присутствовать только как VAR параметр процедуры, требуется
-	//принудительная установка признака переменной для записи
-	//(для указателя значение данного параметра не играет роли)
+	//РїРѕСЃРєРѕР»СЊРєСѓ Р·Р°РїРёСЃСЊ РјРѕР¶РµС‚ РїСЂРёСЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РєР°Рє VAR РїР°СЂР°РјРµС‚СЂ РїСЂРѕС†РµРґСѓСЂС‹, С‚СЂРµР±СѓРµС‚СЃСЏ
+	//РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅР°СЏ СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ Р·Р°РїРёСЃРё
+	//(РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ Р·РЅР°С‡РµРЅРёРµ РґР°РЅРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РЅРµ РёРіСЂР°РµС‚ СЂРѕР»Рё)
 	BV->is_var = true;
-	//проверка типа переменной для доп. настройки
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№ РґР»СЏ РґРѕРї. РЅР°СЃС‚СЂРѕР№РєРё
 	switch (BV->name_id) {
 	case id_CPointerVar:
-		//установка признака объявления переменной через QualidentType (необходимо для поиска в списке полей записи)
+		//СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° РѕР±СЉСЏРІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ С‡РµСЂРµР· QualidentType (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РїРѕРёСЃРєР° РІ СЃРїРёСЃРєРµ РїРѕР»РµР№ Р·Р°РїРёСЃРё)
 		static_cast<CPointerVar*>(BV)->qualident_type = true;
-		//для указателя установка признака ук. на запись (проверено в Init)
+		//РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° СѓРє. РЅР° Р·Р°РїРёСЃСЊ (РїСЂРѕРІРµСЂРµРЅРѕ РІ Init)
 		static_cast<CPointerVar*>(BV)->SetIsRecord();
-		//установка признака нахождения под охраной
+		//СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° РЅР°С…РѕР¶РґРµРЅРёСЏ РїРѕРґ РѕС…СЂР°РЅРѕР№
 		BV->is_guarded = true;
 		break;
 	case id_CCommonVar:
-		//установка признака переменной
+		//СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° РїРµСЂРµРјРµРЅРЅРѕР№
 		static_cast<CCommonVar*>(BV)->SetTagName(spec_name.pref_ident, spec_name.ident);
 		break;
 	default:
-		//установка признака нахождения под охраной
+		//СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРёР·РЅР°РєР° РЅР°С…РѕР¶РґРµРЅРёСЏ РїРѕРґ РѕС…СЂР°РЅРѕР№
 		BV->is_guarded = true;
 	}//switch
 	return BV;
@@ -591,7 +591,7 @@ CBaseVar* CGuard::CreateGuardVar()
 
 
 //-----------------------------------------------------------------------------
-//получение названия модуля (только для импортированной переменной)
+//РїРѕР»СѓС‡РµРЅРёРµ РЅР°Р·РІР°РЅРёСЏ РјРѕРґСѓР»СЏ (С‚РѕР»СЊРєРѕ РґР»СЏ РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№)
 const char* CGuard::GetVarModuleName()
 {
 	return VarName.pref_ident;
@@ -599,120 +599,120 @@ const char* CGuard::GetVarModuleName()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта Guard из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° Guard РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CGuard::Init(CLexBuf *lb)
 {
-	//инициализация имени тестируемой переменной
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРјРµРЅРё С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	int err_num = VarName.Init(lb, parent_element);
 	if (err_num) return err_num;
 
-	//проверка наличия тестируемой переменной
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	CBaseName* BN = parent_element->GetGlobalName(VarName.pref_ident, VarName.ident);
 	if (!BN) {
-		//проверка случая <запись>.<поле> - тогда выдается ": missing" вместо "undeclared"
+		//РїСЂРѕРІРµСЂРєР° СЃР»СѓС‡Р°СЏ <Р·Р°РїРёСЃСЊ>.<РїРѕР»Рµ> - С‚РѕРіРґР° РІС‹РґР°РµС‚СЃСЏ ": missing" РІРјРµСЃС‚Рѕ "undeclared"
 		if (parent_element->GetGlobalName(VarName.pref_ident)) return s_e_ColonMissing;
 		else return s_e_UndeclaredIdent;
 	}
 
-	//имя типа запись (для проверки наследования в случае записи или ук. на запись)
+	//РёРјСЏ С‚РёРїР° Р·Р°РїРёСЃСЊ (РґР»СЏ РїСЂРѕРІРµСЂРєРё РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ РІ СЃР»СѓС‡Р°Рµ Р·Р°РїРёСЃРё РёР»Рё СѓРє. РЅР° Р·Р°РїРёСЃСЊ)
 	const char* module_name;
 	const char* type_name;
 
-	//проверка типа тестируемой переменной
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	switch (BN->name_id) {
 	case id_CRecordVar:
-		//получена переменная типа запись
+		//РїРѕР»СѓС‡РµРЅР° РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° Р·Р°РїРёСЃСЊ
 		if (!static_cast<CRecordVar*>(BN)->is_var) return s_e_GuardVarNotRecOrP;
 		type_id = id_CRecordType;
-		//запоминание названия типа переменной
+		//Р·Р°РїРѕРјРёРЅР°РЅРёРµ РЅР°Р·РІР°РЅРёСЏ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№
 		module_name = static_cast<CRecordVar*>(BN)->GetTypeModuleAlias();
 		type_name = static_cast<CRecordVar*>(BN)->GetTypeName();
 		break;
 	case id_CCommonVar:
-		//получена переменная типа обобщение
+		//РїРѕР»СѓС‡РµРЅР° РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° РѕР±РѕР±С‰РµРЅРёРµ
 		if (!static_cast<CCommonVar*>(BN)->is_var) return s_e_GuardVarNotRecOrP;
 		if (!static_cast<CCommonVar*>(BN)->IsPureCommon()) return s_e_GuardVarNotRecOrP;
 		type_id = id_CCommonType;
 		break;
 	case id_CPointerVar:
-		//получение типа, на который указывает данный указатель
+		//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°, РЅР° РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·С‹РІР°РµС‚ РґР°РЅРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
 		BN = static_cast<CPointerVar*>(BN)->FindType();
-		//проверка наличия ук. на обобщение
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРёРµ
 		if (id_CCommonType == BN->name_id) {
 			type_id = id_CCommonType;
 			break;
 		}
-		//получена переменная типа указатель на запись
+		//РїРѕР»СѓС‡РµРЅР° РїРµСЂРµРјРµРЅРЅР°СЏ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р·Р°РїРёСЃСЊ
 		type_id = id_CPointerType;
-		//запоминание названия типа переменной
+		//Р·Р°РїРѕРјРёРЅР°РЅРёРµ РЅР°Р·РІР°РЅРёСЏ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№
 		module_name = static_cast<CBaseType*>(BN)->GetModuleAlias();
 		type_name = BN->name;
 		break;
 	default:
-		//получена переменная недопустимого типа
+		//РїРѕР»СѓС‡РµРЅР° РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ С‚РёРїР°
 		return s_e_GuardVarNotRecOrP;
 	}//switch
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия символа ":"
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРёРјРІРѕР»Р° ":"
 	if (!lb->ReadLex(li) || lex_k_colon != li.lex) return s_e_ColonMissing;
 
-	//получение типа в охране с проверкой необходимости считывать "<" параметр ">"
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РІ РѕС…СЂР°РЅРµ СЃ РїСЂРѕРІРµСЂРєРѕР№ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃС‡РёС‚С‹РІР°С‚СЊ "<" РїР°СЂР°РјРµС‚СЂ ">"
 	if (id_CCommonType == type_id) {
 
-		//обработка обобщенной переменой или ук. на обобщение
+		//РѕР±СЂР°Р±РѕС‚РєР° РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРѕР№ РёР»Рё СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРёРµ
 
-		//проверка наличия "<" - начало признака специализации
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ "<" - РЅР°С‡Р°Р»Рѕ РїСЂРёР·РЅР°РєР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 		if (!lb->ReadLex(li) || lex_k_lt != li.lex) return s_e_OpAngleMissing;
-		//инициализация описания признака
+		//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРїРёСЃР°РЅРёСЏ РїСЂРёР·РЅР°РєР°
 		err_num = spec_name.Init(lb, parent_element);
 		if (err_num) return err_num;
-		//получение типа в случае наличия обобщенной переменной
+		//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РІ СЃР»СѓС‡Р°Рµ РЅР°Р»РёС‡РёСЏ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		if (id_CCommonVar == BN->name_id) BN = static_cast<CCommonVar*>(BN)->FindType();
-		//получение имени типа тестируемой обобщенной переменной
+		//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С‚РёРїР° С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		const char* m_a = static_cast<CBaseType*>(BN)->GetModuleAlias();
 		if (m_a) TypeName.pref_ident = str_new_copy(m_a);
 		TypeName.ident = str_new_copy(BN->name);
-		//проверка, является ли признак допустимым для данного обобщения
+		//РїСЂРѕРІРµСЂРєР°, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїСЂРёР·РЅР°Рє РґРѕРїСѓСЃС‚РёРјС‹Рј РґР»СЏ РґР°РЅРЅРѕРіРѕ РѕР±РѕР±С‰РµРЅРёСЏ
 		if (id_CCommonType != BN->name_id) return s_m_Error;
 		if (!static_cast<CCommonType*>(BN)->FindSpec(spec_name.pref_ident, spec_name.ident, spec_name.ident)) return s_e_SpecTypeTag;
-		//проверка наличия ">" - конец признака специализации
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ">" - РєРѕРЅРµС† РїСЂРёР·РЅР°РєР° СЃРїРµС†РёР°Р»РёР·Р°С†РёРё
 		if (!lb->ReadLex(li) || lex_k_gt != li.lex) return s_e_ClAngleMissing;
-		//завершение обработки обобщения
+		//Р·Р°РІРµСЂС€РµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё РѕР±РѕР±С‰РµРЅРёСЏ
 		return 0;
 
 	} else {
 
-		//обработка записи или ук. на запись
+		//РѕР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРё РёР»Рё СѓРє. РЅР° Р·Р°РїРёСЃСЊ
 
-		//инициализация имени типа тестируемой переменной
+		//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРјРµРЅРё С‚РёРїР° С‚РµСЃС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		err_num = TypeName.Init(lb, parent_element);
 		if (err_num) return err_num;
-		//проверка наличия известного имени типа
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёР·РІРµСЃС‚РЅРѕРіРѕ РёРјРµРЅРё С‚РёРїР°
 		BN = parent_element->GetGlobalName(TypeName.pref_ident, TypeName.ident);
 		if (!BN) return s_e_UndeclaredIdent;
-		//проверка, был ли указан идентификатор типа
+		//РїСЂРѕРІРµСЂРєР°, Р±С‹Р» Р»Рё СѓРєР°Р·Р°РЅ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РёРїР°
 		if (!CBaseType::IsTypeId(BN->name_id)) return s_e_IdentNotType;
-		//проверка, соответствует ли тип в охране охраняемой переменной
+		//РїСЂРѕРІРµСЂРєР°, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ Р»Рё С‚РёРї РІ РѕС…СЂР°РЅРµ РѕС…СЂР°РЅСЏРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		if (id_CRecordType == type_id) {
-			//проверка наличия типа запись
+			//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚РёРїР° Р·Р°РїРёСЃСЊ
 			if (id_CRecordType != BN->name_id) return s_e_GuardTypeNotRec;
 		} else {
-			//проверка наличия типа указатель
+			//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚РёРїР° СѓРєР°Р·Р°С‚РµР»СЊ
 			if (id_CPointerType != BN->name_id) return s_e_GuardTypeNotP;
-			//получение типа, на кот. указывает указатель
+			//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°, РЅР° РєРѕС‚. СѓРєР°Р·С‹РІР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ
 			BN = static_cast<CPointerType*>(BN)->FindType();
-			//проверка, указывает ли ук. на запись
+			//РїСЂРѕРІРµСЂРєР°, СѓРєР°Р·С‹РІР°РµС‚ Р»Рё СѓРє. РЅР° Р·Р°РїРёСЃСЊ
 			if (id_CRecordType != BN->name_id) return s_e_GuardTypeNotExt;
 		}
-		//проверка наличия имени типа (для переменной неименованного типа нет смысла проверять охрану)
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РёРјРµРЅРё С‚РёРїР° (РґР»СЏ РїРµСЂРµРјРµРЅРЅРѕР№ РЅРµРёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ С‚РёРїР° РЅРµС‚ СЃРјС‹СЃР»Р° РїСЂРѕРІРµСЂСЏС‚СЊ РѕС…СЂР°РЅСѓ)
 		if (!type_name) return s_e_GuardTypeNotExt;
-		//проверка, является ли охрана расширением типа охраняемой переменной
+		//РїСЂРѕРІРµСЂРєР°, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РѕС…СЂР°РЅР° СЂР°СЃС€РёСЂРµРЅРёРµРј С‚РёРїР° РѕС…СЂР°РЅСЏРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		if (!static_cast<CRecordType*>(BN)->IsExtension(module_name, type_name))
 			return s_e_GuardTypeNotExt;
-		//завершение обработки записи или ук. на запись
+		//Р·Р°РІРµСЂС€РµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё Р·Р°РїРёСЃРё РёР»Рё СѓРє. РЅР° Р·Р°РїРёСЃСЊ
 		return 0;
 
 	}//else
@@ -721,37 +721,37 @@ int CGuard::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CGuard
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CGuard
 void CGuard::WriteCPP(CPP_files& f)
 {
-	//начало формирование секции Guard, включая проверку отсутствия NIL
+	//РЅР°С‡Р°Р»Рѕ С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРµРєС†РёРё Guard, РІРєР»СЋС‡Р°СЏ РїСЂРѕРІРµСЂРєСѓ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ NIL
 	f.tab_fc();
 	fprintf(f.fc, "if (");
 	if (VarName.pref_ident) fprintf(f.fc, "%s::", VarName.pref_ident);
 	fprintf(f.fc, "%s && ", VarName.ident);
 
-	//проверка наличия обобщенного типа
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕР±РѕР±С‰РµРЅРЅРѕРіРѕ С‚РёРїР°
 	if (id_CCommonType == type_id) {
-		//WITH с обобщением
+		//WITH СЃ РѕР±РѕР±С‰РµРЅРёРµРј
 		fprintf(f.fc, "(");
 		if (VarName.pref_ident) fprintf(f.fc, "%s::", VarName.pref_ident);
 		fprintf(f.fc, "%s->O2M_SID == ", VarName.ident);
 		if (VarName.pref_ident) fprintf(f.fc, "%s::", VarName.pref_ident);
 		fprintf(f.fc, "%s->O2M_SID_", VarName.ident);
 	} else {
-		//обычный необобщенный WITH
+		//РѕР±С‹С‡РЅС‹Р№ РЅРµРѕР±РѕР±С‰РµРЅРЅС‹Р№ WITH
 		fprintf(f.fc, "!strcmp(");
 		if (VarName.pref_ident) fprintf(f.fc, "%s::", VarName.pref_ident);
 		fprintf(f.fc, "%s->O2M_SYS_ID(), ", VarName.ident);
 	}
 
-	//получение типа-охраны
+	//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°-РѕС…СЂР°РЅС‹
 	CBaseName* BN = parent_element->GetGlobalName(TypeName.pref_ident, TypeName.ident);
 
-	//генерация кода типа-охраны
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° С‚РёРїР°-РѕС…СЂР°РЅС‹
 	switch (type_id) {
 	case id_CCommonType:
-		//обработка обобщения
+		//РѕР±СЂР°Р±РѕС‚РєР° РѕР±РѕР±С‰РµРЅРёСЏ
 		{
 			const CCommonType::SSpec* spec = static_cast<CCommonType*>(BN)->FindSpec(spec_name.pref_ident, spec_name.ident, spec_name.ident);
 			if (!spec) throw error_Internal("CGuard::WriteCPP");
@@ -762,21 +762,21 @@ void CGuard::WriteCPP(CPP_files& f)
 		}
 		break;
 	case id_CPointerType:
-		//обработка ук. на запись
+		//РѕР±СЂР°Р±РѕС‚РєР° СѓРє. РЅР° Р·Р°РїРёСЃСЊ
 		fprintf(f.fc, "\"%s\"", static_cast<CRecordType*>(static_cast<CPointerType*>(BN)->FindType())->GetRuntimeId());
 		break;
 	default:
-		//обработка записи
+		//РѕР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРё
 		fprintf(f.fc, "\"%s\"", static_cast<CRecordType*>(BN)->GetRuntimeId());
 	}
 
-	//формирование секции Guard с последовательностью операторов
+	//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРµРєС†РёРё Guard СЃ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊСЋ РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	fprintf(f.fc, ")) {\n");
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта |
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° |
 CGuardPair::~CGuardPair()
 {
 	delete StatementSeq;
@@ -785,27 +785,27 @@ CGuardPair::~CGuardPair()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта | из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° | РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CGuardPair::Init(CLexBuf *lb)
 {
-	//переменная для получения номера ошибки
+	//РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РЅРѕРјРµСЂР° РѕС€РёР±РєРё
 	int err_num = 0;
 
-	//проверка наличия выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Guard = new CGuard(parent_element);
 	err_num = Guard->Init(lb);
 	if (err_num) return err_num;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова DO
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° DO
 	if (!lb->ReadLex(li) || lex_k_DO != li.lex) return s_e_DO;
 
-	//занесение в WithLoopLink охраняемой переменной
+	//Р·Р°РЅРµСЃРµРЅРёРµ РІ WithLoopLink РѕС…СЂР°РЅСЏРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	WithLoopLink.AddName(Guard->GetVarModuleName(), Guard->CreateGuardVar());
 
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(&WithLoopLink);
 	err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
@@ -815,7 +815,7 @@ int CGuardPair::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта WITH
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° WITH
 CWithStatement::~CWithStatement()
 {
 	if (GuardPairStore) {
@@ -829,13 +829,13 @@ CWithStatement::~CWithStatement()
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия оператора RETURN
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° RETURN
 EHaveRet CWithStatement::HaveRet() const
 {
-	//признаки наличия веток операторов без и с RETURN
+	//РїСЂРёР·РЅР°РєРё РЅР°Р»РёС‡РёСЏ РІРµС‚РѕРє РѕРїРµСЂР°С‚РѕСЂРѕРІ Р±РµР· Рё СЃ RETURN
 	bool HaveNo = false;
 	bool HaveYes = false;
-	//проверка наличия RETURN среди содержимого секций ELSIF
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN СЃСЂРµРґРё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС†РёР№ ELSIF
 	CBaseVector::const_iterator ci;
 	for (ci = GuardPairStore->begin(); ci != GuardPairStore->end(); ++ci)
 		switch ((*ci)->HaveRet()) {
@@ -847,7 +847,7 @@ EHaveRet CWithStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//проверка наличия RETURN в секции ELSE (если есть)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ RETURN РІ СЃРµРєС†РёРё ELSE (РµСЃР»Рё РµСЃС‚СЊ)
 	if (ElseStatementSeq)
 		switch (ElseStatementSeq->HaveRet()) {
 		case hr_NotAll:
@@ -858,16 +858,16 @@ EHaveRet CWithStatement::HaveRet() const
 		default:
 			HaveYes = true;
 		}
-	//т.к. все случаи NotAll проверены выше, проверяем наличие No и Yes
+	//С‚.Рє. РІСЃРµ СЃР»СѓС‡Р°Рё NotAll РїСЂРѕРІРµСЂРµРЅС‹ РІС‹С€Рµ, РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ No Рё Yes
 	return HaveYes ? HaveNo ? hr_NotAll : hr_Yes : hr_No;
 }
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта WITH из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° WITH РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CWithStatement::Init(CLexBuf *lb)
 {
-	//создание списка | с первым элементом (для WITH ... DO)
+	//СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° | СЃ РїРµСЂРІС‹Рј СЌР»РµРјРµРЅС‚РѕРј (РґР»СЏ WITH ... DO)
 	CGuardPair* GPair = new CGuardPair(parent_element);
 	int err_num = GPair->Init(lb);
 	if (err_num) {
@@ -878,15 +878,15 @@ int CWithStatement::Init(CLexBuf *lb)
 	GuardPairStore = new CBaseVector;
 	GuardPairStore->push_back(GPair);
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//чтение очередной лексемы (ключевого слова)
+	//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 
-	//проверка наличия | (список уже создан)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ | (СЃРїРёСЃРѕРє СѓР¶Рµ СЃРѕР·РґР°РЅ)
 	while (lex_k_vertical == li.lex) {
-		//проверка очередной пары Guard DO StatementSeq
+		//РїСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРЅРѕР№ РїР°СЂС‹ Guard DO StatementSeq
 		GPair = new CGuardPair(parent_element);
 		err_num = GPair->Init(lb);
 		if (err_num) {
@@ -895,7 +895,7 @@ int CWithStatement::Init(CLexBuf *lb)
 		}
 		GuardPairStore->push_back(GPair);
 
-		//чтение очередной лексемы (ключевого слова)
+		//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 	}
 
@@ -903,11 +903,11 @@ int CWithStatement::Init(CLexBuf *lb)
 		ElseStatementSeq = new CStatementSeq(parent_element);
 		err_num = ElseStatementSeq->Init(lb);
 		if (err_num) return err_num;
-		//чтение очередной лексемы (ключевого слова)
+		//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_END;
 	}
 
-	//проверка наличия конца (остальные варианты проверены)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєРѕРЅС†Р° (РѕСЃС‚Р°Р»СЊРЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РїСЂРѕРІРµСЂРµРЅС‹)
 	if (lex_k_END != li.lex) return s_e_END;
 
 	return 0;
@@ -915,19 +915,19 @@ int CWithStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CWithStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CWithStatement
 void CWithStatement::WriteCPP(CPP_files& f)
 {
-	//запись кода первой охраны (всегда должна присутствовать)
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїРµСЂРІРѕР№ РѕС…СЂР°РЅС‹ (РІСЃРµРіРґР° РґРѕР»Р¶РЅР° РїСЂРёСЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ)
 	CBaseVector::const_iterator ci = GuardPairStore->begin();
 	(*ci)->WriteCPP(f);
-	//запись кода оставшихся охран
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕСЃС‚Р°РІС€РёС…СЃСЏ РѕС…СЂР°РЅ
 	for (++ci; ci != GuardPairStore->end(); ++ci) {
 		fprintf(f.fc, " else\n");
 		(*ci)->WriteCPP(f);
 	}
 
-	//запись последовательности операторов из раздела ELSE (если есть)
+	//Р·Р°РїРёСЃСЊ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РѕРїРµСЂР°С‚РѕСЂРѕРІ РёР· СЂР°Р·РґРµР»Р° ELSE (РµСЃР»Рё РµСЃС‚СЊ)
 	fprintf(f.fc, " else\n");
 	if (ElseStatementSeq) {
 		f.tab_fc();
@@ -938,7 +938,7 @@ void CWithStatement::WriteCPP(CPP_files& f)
 		f.tab_fc();
 		fprintf(f.fc, "}");
 	} else {
-		//запись кода выхода из программы при отсутствии блока ELSE
+		//Р·Р°РїРёСЃСЊ РєРѕРґР° РІС‹С…РѕРґР° РёР· РїСЂРѕРіСЂР°РјРјС‹ РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё Р±Р»РѕРєР° ELSE
 		f.tab_fc();
 		fprintf(f.fc, "\texit(0)");
 	}
@@ -946,7 +946,7 @@ void CWithStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта StatementSeq
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° StatementSeq
 CStatementSeq::~CStatementSeq()
 {
 	CBaseVector::const_iterator ci;
@@ -956,7 +956,7 @@ CStatementSeq::~CStatementSeq()
 
 
 //-----------------------------------------------------------------------------
-//проверка наличия оператора RETURN
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° RETURN
 EHaveRet CStatementSeq::HaveRet() const
 {
 	CBaseVector::const_reverse_iterator ci;
@@ -969,18 +969,18 @@ EHaveRet CStatementSeq::HaveRet() const
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CStatementSeq::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
 	while(true){
-		//инициализация одного оператора
+		//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРґРЅРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР°
 		int err_num	= StatementInit(lb);
 		if (err_num) return err_num;
 		DECL_SAVE_POS
-		//чтение кл. слова ";" (если есть)
+		//С‡С‚РµРЅРёРµ РєР». СЃР»РѕРІР° ";" (РµСЃР»Рё РµСЃС‚СЊ)
 		if (!lb->ReadLex(li) || lex_k_semicolon != li.lex) {
 			RESTORE_POS
 			return 0;
@@ -992,38 +992,38 @@ int CStatementSeq::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта Statement из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° Statement РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CStatementSeq::StatementInit(CLexBuf *lb)
 {
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//получение ключевого слова или ид.
+	//РїРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР° РёР»Рё РёРґ.
 	if (!lb->ReadLex(li) || (lex_k_dot > li.lex && lex_i != li.lex)) return s_e_Statement;
 
-	//пока никакой оператор не найден
+	//РїРѕРєР° РЅРёРєР°РєРѕР№ РѕРїРµСЂР°С‚РѕСЂ РЅРµ РЅР°Р№РґРµРЅ
 	CBase *Base = NULL;
 
-	//проверка типа полученной лексемы
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РїРѕР»СѓС‡РµРЅРЅРѕР№ Р»РµРєСЃРµРјС‹
 	switch (li.lex) {
 
-	//проверка наличия вызова или присваивания
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹Р·РѕРІР° РёР»Рё РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 	case lex_i:
 	case lex_k_op_brace:
 		RESTORE_POS
-		//проверка наличия вызова обобщенной процедуры
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹Р·РѕРІР° РѕР±РѕР±С‰РµРЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
 		if (lex_k_op_brace == li.lex)
 			Base = new CCallStatement(parent_element, NULL, false, true);
 		else {
-			//получение Designator, по которому определяется вызов процедуры или присваивание
+			//РїРѕР»СѓС‡РµРЅРёРµ Designator, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РІС‹Р·РѕРІ РїСЂРѕС†РµРґСѓСЂС‹ РёР»Рё РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 			CDesignator* Des = new CDesignator(parent_element, false);
 			int err_num = Des->Init(lb);
 			if (err_num) {
 				delete Des;
 				return err_num;
 			}
-			//проверка наличия оператора вызова или оператора присваивания
+			//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° РІС‹Р·РѕРІР° РёР»Рё РѕРїРµСЂР°С‚РѕСЂР° РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 			if (Des->IsProcName())
 				Base = new CCallStatement(parent_element, Des, true, true);
 			else
@@ -1031,7 +1031,7 @@ int CStatementSeq::StatementInit(CLexBuf *lb)
 		}//else
 		break;
 
-	//проверка наличия стандартной процедуры (StdProc)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹ (StdProc)
 	case lex_k_ASSERT:
 		Base = new CAssertStdProc(parent_element);
 		break;
@@ -1057,7 +1057,7 @@ int CStatementSeq::StatementInit(CLexBuf *lb)
 		Base = new CNewStdProc(parent_element);
 		break;
 
-	//проверка наличия оператора (Statement)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїРµСЂР°С‚РѕСЂР° (Statement)
 	case lex_k_IF:
 		Base = new CIfStatement(parent_element);
 		break;
@@ -1086,7 +1086,7 @@ int CStatementSeq::StatementInit(CLexBuf *lb)
 		Base = new CReturnStatement(parent_element);
 		break;
 
-	//проверка наличия вызова процедуры-функции (ошибка)
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹Р·РѕРІР° РїСЂРѕС†РµРґСѓСЂС‹-С„СѓРЅРєС†РёРё (РѕС€РёР±РєР°)
 	case lex_k_ABS:
 	case lex_k_ASH:
 	case lex_k_CAP:
@@ -1104,17 +1104,17 @@ int CStatementSeq::StatementInit(CLexBuf *lb)
 
 	}//switch
 
-	//инициализация созданного объекта (если он был создан)
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕР·РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° (РµСЃР»Рё РѕРЅ Р±С‹Р» СЃРѕР·РґР°РЅ)
 	if (Base) {
 		int err_num = Base->Init(lb);
 		if (err_num) {
 			delete Base;
 			return err_num;
 		}
-		//занесение считанного объекта в список
+		//Р·Р°РЅРµСЃРµРЅРёРµ СЃС‡РёС‚Р°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° РІ СЃРїРёСЃРѕРє
 		StatStore.push_back(Base);
 	} else {
-		//найден пустой оператор (ошибки нет)
+		//РЅР°Р№РґРµРЅ РїСѓСЃС‚РѕР№ РѕРїРµСЂР°С‚РѕСЂ (РѕС€РёР±РєРё РЅРµС‚)
 		RESTORE_POS
 	}
 
@@ -1123,7 +1123,7 @@ int CStatementSeq::StatementInit(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CStatementSeq
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CStatementSeq
 void CStatementSeq::WriteCPP(CPP_files& f)
 {
 	f.tab_level_c++;
@@ -1139,15 +1139,15 @@ void CStatementSeq::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта EXIT из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° EXIT РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CExitStatement::Init(CLexBuf *lb)
 {
-	//проверка нахождения EXIT в StatementSeq от оператора LOOP
+	//РїСЂРѕРІРµСЂРєР° РЅР°С…РѕР¶РґРµРЅРёСЏ EXIT РІ StatementSeq РѕС‚ РѕРїРµСЂР°С‚РѕСЂР° LOOP
 	const CBaseName* BN = this->parent_element;
 	while (BN) {
-		//проверка наличия среди parent_element объекта, использующегося для связи с оператором LOOP
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃСЂРµРґРё parent_element РѕР±СЉРµРєС‚Р°, РёСЃРїРѕР»СЊР·СѓСЋС‰РµРіРѕСЃСЏ РґР»СЏ СЃРІСЏР·Рё СЃ РѕРїРµСЂР°С‚РѕСЂРѕРј LOOP
 		if (id_CWithLoopLink == BN->name_id && static_cast<const CWithLoopLink*>(BN)->UnderLoop()) {
-			//сохранение UID оператора LOOP (необходимо для генерации кода C++)
+			//СЃРѕС…СЂР°РЅРµРЅРёРµ UID РѕРїРµСЂР°С‚РѕСЂР° LOOP (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РіРµРЅРµСЂР°С†РёРё РєРѕРґР° C++)
 			UID = static_cast<const CWithLoopLink*>(BN)->LoopUID;
 			return 0;
 		}
@@ -1158,7 +1158,7 @@ int CExitStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CExitStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CExitStatement
 void CExitStatement::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1167,7 +1167,7 @@ void CExitStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта FOR
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° FOR
 CForStatement::~CForStatement()
 {
 	delete[] var_name;
@@ -1178,69 +1178,69 @@ CForStatement::~CForStatement()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта FOR из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° FOR РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CForStatement::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//получение ид-ра
+	//РїРѕР»СѓС‡РµРЅРёРµ РёРґ-СЂР°
 	if (!lb->ReadLex(li) || (lex_i != li.lex)) return s_e_IdentExpected;
 	var_name = str_new_copy(li.st);
 
-	//поиск ид-ра в таблице имен и проверка его типа
+	//РїРѕРёСЃРє РёРґ-СЂР° РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ Рё РїСЂРѕРІРµСЂРєР° РµРіРѕ С‚РёРїР°
 	CBaseName* BN = parent_element->GetGlobalName(var_name);
 	if (!BN) return s_e_UndeclaredIdent;
 	if (!CBaseVar::IsIntId(BN->name_id)) return s_e_FOR_VarNotInt;
 
-	//проверка наличия кл. слова :=
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° :=
 	if (!lb->ReadLex(li) || lex_k_assign != li.lex) return s_e_AssignMissing;
 
-	//проверка наличия выражения For
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ For
 	ForExpr = new CExpr(parent_element);
 	int err_num = ForExpr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия кл. слова TO
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° TO
 	if (!lb->ReadLex(li) || lex_k_TO != li.lex) return s_e_TO;
 
-	//проверка наличия выражения To
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ To
 	ToExpr = new CExpr(parent_element);
 	err_num = ToExpr->Init(lb);
 	if (err_num) return err_num;
 
-	//чтение очередной лексемы (ключевого слова)
+	//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 	if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_DO;
 
-	//проверка наличия ConstExpr, если получен BY
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ ConstExpr, РµСЃР»Рё РїРѕР»СѓС‡РµРЅ BY
 	if (lex_k_BY == li.lex) {
-		//создание константного выражения для BY
+		//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ BY
 		CBaseVar* ByVar;
 		err_num = ConstSelector(lb, ByVar, parent_element);
 		if (err_num) return err_num;
-		//проверка получения целочисленной константы
+		//РїСЂРѕРІРµСЂРєР° РїРѕР»СѓС‡РµРЅРёСЏ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
 		if (!CBaseVar::IsIntId(ByVar->name_id)) {
 			delete ByVar;
 			return s_e_ExprNotIntConst;
 		}
 		step = ByVar->GetIntValue();
 		delete ByVar;
-		//проверка шага, равного 0
+		//РїСЂРѕРІРµСЂРєР° С€Р°РіР°, СЂР°РІРЅРѕРіРѕ 0
 		if (!step) return s_e_FOR_BY_Zero;
-		//чтение очередной лексемы (ключевого слова)
+		//С‡С‚РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕР№ Р»РµРєСЃРµРјС‹ (РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР°)
 		if (!lb->ReadLex(li) || lex_k_dot > li.lex) return s_e_DO;
 	} else
-		step = 1;	//шаг по умолчанию
+		step = 1;	//С€Р°Рі РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-	//проверка наличия кл. слова DO
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° DO
 	if (lex_k_DO != li.lex) return s_e_DO;
 
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(parent_element);
 	err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия кл. слова END
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° END
 	if (!lb->ReadLex(li) || lex_k_END != li.lex) return s_e_END;
 
 	return 0;
@@ -1248,24 +1248,24 @@ int CForStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CForStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CForStatement
 void CForStatement::WriteCPP(CPP_files& f)
 {
-	//временная переменная (условие TO не должно меняться внутри цикла)
+	//РІСЂРµРјРµРЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ (СѓСЃР»РѕРІРёРµ TO РЅРµ РґРѕР»Р¶РЅРѕ РјРµРЅСЏС‚СЊСЃСЏ РІРЅСѓС‚СЂРё С†РёРєР»Р°)
 	f.tab_fc();
 	fprintf(f.fc, "{long O2M_FOR=");
 	ToExpr->WriteCPP(f);
 	fprintf(f.fc, ";\n");
 
-	//генерация оператора for
+	//РіРµРЅРµСЂР°С†РёСЏ РѕРїРµСЂР°С‚РѕСЂР° for
 	f.tab_fc();
 	fprintf(f.fc, "for(%s=", var_name);
 	ForExpr->WriteCPP(f);
 
-	//обработка числового значения шага
+	//РѕР±СЂР°Р±РѕС‚РєР° С‡РёСЃР»РѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ С€Р°РіР°
 	fprintf(f.fc, "; %s%c=O2M_FOR; %s+=%li) {\n", var_name, (step > 0) ? '<' : '>', var_name, step);
 
-	//запись последовательности операторов
+	//Р·Р°РїРёСЃСЊ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq->WriteCPP(f);
 
 	f.tab_fc();
@@ -1274,12 +1274,12 @@ void CForStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//статическая переменная для создания уникального ID для каждого оператора LOOP
+//СЃС‚Р°С‚РёС‡РµСЃРєР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ ID РґР»СЏ РєР°Р¶РґРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР° LOOP
 int CLoopStatement::CurrentUID = 0;
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта LOOP
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° LOOP
 CLoopStatement::~CLoopStatement()
 {
 	delete StatementSeq;
@@ -1287,21 +1287,21 @@ CLoopStatement::~CLoopStatement()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта LOOP из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° LOOP РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CLoopStatement::Init(CLexBuf *lb)
 {
-	//установка UID для передачи в StatementSeq (в нем скорее всего есть операторы EXIT)
+	//СѓСЃС‚Р°РЅРѕРІРєР° UID РґР»СЏ РїРµСЂРµРґР°С‡Рё РІ StatementSeq (РІ РЅРµРј СЃРєРѕСЂРµРµ РІСЃРµРіРѕ РµСЃС‚СЊ РѕРїРµСЂР°С‚РѕСЂС‹ EXIT)
 	WithLoopLink.LoopUID = CurrentUID++;
 
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(&WithLoopLink);
 	int err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова END
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° END
 	if (!lb->ReadLex(li) || lex_k_END != li.lex) return s_e_END;
 
 	return 0;
@@ -1309,7 +1309,7 @@ int CLoopStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CLoopStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CLoopStatement
 void CLoopStatement::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1323,7 +1323,7 @@ void CLoopStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта REPEAT
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° REPEAT
 CRepeatStatement::~CRepeatStatement()
 {
 	delete StatementSeq;
@@ -1332,32 +1332,32 @@ CRepeatStatement::~CRepeatStatement()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта REPEAT из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° REPEAT РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CRepeatStatement::Init(CLexBuf *lb)
 {
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(parent_element);
 	int err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова UNTIL
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° UNTIL
 	if (!lb->ReadLex(li) || lex_k_UNTIL != li.lex) return s_e_UNTIL;
 
-	//проверка наличия выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr = new CExpr(parent_element);
 	err_num = Expr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	return (Expr->GetResultId() == id_CBooleanVar) ? 0 : s_e_UNTIL_ExprType;
 }//Init
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CRepeatStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CRepeatStatement
 void CRepeatStatement::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1374,7 +1374,7 @@ void CRepeatStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта RETURN
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° RETURN
 CReturnStatement::~CReturnStatement()
 {
 	delete Expr;
@@ -1382,46 +1382,46 @@ CReturnStatement::~CReturnStatement()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта RETURN из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° RETURN РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CReturnStatement::Init(CLexBuf *lb)
 {
-	//получение ук. на родительский объект
+	//РїРѕР»СѓС‡РµРЅРёРµ СѓРє. РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
 	const CBaseName *BN = parent_element;
-	//поиск процедуры (или модуля) среди иерархии родительских объектов
+	//РїРѕРёСЃРє РїСЂРѕС†РµРґСѓСЂС‹ (РёР»Рё РјРѕРґСѓР»СЏ) СЃСЂРµРґРё РёРµСЂР°СЂС…РёРё СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РѕР±СЉРµРєС‚РѕРІ
 	while (BN->parent_element && !CProcedure::IsProcId(BN->name_id))
 		BN = BN->parent_element;
 
-	//проверка включенности оператора в процедуру (функцию)
+	//РїСЂРѕРІРµСЂРєР° РІРєР»СЋС‡РµРЅРЅРѕСЃС‚Рё РѕРїРµСЂР°С‚РѕСЂР° РІ РїСЂРѕС†РµРґСѓСЂСѓ (С„СѓРЅРєС†РёСЋ)
 	if (CProcedure::IsProcId(BN->name_id)) {
-		//получение результата выражения и проверка включенности в функцию
+		//РїРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РІС‹СЂР°Р¶РµРЅРёСЏ Рё РїСЂРѕРІРµСЂРєР° РІРєР»СЋС‡РµРЅРЅРѕСЃС‚Рё РІ С„СѓРЅРєС†РёСЋ
 		const EName_id ResultId = static_cast<const CProcedure*>(BN)->GetResultId();
 		if (id_CBaseName != ResultId) {
-			//проверка необходимости интерпретировать выражение как символьное
+			//РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёРЅС‚РµСЂРїСЂРµС‚РёСЂРѕРІР°С‚СЊ РІС‹СЂР°Р¶РµРЅРёРµ РєР°Рє СЃРёРјРІРѕР»СЊРЅРѕРµ
 			if (id_CCharVar == ResultId)
 				Expr = new CExpr(parent_element, ek_Char, false);
 			else
 				Expr = new CExpr(parent_element);
-			//инициализация выражения
+			//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 			int err_num = Expr->Init(lb);
 			if (err_num) return err_num;
-			//можно в случае id_CCharVar == ResultId выводить не err_num,
-			//а более подходящее сообщение о несовместимости по присваиванию
+			//РјРѕР¶РЅРѕ РІ СЃР»СѓС‡Р°Рµ id_CCharVar == ResultId РІС‹РІРѕРґРёС‚СЊ РЅРµ err_num,
+			//Р° Р±РѕР»РµРµ РїРѕРґС…РѕРґСЏС‰РµРµ СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РЅРµСЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РїРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЋ
 			/**/
-			//здесь необходима проверка совместимости по присваиванию Expr->GetResultId с ResultId
+			//Р·РґРµСЃСЊ РЅРµРѕР±С…РѕРґРёРјР° РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РїРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЋ Expr->GetResultId СЃ ResultId
 			/**/
-			//завершение обработки выражения
+			//Р·Р°РІРµСЂС€РµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё РІС‹СЂР°Р¶РµРЅРёСЏ
 			return 0;
 		}
 	}
 
-	//данный оператор находится в процедуре или модуле
+	//РґР°РЅРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ РЅР°С…РѕРґРёС‚СЃСЏ РІ РїСЂРѕС†РµРґСѓСЂРµ РёР»Рё РјРѕРґСѓР»Рµ
 
 	DECL_SAVE_POS
 
-	//проверяем отсутствие корректного выражения
+	//РїСЂРѕРІРµСЂСЏРµРј РѕС‚СЃСѓС‚СЃС‚РІРёРµ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr = new CExpr(parent_element);
 	if (!Expr->Init(lb)) {
-		//выражение корректно - выводим сообщение об ошибке (с проверкой нахождения в модуле)
+		//РІС‹СЂР°Р¶РµРЅРёРµ РєРѕСЂСЂРµРєС‚РЅРѕ - РІС‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ (СЃ РїСЂРѕРІРµСЂРєРѕР№ РЅР°С…РѕР¶РґРµРЅРёСЏ РІ РјРѕРґСѓР»Рµ)
 		if (id_CModule == BN->name_id)
 			return s_e_RETURN_ExprInModule;
 		else
@@ -1437,7 +1437,7 @@ int CReturnStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CReturnStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CReturnStatement
 void CReturnStatement::WriteCPP(CPP_files& f)
 {
 	if (Expr) {
@@ -1452,7 +1452,7 @@ void CReturnStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//деструктор объекта WHILE
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ РѕР±СЉРµРєС‚Р° WHILE
 CWhileStatement::~CWhileStatement()
 {
 	delete StatementSeq;
@@ -1461,29 +1461,29 @@ CWhileStatement::~CWhileStatement()
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта WHILE из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° WHILE РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CWhileStatement::Init(CLexBuf *lb)
 {
-	//проверка наличия выражения
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr = new CExpr(parent_element);
 	int err_num = Expr->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка типа выражения
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° РІС‹СЂР°Р¶РµРЅРёСЏ
 	if (Expr->GetResultId() != id_CBooleanVar) return s_e_WHILE_ExprType;
 
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова DO
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° DO
 	if (!lb->ReadLex(li) || lex_k_DO != li.lex) return s_e_DO;
 
-	//проверка наличия послед. операторов
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїРѕСЃР»РµРґ. РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	StatementSeq = new CStatementSeq(parent_element);
 	err_num = StatementSeq->Init(lb);
 	if (err_num) return err_num;
 
-	//проверка наличия кл. слова END
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° END
 	if (!lb->ReadLex(li) || lex_k_END != li.lex) return s_e_END;
 
 	return 0;
@@ -1491,7 +1491,7 @@ int CWhileStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CWhileStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CWhileStatement
 void CWhileStatement::WriteCPP(CPP_files& f)
 {
 	f.tab_fc();
@@ -1508,37 +1508,37 @@ void CWhileStatement::WriteCPP(CPP_files& f)
 
 
 //-----------------------------------------------------------------------------
-//инициализация объекта Assign (оператор присваивания) из потока лексем
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° Assign (РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ) РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int CAssignStatement::Init(CLexBuf *lb)
 {
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//проверка наличия кл. слова ":="
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР». СЃР»РѕРІР° ":="
 	if (!lb->ReadLex(li) || lex_k_assign != li.lex) return s_e_AssignMissing;
 
-	//проверка отсутствия эл-тов только для чтения в левой части присваивания
+	//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЌР»-С‚РѕРІ С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ РІ Р»РµРІРѕР№ С‡Р°СЃС‚Рё РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 	if (Designator->IsReadOnly()) return s_e_AssignReadonly;
 
-	//получение объекта, на который ссылается обозначение
+	//РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р°, РЅР° РєРѕС‚РѕСЂС‹Р№ СЃСЃС‹Р»Р°РµС‚СЃСЏ РѕР±РѕР·РЅР°С‡РµРЅРёРµ
 	CBaseName *BN = Designator->FindLastName();
-	//проверка наличия объекта и отсутствия признака константы, если он отсутствует,
-	//объект именованный, т.к. только константы могут быть неименованными
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕР±СЉРµРєС‚Р° Рё РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїСЂРёР·РЅР°РєР° РєРѕРЅСЃС‚Р°РЅС‚С‹, РµСЃР»Рё РѕРЅ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚,
+	//РѕР±СЉРµРєС‚ РёРјРµРЅРѕРІР°РЅРЅС‹Р№, С‚.Рє. С‚РѕР»СЊРєРѕ РєРѕРЅСЃС‚Р°РЅС‚С‹ РјРѕРіСѓС‚ Р±С‹С‚СЊ РЅРµРёРјРµРЅРѕРІР°РЅРЅС‹РјРё
 	if (!BN || (CBaseVar::IsVarId(BN->name_id) && static_cast<CBaseVar*>(BN)->is_const)) return s_e_AssignConst;
 
-	//проверка присвоения обобщенной переменной через ук. на обобщенную переменную
+	//РїСЂРѕРІРµСЂРєР° РїСЂРёСЃРІРѕРµРЅРёСЏ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ С‡РµСЂРµР· СѓРє. РЅР° РѕР±РѕР±С‰РµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
 	if (id_CCommonVar == BN->name_id) {
 		cv_compound_name = static_cast<CCommonVar*>(BN)->GetCPPCompoundName();
 		if (!cv_compound_name) return s_e_SpecTypeExpected;
 	}
 
-	//проверка присвоения текстовой строки массиву
+	//РїСЂРѕРІРµСЂРєР° РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 	if (id_CArrayVar == Designator->GetResultId())
 		str_to_array = true;
 	if (id_CPointerVar == BN->name_id && static_cast<CPointerVar*>(BN)->IsArrayPointer())
 		str_to_array = true;
 
-	//проверка требуемой интерпретации выражения 
+	//РїСЂРѕРІРµСЂРєР° С‚СЂРµР±СѓРµРјРѕР№ РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёРё РІС‹СЂР°Р¶РµРЅРёСЏ 
 	switch (Designator->GetResultId()) {
 	case id_CCharVar:
 		Expr = new CExpr(parent_element, ek_Char, false);
@@ -1550,27 +1550,27 @@ int CAssignStatement::Init(CLexBuf *lb)
 		Expr = new CExpr(parent_element);
 	}
 
-	//инициализация выражения
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 	int err_num = Expr->Init(lb);
 	if (err_num) return err_num;
 	EName_id ERI = Expr->GetResultId();
 
-	//проверка отсутствия указателя в случае присвоения обобщенной переменной
+	//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СѓРєР°Р·Р°С‚РµР»СЏ РІ СЃР»СѓС‡Р°Рµ РїСЂРёСЃРІРѕРµРЅРёСЏ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	if (cv_compound_name && id_CRecordVar != ERI) return s_e_Incompatible;
 
 
 	////////////////////////////////////////
-	//проверка совместимости по присваиванию
+	//РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РїРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЋ
 	/**/
 
-	//пока при присвоении указателей не проверяется условие расширения типов
+	//РїРѕРєР° РїСЂРё РїСЂРёСЃРІРѕРµРЅРёРё СѓРєР°Р·Р°С‚РµР»РµР№ РЅРµ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ СѓСЃР»РѕРІРёРµ СЂР°СЃС€РёСЂРµРЅРёСЏ С‚РёРїРѕРІ
 	if (id_CPointerVar == Designator->GetResultId() && id_CPointerVar != ERI && id_CArrayVar != ERI) return s_e_Incompatible;
 
-	//проверка присвоения текстовой строки массиву
+	//РїСЂРѕРІРµСЂРєР° РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 	if (id_CArrayVar == BN->name_id && id_CArrayVar != ERI && id_CCharVar != ERI) return s_e_Incompatible;
 
-	//проверка совместимости по присваиванию для числовых типов
-	/**/	//временно, пока не реализована полная проверка
+	//РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РїРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЋ РґР»СЏ С‡РёСЃР»РѕРІС‹С… С‚РёРїРѕРІ
+	/**/	//РІСЂРµРјРµРЅРЅРѕ, РїРѕРєР° РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅР° РїРѕР»РЅР°СЏ РїСЂРѕРІРµСЂРєР°
 	if (CBaseVar::IsDigitId(BN->name_id))
 		if (!IsId1IncloseId2(BN->name_id, ERI))
 			return s_e_Incompatible;
@@ -1580,51 +1580,51 @@ int CAssignStatement::Init(CLexBuf *lb)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CAssignStatement
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CAssignStatement
 void CAssignStatement::WriteCPP(CPP_files& f)
 {
 	////////////////////////////////////////////////////
-	//генерация кода присвоения текстовой строки массиву
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 	if (str_to_array) {
 		WriteCPP_array(f);
 		return;
 	}
 
 	//////////////////////////////////////
-	//генерация кода обычного присваивания
+	//РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РѕР±С‹С‡РЅРѕРіРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 	f.tab_fc();
-	//в случае присвоения обобщенной переменной генерируем исп. значения переменной
+	//РІ СЃР»СѓС‡Р°Рµ РїСЂРёСЃРІРѕРµРЅРёСЏ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РіРµРЅРµСЂРёСЂСѓРµРј РёСЃРї. Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 	if (cv_compound_name) fprintf(f.fc, "*");
-	//запись кода обозначения без генерации кода охраны (если есть охрана)
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РѕР±РѕР·РЅР°С‡РµРЅРёСЏ Р±РµР· РіРµРЅРµСЂР°С†РёРё РєРѕРґР° РѕС…СЂР°РЅС‹ (РµСЃР»Рё РµСЃС‚СЊ РѕС…СЂР°РЅР°)
 	Designator->WriteCPP_Guardless(f);
-	//в случае присвоения обобщенной переменной генерируем обращение к соотв. члену
+	//РІ СЃР»СѓС‡Р°Рµ РїСЂРёСЃРІРѕРµРЅРёСЏ РѕР±РѕР±С‰РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РіРµРЅРµСЂРёСЂСѓРµРј РѕР±СЂР°С‰РµРЅРёРµ Рє СЃРѕРѕС‚РІ. С‡Р»РµРЅСѓ
 	if (cv_compound_name) fprintf(f.fc, "->O2M_SPEC_%s", cv_compound_name);
-	//запись операции присвоения
+	//Р·Р°РїРёСЃСЊ РѕРїРµСЂР°С†РёРё РїСЂРёСЃРІРѕРµРЅРёСЏ
 	fprintf(f.fc, " = ");
-	//запись выражения
+	//Р·Р°РїРёСЃСЊ РІС‹СЂР°Р¶РµРЅРёСЏ
 	Expr->WriteCPP(f);
 }//WriteCPP
 
 
 //-----------------------------------------------------------------------------
-//запись кода в случае присвоения текстовой строки массиву
+//Р·Р°РїРёСЃСЊ РєРѕРґР° РІ СЃР»СѓС‡Р°Рµ РїСЂРёСЃРІРѕРµРЅРёСЏ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё РјР°СЃСЃРёРІСѓ
 void CAssignStatement::WriteCPP_array(CPP_files &f)
 {
 	f.tab_fc();
 	fprintf(f.fc, "COPY(");
 
-	//запись значения источника
+	//Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ РёСЃС‚РѕС‡РЅРёРєР°
 	Expr->WriteCPP(f);
 	fprintf(f.fc, ", ");
-	//получение источника (переменной-массива или указателя)
+	//РїРѕР»СѓС‡РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° (РїРµСЂРµРјРµРЅРЅРѕР№-РјР°СЃСЃРёРІР° РёР»Рё СѓРєР°Р·Р°С‚РµР»СЏ)
 	CBaseName* BN = Expr->FindLastName();
 	WriteCPP_COPY_Par(f, BN);
 	fprintf(f.fc, ", ");
 
-	//запись значения приемника
+	//Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ РїСЂРёРµРјРЅРёРєР°
 	Designator->WriteCPP(f);
 	fprintf(f.fc, ", ");
-	//получение приемника (переменной-массива или указателя)
+	//РїРѕР»СѓС‡РµРЅРёРµ РїСЂРёРµРјРЅРёРєР° (РїРµСЂРµРјРµРЅРЅРѕР№-РјР°СЃСЃРёРІР° РёР»Рё СѓРєР°Р·Р°С‚РµР»СЏ)
 	BN = Designator->FindLastName();
 	WriteCPP_COPY_Par(f, BN);
 	fprintf(f.fc, ")");
@@ -1633,16 +1633,16 @@ void CAssignStatement::WriteCPP_array(CPP_files &f)
 
 
 //-----------------------------------------------------------------------------
-//Запись кода CGuardPair
+//Р—Р°РїРёСЃСЊ РєРѕРґР° CGuardPair
 void CGuardPair::WriteCPP(CPP_files &f)
 {
-	//запись кода проверки динамического типа переменной
+	//Р·Р°РїРёСЃСЊ РєРѕРґР° РїСЂРѕРІРµСЂРєРё РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ С‚РёРїР° РїРµСЂРµРјРµРЅРЅРѕР№
 	Guard->WriteCPP(f);
 
-	//запись последовательности операторов
+	//Р·Р°РїРёСЃСЊ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	if (StatementSeq) StatementSeq->WriteCPP(f);
 
-	//запись закрывающей скобки блока операторов (открывающая скобка записана в Guard->WriteCPP)
+	//Р·Р°РїРёСЃСЊ Р·Р°РєСЂС‹РІР°СЋС‰РµР№ СЃРєРѕР±РєРё Р±Р»РѕРєР° РѕРїРµСЂР°С‚РѕСЂРѕРІ (РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° Р·Р°РїРёСЃР°РЅР° РІ Guard->WriteCPP)
 	f.tab_fc();
 	fprintf(f.fc, "}");
 }
