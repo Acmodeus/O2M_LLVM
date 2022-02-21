@@ -1,5 +1,5 @@
 //=============================================================================
-// Описание деклараций, используемых всеми модулями транслятора
+// РћРїРёСЃР°РЅРёРµ РґРµРєР»Р°СЂР°С†РёР№, РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РІСЃРµРјРё РјРѕРґСѓР»СЏРјРё С‚СЂР°РЅСЃР»СЏС‚РѕСЂР°
 //=============================================================================
 
 #include "Common.h"
@@ -8,7 +8,7 @@
 
 
 //-----------------------------------------------------------------------------
-//проверка поглощения (inclusion) типом id1 типа id2
+//РїСЂРѕРІРµСЂРєР° РїРѕРіР»РѕС‰РµРЅРёСЏ (inclusion) С‚РёРїРѕРј id1 С‚РёРїР° id2
 bool IsId1IncloseId2(const EName_id id1, const EName_id id2) {
 	if (id1 == id2) return true;
 	switch (id1) {
@@ -48,29 +48,29 @@ bool IsId1IncloseId2(const EName_id id1, const EName_id id2) {
 
 
 //-----------------------------------------------------------------------------
-//проверка одинаковых типов (Same Types)
+//РїСЂРѕРІРµСЂРєР° РѕРґРёРЅР°РєРѕРІС‹С… С‚РёРїРѕРІ (Same Types)
 bool IsSameTypes(const CBaseVar* v1, const CBaseVar* v2) {
 	if (v1->name_id != id_CArrayVar)
 		if (v1->name_id == v2->name_id) return true; else return false;
 	else
 		/**/
-		//ввести проверку не открытых массивов
+		//РІРІРµСЃС‚Рё РїСЂРѕРІРµСЂРєСѓ РЅРµ РѕС‚РєСЂС‹С‚С‹С… РјР°СЃСЃРёРІРѕРІ
 		return false;
 }
 
 
 //-----------------------------------------------------------------------------
-//проверка равных типов (Equal Types)
+//РїСЂРѕРІРµСЂРєР° СЂР°РІРЅС‹С… С‚РёРїРѕРІ (Equal Types)
 bool IsEqualTypes(const CBaseVar* v1, const CBaseVar* v2) {
 	if (IsSameTypes(v1, v2)) return true;
 	/**/
-	//ввести проверку открытых массивов с равными типами эл-тов и процедурных типов с совпадающими списками формальных параметров
+	//РІРІРµСЃС‚Рё РїСЂРѕРІРµСЂРєСѓ РѕС‚РєСЂС‹С‚С‹С… РјР°СЃСЃРёРІРѕРІ СЃ СЂР°РІРЅС‹РјРё С‚РёРїР°РјРё СЌР»-С‚РѕРІ Рё РїСЂРѕС†РµРґСѓСЂРЅС‹С… С‚РёРїРѕРІ СЃ СЃРѕРІРїР°РґР°СЋС‰РёРјРё СЃРїРёСЃРєР°РјРё С„РѕСЂРјР°Р»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	return false;
 }
 
 
 //-----------------------------------------------------------------------------
-//проверка совместимости по присваиванию (Assign Compatible)
+//РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РїРѕ РїСЂРёСЃРІР°РёРІР°РЅРёСЋ (Assign Compatible)
 bool IsEAssignCompatibleWithV(const CBaseVar* ve, const CBaseVar* vv) {
 	if (IsSameTypes(ve, vv)) return true;
 	if (CBaseVar::IsDigitId(ve->name_id) && CBaseVar::IsDigitId(vv->name_id) && IsId1IncloseId2(vv->name_id, ve->name_id)) return true;
@@ -82,7 +82,7 @@ bool IsEAssignCompatibleWithV(const CBaseVar* ve, const CBaseVar* vv) {
 
 
 //-----------------------------------------------------------------------------
-//получение ид. наименьшего типа, поглощающего оба операнда, или id_CBaseName
+//РїРѕР»СѓС‡РµРЅРёРµ РёРґ. РЅР°РёРјРµРЅСЊС€РµРіРѕ С‚РёРїР°, РїРѕРіР»РѕС‰Р°СЋС‰РµРіРѕ РѕР±Р° РѕРїРµСЂР°РЅРґР°, РёР»Рё id_CBaseName
 EName_id GetMaxDigitId(const EName_id id1, const EName_id id2) {
 	if (IsId1IncloseId2(id1, id2)) return id1;
 	if (IsId1IncloseId2(id2, id1)) return id2;
@@ -91,23 +91,23 @@ EName_id GetMaxDigitId(const EName_id id1, const EName_id id2) {
 
 
 //-----------------------------------------------------------------------------
-//создание объекта TYPE из потока лексем
+//СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° TYPE РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int TypeSelector(CLexBuf *lb, CBaseType* &BaseType, const CBaseName* parent)
 {
-	//для проверки наличия QualidentType нужно сохранять позицию в файле
+	//РґР»СЏ РїСЂРѕРІРµСЂРєРё РЅР°Р»РёС‡РёСЏ QualidentType РЅСѓР¶РЅРѕ СЃРѕС…СЂР°РЅСЏС‚СЊ РїРѕР·РёС†РёСЋ РІ С„Р°Р№Р»Рµ
 	DECL_SAVE_POS
-	//буфер для чтения информации о текущей лексеме
+	//Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р»РµРєСЃРµРјРµ
 	CLexInfo li;
 
-	//получение ключевого слова или ид.
+	//РїРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡РµРІРѕРіРѕ СЃР»РѕРІР° РёР»Рё РёРґ.
 	if (!lb->ReadLex(li) || (lex_k_dot > li.lex && lex_i != li.lex)) return s_e_TypeDefinition;
 
-	BaseType = NULL;				//указатель на тип
+	BaseType = NULL;				//СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РёРї
 
-	//проверка типа лексемы для выбора инициализируемого типа
+	//РїСЂРѕРІРµСЂРєР° С‚РёРїР° Р»РµРєСЃРµРјС‹ РґР»СЏ РІС‹Р±РѕСЂР° РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРјРѕРіРѕ С‚РёРїР°
 	switch (li.lex) {
 	case lex_i:
-		//возможно наличие QualidentType
+		//РІРѕР·РјРѕР¶РЅРѕ РЅР°Р»РёС‡РёРµ QualidentType
 		RESTORE_POS
 		BaseType = new CQualidentType(parent);
 		break;
@@ -151,23 +151,23 @@ int TypeSelector(CLexBuf *lb, CBaseType* &BaseType, const CBaseName* parent)
 		BaseType = new CBooleanType(parent);
 	}
 
-	//инициализация созданного объекта
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕР·РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if (BaseType) {
 		int err_num = BaseType->Init(lb);
-		//проверка отсутствия ошибок при инициализации
+		//РїСЂРѕРІРµСЂРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РѕС€РёР±РѕРє РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 		if (err_num) {
 			delete BaseType;
 			BaseType = NULL;
-			return err_num;	//код ошибки
+			return err_num;	//РєРѕРґ РѕС€РёР±РєРё
 		}
-		//проверка наличия SpecType
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ SpecType
 		if (BaseType->name_id == id_CQualidentType) {
 			SAVE_POS
 			err_num = !lb->ReadLex(li) || lex_k_lt != li.lex;
 			RESTORE_POS
 			if (!err_num) {
-				//найден SpecType, инициализируем его
-				//получаем уже загруженный Qualident из CQualidentType
+				//РЅР°Р№РґРµРЅ SpecType, РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РµРіРѕ
+				//РїРѕР»СѓС‡Р°РµРј СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅС‹Р№ Qualident РёР· CQualidentType
 				CQualident* q = static_cast<CQualidentType*>(BaseType)->Qualident;
 				static_cast<CQualidentType*>(BaseType)->Qualident = NULL;
 				delete BaseType;
@@ -181,7 +181,7 @@ int TypeSelector(CLexBuf *lb, CBaseType* &BaseType, const CBaseName* parent)
 				}
 			}
 		}
-		//тип инициализирован
+		//С‚РёРї РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅ
 		return 0;
 	}
 
@@ -190,10 +190,10 @@ int TypeSelector(CLexBuf *lb, CBaseType* &BaseType, const CBaseName* parent)
 
 
 //-----------------------------------------------------------------------------
-//создание константы из потока лексем
+//СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ РёР· РїРѕС‚РѕРєР° Р»РµРєСЃРµРј
 int ConstSelector(CLexBuf *lb, CBaseVar* &BaseVar, const CBaseName* parent_element)
 {
-	//создание выражения
+	//СЃРѕР·РґР°РЅРёРµ РІС‹СЂР°Р¶РµРЅРёСЏ
 	CExpr* Expr = new CExpr(parent_element);
 	int err_num = Expr->Init(lb);
 	if (err_num) {
@@ -201,7 +201,7 @@ int ConstSelector(CLexBuf *lb, CBaseVar* &BaseVar, const CBaseName* parent_eleme
 		BaseVar = NULL;
 		return err_num;
 	}
-	//получение константы
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 	err_num = Expr->CreateConst(BaseVar);
 	delete Expr;
 	return err_num;
@@ -209,7 +209,7 @@ int ConstSelector(CLexBuf *lb, CBaseVar* &BaseVar, const CBaseName* parent_eleme
 
 
 //-----------------------------------------------------------------------------
-//копирование строки с выделением памяти
+//РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЃ РІС‹РґРµР»РµРЅРёРµРј РїР°РјСЏС‚Рё
 char* str_new_copy(const char* source)
 {
 	char* dest = new char[strlen(source) + 1];
@@ -218,7 +218,7 @@ char* str_new_copy(const char* source)
 
 
 //-----------------------------------------------------------------------------
-//получение уникального числового идентификатора
+//РїРѕР»СѓС‡РµРЅРёРµ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ С‡РёСЃР»РѕРІРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
 int GetGlobalUId()
 {
 	static int GlobalUId = 0;
