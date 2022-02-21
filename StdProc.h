@@ -273,7 +273,7 @@ public:
 	CAssertStdProc(const CBaseName* parent) : CBase(parent), Expr(parent), AssertVal(0) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	CExpr Expr;		//выражение, для которого утверждается истинность (иначе прерывание)
 	long AssertVal;	//возвращаемое в систему значение
 };//CAssertStdProc

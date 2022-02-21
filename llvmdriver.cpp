@@ -1,3 +1,7 @@
+//===============================================================
+// Описание процедур, для компиляции с помощью LLVM
+//===============================================================
+
 #include "llvmdriver.h"
 
 //Деструктор объекта LLVMDriver
@@ -649,6 +653,8 @@ Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
             WriteLLVM(static_cast<CIncStdProc*>(base));
         }else if(typeid(*base) == typeid (CNewStdProc)){
             WriteLLVM(static_cast<CNewStdProc*>(base));
+        }else if(typeid(*base) == typeid (CAssertStdProc)){
+            WriteLLVM(static_cast<CAssertStdProc*>(base));
         }//if
     }//for
     return nullptr;
@@ -1892,6 +1898,32 @@ Value *LLVMDriver::WriteLLVM(CNewStdProc *d)
         Builder.CreateStore(ConstantInt::get(Type::getInt32Ty(TheContext),SpecTypes[specname]),spec);
     }//if
     return Builder.CreateStore(call,des);
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры ASSERT
+Value *LLVMDriver::WriteLLVM(CAssertStdProc *d)
+{
+    Function *TheFunction = Builder.GetInsertBlock()->getParent();
+    BasicBlock *assertBB = BasicBlock::Create(TheContext, "assert");
+    BasicBlock *exitBB = BasicBlock::Create(TheContext, "exit",TheFunction);
+    Value* expr = CastToType(WriteLLVM(&d->Expr),Type::getInt1Ty(TheContext));
+    Builder.CreateCondBr(expr, assertBB, exitBB);
+    Builder.SetInsertPoint(exitBB);
+    std::string name="exit";
+    Function *F=Functions[name];
+    if(!F){
+        Type* reType=Type::getVoidTy(TheContext);
+        std::vector<Type *> pars(1, Type::getInt32Ty(TheContext));
+        StringVector emptyVector;
+        F = createFunction(reType,pars,emptyVector,name);
+        Functions[name]=F;
+    }
+    Builder.CreateCall(F,ConstantInt::get(Type::getInt32Ty(TheContext),d->AssertVal));
+    Builder.CreateUnreachable();
+    TheFunction->getBasicBlockList().push_back(assertBB);
+    Builder.SetInsertPoint(assertBB);
+    return nullptr;
 }//WriteLLVM
 
 

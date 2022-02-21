@@ -1,3 +1,7 @@
+//===============================================================
+// Объявление процедур, для компиляции с помощью LLVM
+//===============================================================
+
 #ifndef LLVMDRIVER_H
 #define LLVMDRIVER_H
 
@@ -129,6 +133,7 @@ public:
     Value* WriteLLVM(CDecStdProc* d);
     Value* WriteLLVM(CIncStdProc* d);
     Value* WriteLLVM(CNewStdProc* d);
+    Value* WriteLLVM(CAssertStdProc* d);
 };
 
 #endif // LLVMDRIVER_H
