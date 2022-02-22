@@ -655,6 +655,10 @@ Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
             WriteLLVM(static_cast<CNewStdProc*>(base));
         }else if(typeid(*base) == typeid (CAssertStdProc)){
             WriteLLVM(static_cast<CAssertStdProc*>(base));
+        }else if(typeid(*base) == typeid (CHaltStdProc)){
+            WriteLLVM(static_cast<CHaltStdProc*>(base));
+        }else if(typeid(*base) == typeid (CCopyStdProc)){
+            WriteLLVM(static_cast<CCopyStdProc*>(base));
         }//if
     }//for
     return nullptr;
@@ -1924,6 +1928,69 @@ Value *LLVMDriver::WriteLLVM(CAssertStdProc *d)
     TheFunction->getBasicBlockList().push_back(assertBB);
     Builder.SetInsertPoint(assertBB);
     return nullptr;
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры HALT
+Value *LLVMDriver::WriteLLVM(CHaltStdProc *d)
+{
+    Function *TheFunction = Builder.GetInsertBlock()->getParent();
+    BasicBlock *unrechBB = BasicBlock::Create(TheContext, "unreach");
+    BasicBlock *exitBB = BasicBlock::Create(TheContext, "halt",TheFunction);
+    Value* expr = ConstantInt::get(Type::getInt1Ty(TheContext),1);
+    Builder.CreateCondBr(expr, exitBB,unrechBB);
+    Builder.SetInsertPoint(exitBB);
+    std::string name="exit";
+    Function *F=Functions[name];
+    if(!F){
+        Type* reType=Type::getVoidTy(TheContext);
+        std::vector<Type *> pars(1, Type::getInt32Ty(TheContext));
+        StringVector emptyVector;
+        F = createFunction(reType,pars,emptyVector,name);
+        Functions[name]=F;
+    }
+    Builder.CreateCall(F,ConstantInt::get(Type::getInt32Ty(TheContext),d->HaltVal));
+    Builder.CreateUnreachable();
+    TheFunction->getBasicBlockList().push_back(unrechBB);
+    Builder.SetInsertPoint(unrechBB);
+    return nullptr;
+}//WriteLLVM
+
+//-----------------------------------------------------------------------------
+//Генерация кода LLVM процедуры COPY
+Value *LLVMDriver::WriteLLVM(CCopyStdProc *d)
+{
+    //используется функция COPY из сгенерированного файла _O2M_sys.cpp
+    std::string name="_Z4COPYPKciPci";
+    Function *F=Functions[name];
+    if(!F){
+        Type *FunRetType=Type::getVoidTy(TheContext);
+        std::vector<Type *> pars={Type::getInt8PtrTy(TheContext),
+                                  Type::getInt32Ty(TheContext),
+                                  Type::getInt8PtrTy(TheContext),
+                                  Type::getInt32Ty(TheContext)};
+        StringVector emptyVector;
+        F=createFunction(FunRetType,pars,emptyVector,name);
+        Functions[name]=F;
+    }//if
+    //получение значения источника
+    Value* string1 = WriteLLVM(&d->ExprSource);
+    CBaseName* BN = d->ExprSource.FindLastName();
+    Value* size1 = WriteLLVM_COPY_Par(BN);
+    //получение значения приемника
+    Value* string2 = WriteLLVM(&d->ExprDest);
+    BN = d->ExprDest.FindLastName();
+    Value* size2 = WriteLLVM_COPY_Par(BN);
+    //Если указатель на строку, получим саму строку
+    while(string2->getType()->getContainedType(0)->isArrayTy()){
+        std::vector<Value*> values;
+        values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
+        values.push_back(Constant::getNullValue(Type::getInt32Ty(TheContext)));
+        string2=Builder.CreateGEP(string2,values);
+    }//while
+    //Вызов функции COPY
+    std::vector<Value *> values={string1,size1,string2,size2};
+    return Builder.CreateCall(F,values);
 }//WriteLLVM
 
 

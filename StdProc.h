@@ -229,9 +229,10 @@ public:
 //COPY
 class CCopyStdProc : public CBase
 {
+public:
 	CExpr ExprSource;
 	CExpr ExprDest;
-public:
+//public:
 	CCopyStdProc(const CBaseName* parent) : CBase(parent), ExprSource(parent), ExprDest(parent) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
@@ -287,7 +288,7 @@ public:
 	CHaltStdProc(const CBaseName *parent) : CBase(parent), HaltVal(0) {};
 	int Init(CLexBuf *lb);
 	void WriteCPP(CPP_files& f);
-private:
+//private:
 	long HaltVal;	//возвращаемое в систему значение
 };//CHaltStdProc
 

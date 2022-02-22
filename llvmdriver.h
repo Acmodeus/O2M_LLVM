@@ -134,6 +134,8 @@ public:
     Value* WriteLLVM(CIncStdProc* d);
     Value* WriteLLVM(CNewStdProc* d);
     Value* WriteLLVM(CAssertStdProc* d);
+    Value* WriteLLVM(CHaltStdProc* d);
+    Value* WriteLLVM(CCopyStdProc* d);
 };
 
 #endif // LLVMDRIVER_H
