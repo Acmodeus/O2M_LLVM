@@ -6,11 +6,8 @@
 #define LLVMDRIVER_H
 
 #include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/Optional.h"
-#include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
-#include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/IRBuilder.h"
@@ -37,6 +34,11 @@ using namespace llvm::sys;
 class LLVMDriver
 {
 public:
+    //генерация кода LLVM и запись в файл
+    int Init(CModule *m);
+    LLVMDriver(): Builder(TheContext){};
+    ~LLVMDriver();
+private:
     LLVMContext TheContext;
     IRBuilder<> Builder;
     std::unique_ptr<Module> TheModule;
@@ -53,8 +55,6 @@ public:
     std::map<std::string, int> SpecTypes;
     //Карта блоков, используется для выхода из бесконечного цикла
     std::map<int, BasicBlock *> BasicBlocks;
-    LLVMDriver(): Builder(TheContext){};
-    ~LLVMDriver();
     //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
     AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, std::string name,Type* type);
     //Функция приведения типов
@@ -72,8 +72,6 @@ public:
     //создание функции выбора специализированных функций
     void CreateCommonFun(CCommonProc* p,Function* F);
     void CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector::const_iterator i,std::string funName,std::vector<Value*> values,std::vector<Type *> pars);
-    //генерация кода LLVM и запись в файл
-    int Init(CModule *m);
     //генерация кода LLVM модуля
     Value* WriteLLVM(CModule *m);
     Value* WriteLLVM_var(CDeclSeq* ds);
