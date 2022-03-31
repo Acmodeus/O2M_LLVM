@@ -1098,6 +1098,7 @@ Value *LLVMDriver::WriteLLVM(CReturnStatement *s)
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
     Builder.SetInsertPoint(unreachBB);
+    Builder.CreateUnreachable();
     return nullptr;
 }//WriteLLVM
 
@@ -1219,6 +1220,7 @@ Value *LLVMDriver::WriteLLVM(CExitStatement *s)
     BasicBlock *unreachBB = BasicBlock::Create(TheContext, "unreach");
     TheFunction->getBasicBlockList().push_back(unreachBB);
     Builder.SetInsertPoint(unreachBB);
+    Builder.CreateUnreachable();
     return nullptr;
 }//WriteLLVM
 
@@ -1935,11 +1937,6 @@ Value *LLVMDriver::WriteLLVM(CAssertStdProc *d)
 Value *LLVMDriver::WriteLLVM(CHaltStdProc *d)
 {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    BasicBlock *unrechBB = BasicBlock::Create(TheContext, "unreach");
-    BasicBlock *exitBB = BasicBlock::Create(TheContext, "halt",TheFunction);
-    Value* expr = ConstantInt::get(Type::getInt1Ty(TheContext),1);
-    Builder.CreateCondBr(expr, exitBB,unrechBB);
-    Builder.SetInsertPoint(exitBB);
     std::string name="exit";
     Function *F=Functions[name];
     if(!F){
@@ -1951,8 +1948,6 @@ Value *LLVMDriver::WriteLLVM(CHaltStdProc *d)
     }
     Builder.CreateCall(F,ConstantInt::get(Type::getInt32Ty(TheContext),d->HaltVal));
     Builder.CreateUnreachable();
-    TheFunction->getBasicBlockList().push_back(unrechBB);
-    Builder.SetInsertPoint(unrechBB);
     return nullptr;
 }//WriteLLVM
 
