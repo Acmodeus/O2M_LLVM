@@ -79,7 +79,7 @@ private:
     Value* WriteLLVM(CStatementSeq* ss);
     //генерация кода LLVM переменных
     Value* WriteLLVM(CBaseVar* v);
-    Value* WriteLLVM_ConstValue(CBaseVar* v);
+    Constant* WriteLLVM_ConstValue(CBaseVar* v);
 
     //генерация кода LLVM процедуры
     Function* WriteLLVM(CProcedure* p);

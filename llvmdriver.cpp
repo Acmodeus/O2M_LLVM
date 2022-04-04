@@ -18,38 +18,38 @@ LLVMDriver::~LLVMDriver()
 //-----------------------------------------------------------------------------
 //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
 AllocaInst *LLVMDriver::CreateEntryBlockAlloca(Function *TheFunction,
-                                          std::string name,Type* type) {
-  IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
-                 TheFunction->getEntryBlock().begin());
-  return TmpB.CreateAlloca(type, 0,name);
+                                               std::string name,Type* type) {
+    IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
+                     TheFunction->getEntryBlock().begin());
+    return TmpB.CreateAlloca(type, 0,name);
 }//CreateEntryBlockAlloca
 
 //-----------------------------------------------------------------------------
 //Функция приведения типов
 Value *LLVMDriver::CastToType(Value* v, Type* destType) {
-  //В случае v=Nullptr, возвращается либо Nullptr, либо NullValue типа destType
-  if(!v){
-    if(!destType) return v;
-    return Constant::getNullValue(destType);
-  }
-  Type* valueType = v->getType();
-  //для указателей, массивов приведение типа не производится
-  if (valueType->isPointerTy()||valueType->isArrayTy()) return v;
-  if(v->getType() == destType) return v;
-  //приведение к типу Double
-  if(destType==Type::getDoubleTy(TheContext)){
-      return Builder.CreateSIToFP(v,destType,"castTmp");
-  }
-  //приведение к целому типу размером 1 бит производится через сравнение с нулем
-  if(destType==Type::getInt1Ty(TheContext)){
-      if(valueType == Type::getDoubleTy(TheContext))
-          return Builder.CreateFCmpONE(v,ConstantFP::get(valueType,0.0),"castTmp");
-      else return Builder.CreateICmpNE(v,ConstantInt::get(valueType,0),"castTmp");
-  }
-  //приведение к целому типу размером > 1 бит
-  if(valueType == Type::getDoubleTy(TheContext))
-      return Builder.CreateFPToSI(v,destType,"castTmp");
-  return Builder.CreateIntCast(v,destType,true,"castTmp");
+    //В случае v=Nullptr, возвращается либо Nullptr, либо NullValue типа destType
+    if(!v){
+        if(!destType) return v;
+        return Constant::getNullValue(destType);
+    }
+    Type* valueType = v->getType();
+    //для указателей, массивов приведение типа не производится
+    if (valueType->isPointerTy()||valueType->isArrayTy()) return v;
+    if(v->getType() == destType) return v;
+    //приведение к типу Double
+    if(destType==Type::getDoubleTy(TheContext)){
+        return Builder.CreateSIToFP(v,destType,"castTmp");
+    }
+    //приведение к целому типу размером 1 бит производится через сравнение с нулем
+    if(destType==Type::getInt1Ty(TheContext)){
+        if(valueType == Type::getDoubleTy(TheContext))
+            return Builder.CreateFCmpONE(v,ConstantFP::get(valueType,0.0),"castTmp");
+        else return Builder.CreateICmpNE(v,ConstantInt::get(valueType,0),"castTmp");
+    }
+    //приведение к целому типу размером > 1 бит
+    if(valueType == Type::getDoubleTy(TheContext))
+        return Builder.CreateFPToSI(v,destType,"castTmp");
+    return Builder.CreateIntCast(v,destType,true,"castTmp");
 }//CastToType
 
 //-----------------------------------------------------------------------------
@@ -133,8 +133,8 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
         if(PT->Type){
             type = GetLLVMType(PT->Type);
         }else{
-                CBaseType* BT = PT->FindType();
-                type = GetLLVMType(BT);
+            CBaseType* BT = PT->FindType();
+            type = GetLLVMType(BT);
         }//if
         //В случае указателя на указатель возвращается первый указатель
         if(type->isPointerTy())
@@ -147,7 +147,7 @@ Type *LLVMDriver::GetLLVMType(CBaseVar *v)
         //Если тип уже создан - возвращаем
         StructType* ST=TheModule->getTypeByName(RV->GetTypeName());
         if(ST){
-           return ST;
+            return ST;
         }//if
         //создание типа
         ST=StructType::create(TheContext,RV->GetTypeName());
@@ -210,8 +210,8 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         if(PT->Type){
             type = GetLLVMType(PT->Type);
         }else{
-                CBaseType* BT = PT->FindType();
-                type = GetLLVMType(BT);
+            CBaseType* BT = PT->FindType();
+            type = GetLLVMType(BT);
         }//if
         //В случае указателя на указатель возвращается первый указатель
         if(type->isPointerTy())
@@ -223,7 +223,7 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         //Если тип уже создан - возвращаем
         StructType* ST=TheModule->getTypeByName(v->name);
         if(ST){
-           return ST;
+            return ST;
         }//if
         //создание типа
         ST=StructType::create(TheContext,v->name);
@@ -245,7 +245,7 @@ Type *LLVMDriver::GetLLVMType(CBaseType *v)
         //Если тип уже создан - возвращаем
         StructType* ST=TheModule->getTypeByName(v->name);
         if(ST){
-           return ST;
+            return ST;
         }//if
         //создание типа
         ST=StructType::create(TheContext,v->name);
@@ -349,18 +349,18 @@ Function* LLVMDriver::GetFunction(CProcedure *p)
     CBaseVarVector::const_iterator i;
     i = p->FormalPars->FPStore.begin();
     for (i = p->FormalPars->FPStore.begin(); i != p->FormalPars->FPStore.end(); ++i){
-      names.push_back((*i)->name);
-      //для массивов добавляются размеры измерений в качестве формальных параметров
-      if ((*i)->name_id==id_CArrayVar) {
-          CArrayType* AT = static_cast<CArrayVar*>(*i)->ArrayType;
-          int dimention = 0;
-          while (AT->name_id == id_CArrayType) {
-              std::string s="O2M_ARR_"+std::to_string(dimention)+"_"+(*i)->name;
-              names.push_back(&s[0]);
-              ++dimention;
-              AT = static_cast<CArrayType*>(AT->Type);
-          }//while
-      }//if
+        names.push_back((*i)->name);
+        //для массивов добавляются размеры измерений в качестве формальных параметров
+        if ((*i)->name_id==id_CArrayVar) {
+            CArrayType* AT = static_cast<CArrayVar*>(*i)->ArrayType;
+            int dimention = 0;
+            while (AT->name_id == id_CArrayType) {
+                std::string s="O2M_ARR_"+std::to_string(dimention)+"_"+(*i)->name;
+                names.push_back(&s[0]);
+                ++dimention;
+                AT = static_cast<CArrayType*>(AT->Type);
+            }//while
+        }//if
     }//for
     //Рессивер передаем в качестве формального параметра
     if(p->Receiver){
@@ -497,60 +497,60 @@ void LLVMDriver::CreateCommonFun_loop(CCommonProc *p, Function *F,CBaseVarVector
 //генерация кода LLVM и запись в файл
 int LLVMDriver::Init(CModule* m)
 {
-      //генерация кода LLVM IR для модуля O2M
-      WriteLLVM(m);
-      //Инициализация целевых платформ
-      InitializeAllTargetInfos();
-      InitializeAllTargets();
-      InitializeAllTargetMCs();
-      InitializeAllAsmParsers();
-      InitializeAllAsmPrinters();
+    //генерация кода LLVM IR для модуля O2M
+    WriteLLVM(m);
+    //Инициализация целевых платформ
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
 
-      auto TargetTriple = sys::getDefaultTargetTriple();
-      TheModule->setTargetTriple(TargetTriple);
+    auto TargetTriple = sys::getDefaultTargetTriple();
+    TheModule->setTargetTriple(TargetTriple);
 
-       std::string Error;
-       auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
 
-       //Печать ошибки и выход если не смогли найти целевую платформу
-       if (!Target) {
-         errs() << Error;
-         return 1;
-       }//if
+    //Печать ошибки и выход если не смогли найти целевую платформу
+    if (!Target) {
+        errs() << Error;
+        return 1;
+    }//if
 
-       auto CPU = "generic";
-       auto Features = "";
+    auto CPU = "generic";
+    auto Features = "";
 
-       TargetOptions opt;
-       auto RM = Optional<Reloc::Model>();
-       auto TheTargetMachine =
+    TargetOptions opt;
+    auto RM = Optional<Reloc::Model>();
+    auto TheTargetMachine =
             Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
 
-       TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+    TheModule->setDataLayout(TheTargetMachine->createDataLayout());
 
-        std::string f_name = std::string(m->name)+".o";
-        std::error_code EC;
-        raw_fd_ostream dest(f_name, EC, sys::fs::OF_None);
+    std::string f_name = std::string(m->name)+".o";
+    std::error_code EC;
+    raw_fd_ostream dest(f_name, EC, sys::fs::OF_None);
 
-        if (EC) {
-          errs() << "Could not open file: " << EC.message();
-          return 1;
-        }//if
+    if (EC) {
+        errs() << "Could not open file: " << EC.message();
+        return 1;
+    }//if
 
-        legacy::PassManager pass;
-        auto FileType = CGFT_ObjectFile;
+    legacy::PassManager pass;
+    auto FileType = CGFT_ObjectFile;
 
-        if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
-          errs() << "TheTargetMachine can't emit a file of this type";
-          return 1;
-        }//if
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        errs() << "TheTargetMachine can't emit a file of this type";
+        return 1;
+    }//if
 
-        pass.run(*TheModule);
-        dest.flush();
+    pass.run(*TheModule);
+    dest.flush();
 
-        outs() << "Wrote " << f_name << "\n";
+    outs() << "Wrote " << f_name << "\n";
 
-        return 0;
+    return 0;
 }//Init
 
 //-----------------------------------------------------------------------------
@@ -669,38 +669,14 @@ Value *LLVMDriver::WriteLLVM(CStatementSeq *ss)
 Value *LLVMDriver::WriteLLVM(CBaseVar *v)
 {
     //признак глобальности
-    bool is_global = id_CModule == v->parent_element->name_id;    
+    bool is_global = id_CModule == v->parent_element->name_id;
     //Получение типа переменной
     Type* type=GetLLVMType(v);
     //в случае константы - инициализируем ее значением, иначе инициализируем нулем
     Constant *InitVal=nullptr;
     if (v->is_const) {
-        switch (v->name_id) {
-            case id_CBooleanVar:
-                InitVal = ConstantInt::get(type,static_cast<CBooleanVar*>(v)->ConstValue);
-                break;
-            case id_CCharVar:
-                InitVal = ConstantInt::get(type,static_cast<CCharVar*>(v)->ConstValue);
-                break;
-            case id_CIntegerVar:
-                InitVal = ConstantInt::get(type,static_cast<CIntegerVar*>(v)->ConstValue);
-                break;
-            case id_CLongintVar:
-                InitVal = ConstantInt::get(type,static_cast<CLongintVar*>(v)->ConstValue);
-                break;
-            case id_CLongrealVar:
-                InitVal = ConstantFP::get(type,static_cast<CLongrealVar*>(v)->ConstValue);
-                break;
-            case id_CRealVar:
-                InitVal = ConstantFP::get(type,static_cast<CRealVar*>(v)->ConstValue);
-                break;
-            case id_CShortintVar:
-                InitVal = ConstantInt::get(type,static_cast<CShortintVar*>(v)->ConstValue);
-                break;
-        default:
-            break;
-        }//switch
-    } else {
+        InitVal=WriteLLVM_ConstValue(v);
+    }else{
         InitVal = Constant::getNullValue(type);
     }//if
     if(is_global){
@@ -724,26 +700,26 @@ Value *LLVMDriver::WriteLLVM(CBaseVar *v)
 
 //-----------------------------------------------------------------------------
 //генерация кода констатных значений
-Value *LLVMDriver::WriteLLVM_ConstValue(CBaseVar *v)
+Constant *LLVMDriver::WriteLLVM_ConstValue(CBaseVar *v)
 {
     switch (v->name_id) {
-        case id_CBooleanVar:
-            return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CBooleanVar*>(v)->ConstValue);
-        case id_CCharVar:
-            return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CCharVar*>(v)->ConstValue);
-        case id_CIntegerVar:
-            return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CIntegerVar*>(v)->ConstValue);
-        case id_CLongintVar:
-            return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CLongintVar*>(v)->ConstValue);
-        case id_CLongrealVar:
-            return ConstantFP::get(GetLLVMType(v->name_id),static_cast<CLongrealVar*>(v)->ConstValue);
-        case id_CRealVar:
-            return ConstantFP::get(GetLLVMType(v->name_id),static_cast<CRealVar*>(v)->ConstValue);
-        case id_CShortintVar:
-            return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CShortintVar*>(v)->ConstValue);
-        case id_CArrayVar:
-            return Builder.CreateGlobalStringPtr(StringRef(static_cast<CArrayVar*>(v)->ConstString));
-        default: return nullptr;
+    case id_CBooleanVar:
+        return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CBooleanVar*>(v)->ConstValue);
+    case id_CCharVar:
+        return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CCharVar*>(v)->ConstValue);
+    case id_CIntegerVar:
+        return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CIntegerVar*>(v)->ConstValue);
+    case id_CLongintVar:
+        return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CLongintVar*>(v)->ConstValue);
+    case id_CLongrealVar:
+        return ConstantFP::get(GetLLVMType(v->name_id),static_cast<CLongrealVar*>(v)->ConstValue);
+    case id_CRealVar:
+        return ConstantFP::get(GetLLVMType(v->name_id),static_cast<CRealVar*>(v)->ConstValue);
+    case id_CShortintVar:
+        return ConstantInt::get(GetLLVMType(v->name_id),static_cast<CShortintVar*>(v)->ConstValue);
+    case id_CArrayVar:
+        return Builder.CreateGlobalStringPtr(StringRef(static_cast<CArrayVar*>(v)->ConstString));
+    default: return nullptr;
     }//switch
 }//WriteLLVM_ConstValue
 
@@ -1401,7 +1377,7 @@ Value *LLVMDriver::WriteLLVM(CSimpleExpr *e)
                 if(term->getType()==Type::getDoubleTy(TheContext))
                     term=Builder.CreateFSub(term, simplePair, "subtmp");
                 else
-                  term=Builder.CreateSub(term, simplePair, "subtmp");
+                    term=Builder.CreateSub(term, simplePair, "subtmp");
                 break;
             case aop_OR:
                 term=Builder.CreateOr(term, simplePair, "ortmp");
@@ -1552,14 +1528,14 @@ Value *LLVMDriver::WriteLLVM(CDesignator *d)
     //получение значения по эл-там обозначения (индексам)
     for (CDesignator::SDesElemStore::const_iterator ci = d->DesElemStore.begin(); ci != d->DesElemStore.end(); ci++) {
         switch ((*ci)->DesKind) {
-        case CDesignator::EDesKind::dk_Array:       
+        case CDesignator::EDesKind::dk_Array:
         case CDesignator::EDesKind::dk_OpenArray:
             designator=WriteLLVM_index((*ci)->ExprList, designator);
             break;
         case CDesignator::EDesKind::dk_Pointer:
         case CDesignator::EDesKind::dk_Record:
             designator=WriteLLVM_record_index(designator,(*ci)->ident,d);
-            break;        
+            break;
         default:
             break;
         }//switch
