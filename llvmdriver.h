@@ -55,10 +55,14 @@ private:
     std::map<std::string, int> SpecTypes;
     //Карта блоков, используется для выхода из бесконечного цикла
     std::map<int, BasicBlock *> BasicBlocks;
+    //указание что загружать при загрузки значения указателя
+    enum load{value,pointer,pointerToPointer};
     //Создание инструкции выделения памяти в начальном блоке функции. Используется для переменных и тд
     AllocaInst *CreateEntryBlockAlloca(Function *TheFunction, std::string name,Type* type);
     //Функция приведения типов
     Value *CastToType(Value* v, Type* destType);
+    //загрузка значения указателя
+    Value *loadValue(Value* v,load i);
     //Создание функции без аргументов
     Function* createFunction(Type* retType,std::string name);
     //Создание функции с аргументами
